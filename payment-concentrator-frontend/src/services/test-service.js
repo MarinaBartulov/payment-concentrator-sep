@@ -1,10 +1,21 @@
 import { HttpService } from "./http-service";
-import { ROUTES } from "../constants";
+import { BANK_SERVICE_ENDPOINTS, SERVICES_ENDPOINTS, PSP_ENDPOINTS } from "../constants";
 
 class TestService extends HttpService {
   test = async () => {
     try {
-      const response = await this.client.get(ROUTES.TEST);
+      const response = await this.client.get(SERVICES_ENDPOINTS.BANK_PAYMENT_SERVICE + BANK_SERVICE_ENDPOINTS.TEST);
+      // console.log(response);
+      alert(response.data);
+      return response;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  getAvailableServices = async () => {
+    try {
+      const response = await this.client.get(SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE + PSP_ENDPOINTS.AVAILABLE_SERVICES);
       console.log(response);
       return response;
     } catch (e) {

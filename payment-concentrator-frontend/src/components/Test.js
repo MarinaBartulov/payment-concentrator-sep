@@ -10,6 +10,10 @@ const Test = () => {
 
   const onClickBitcoin = () => {};
 
+  const onClickAvailableServices = () => {
+    testService.getAvailableServices();
+  };
+
   return (
     <div>
       <h2>Payment methods</h2>
@@ -22,6 +26,9 @@ const Test = () => {
       <Button variant="dark" onClick={onClickBitcoin}>
         Bitcoin
       </Button>
+      <div>
+        <Button onClick={onClickAvailableServices}>Available Payment Services</Button>
+      </div>
     </div>
   );
 };
