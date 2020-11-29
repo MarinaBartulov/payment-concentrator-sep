@@ -17,17 +17,19 @@ const Test = () => {
   return (
     <div>
       <h2>Payment methods</h2>
-      <Button variant="dark" onClick={onClickBank}>
+      <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank
       </Button>
-      <Button variant="dark" onClick={onClickPaypal}>
+      <Button variant="dark" className="myBtn" onClick={onClickPaypal}>
         Paypal
       </Button>
-      <Button variant="dark" onClick={onClickBitcoin}>
+      <Button variant="dark" className="myBtn" onClick={onClickBitcoin}>
         Bitcoin
       </Button>
       <div>
-        <Button onClick={onClickAvailableServices}>Available Payment Services</Button>
+        <Button className="btnAvailable" onClick={onClickAvailableServices}>
+          Available Payment Services
+        </Button>
       </div>
     </div>
   );
