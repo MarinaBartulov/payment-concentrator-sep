@@ -4,11 +4,15 @@ import { testService } from "../services/test-service";
 
 const Test = () => {
   const onClickBank = () => {
-    testService.test();
+    testService.testBank();
   };
-  const onClickPaypal = () => {};
+  const onClickPaypal = () => {
+    testService.testPayPal();
+  };
 
-  const onClickBitcoin = () => {};
+  const onClickBitcoin = () => {
+    testService.testBitcoin();
+  };
 
   const onClickAvailableServices = () => {
     testService.getAvailableServices();

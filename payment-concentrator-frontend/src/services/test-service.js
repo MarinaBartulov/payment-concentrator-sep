@@ -1,11 +1,44 @@
 import { HttpService } from "./http-service";
-import { BANK_SERVICE_ENDPOINTS, SERVICES_ENDPOINTS, PSP_ENDPOINTS } from "../constants";
+import {
+  BANK_SERVICE_ENDPOINTS,
+  BITCOIN_SERVICE_ENDPOINTS,
+  PAYPAL_SERVICE_ENDPOINTS,
+  SERVICES_ENDPOINTS,
+  PSP_ENDPOINTS,
+} from "../constants";
 
 class TestService extends HttpService {
-  test = async () => {
+  testBank = async () => {
     try {
-      const response = await this.client.get(SERVICES_ENDPOINTS.BANK_PAYMENT_SERVICE + BANK_SERVICE_ENDPOINTS.TEST);
-      // console.log(response);
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.BANK_PAYMENT_SERVICE + BANK_SERVICE_ENDPOINTS.TEST
+      );
+      alert(response.data);
+      return response;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  testBitcoin = async () => {
+    try {
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.BITCOIN_PAYMENT_SERVICE +
+          BITCOIN_SERVICE_ENDPOINTS.TEST
+      );
+      alert(response.data);
+      return response;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  testPayPal = async () => {
+    try {
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
+          PAYPAL_SERVICE_ENDPOINTS.TEST
+      );
       alert(response.data);
       return response;
     } catch (e) {
@@ -15,7 +48,11 @@ class TestService extends HttpService {
 
   getAvailableServices = async () => {
     try {
-      const response = await this.client.get(SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE + PSP_ENDPOINTS.AVAILABLE_SERVICES);
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+          PSP_ENDPOINTS.AVAILABLE_SERVICES
+      );
+      alert("Available services are: " + response.data);
       console.log(response);
       return response;
     } catch (e) {
