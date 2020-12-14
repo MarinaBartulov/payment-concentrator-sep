@@ -32,8 +32,6 @@ public class TestService {
             }
         }
 
-        //appsNames.stream().filter(a -> a.contains("PAYMENT")).collect(Collectors.toList());
-
         return appsNames.stream().filter(a -> a.contains("PAYMENT")).collect(Collectors.toList());
     }
 }

@@ -4,11 +4,37 @@ spring:
 
 server:
   port: 8761
+  #HTTPS
+  ssl:
+    key-store: classpath:eureka.p12
+    key-store-password: password
+    key-alias: eureka
+    key-password: password
+    enabled: true
+    algorithm: TLSv1.2
+    key-store-type: PKCS12
+    trust-store-type: PKCS12
+    trust-store: classpath:truststore.p12
+    trust-store-password: password
+    client-auth: need
 
 eureka:
   client:
     registerWithEureka: false
     fetchRegistry: false
+  #HTTPS
+    instance:
+      hostname: localhost
+      securePort: ${server.port}
+      securePortEnabled: true
+      nonSecurePortEnabled: false
+      secureVirtualHostName: ${spring.application.name}
+      health-check-url: https://${eureka.instance.hostname}:${eureka.instance.secure-port}/health
+      status-page-url: https://${eureka.instance.hostname}:${eureka.instance.secure-port}/info
+      home-page-url: https://${eureka.instance.hostname}:${eureka.instance.secure-port}/
+      metadataMap:
+        hostname: ${eureka.instance.hostname}
+        securePort: ${server.port}
 
 logging:
   level:
@@ -16,3 +42,5 @@ logging:
       netflix:
         eureka: OFF
         discovery: OFF
+
+
