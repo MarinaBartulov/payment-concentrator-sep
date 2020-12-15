@@ -33,9 +33,11 @@ public class PaymentService {
         // proveravam da li su Merchant info okej - za sad imam samo id
         if(dto.getMerchantId().equals("") || dto.getMerchantId() == null) {
             throw new Exception("Invalid merchant id."); // validacione poruke genericke, da ne iskazuju sta tacno ne valja
-        } else if(merchantService.findByMerchantId(dto.getMerchantId()) == null) {
+        }
+        if(merchantService.findByMerchantId(dto.getMerchantId()) == null) {
             throw new Exception("Nonexistent merchant id.");
-        } else if(dto.getAmount() < 0) {
+        }
+        if(dto.getAmount() < 0) {
             throw new Exception("Amount cannot be negative.");
         }
         // amount se proverava tek kod banke, prilikom placanja

@@ -1,6 +1,8 @@
 package team16.bankpaymentservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,10 +18,11 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @RequestMapping(value = "/request")
-    public PaymentResponseInfoDTO createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) {
+    public ResponseEntity<PaymentResponseInfoDTO> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
         System.out.println("Usao u banku na request");
-        PaymentResponseInfoDTO dto = new PaymentResponseInfoDTO(1L, "uspeo hihi");
-        return dto;
+        PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
+        //PaymentResponseInfoDTO dto = new PaymentResponseInfoDTO(1L, "uspeo hihi");
+        return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
     }
 
 
