@@ -1,13 +1,15 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
+import { payPalService } from "../services/paypal-service";
 
 const Test = () => {
   const onClickBank = () => {
     testService.testBank();
   };
   const onClickPaypal = () => {
-    testService.testPayPal();
+    //testService.testPayPal();
+    payPalService.pay(payPalData);
   };
 
   const onClickBitcoin = () => {
@@ -18,8 +20,17 @@ const Test = () => {
     testService.getAvailableServices();
   };
 
+  const payPalData = {
+    price: 1,
+    currency: "USD",
+    method: "paypal",
+    intent: "sale",
+    description: "test",
+  };
+
   return (
     <div>
+      <h1>Payment Concentrator</h1>
       <h2>Payment methods</h2>
       <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank

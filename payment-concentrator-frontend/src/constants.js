@@ -13,6 +13,8 @@ export const BANK_SERVICE_ENDPOINTS = {
 
 export const PAYPAL_SERVICE_ENDPOINTS = {
   TEST: "/api/test",
+  PAY: "/api/pay",
+  EXECUTE: "/api/pay/execute",
 };
 
 export const BITCOIN_SERVICE_ENDPOINTS = {
