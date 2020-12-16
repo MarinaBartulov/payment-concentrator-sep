@@ -16,7 +16,7 @@ function App() {
         <Route exact path="/pay/return">
           <PayPalReturn />
         </Route>
-        <Route path="/pay/cancel">
+        <Route path="/pay/cancel/:id">
           <PayPalCancel />
         </Route>
         <Route path="/pay/return/success">

@@ -23,9 +23,7 @@ const Test = () => {
   const payPalData = {
     price: 1,
     currency: "USD",
-    method: "paypal",
-    intent: "sale",
-    description: "test",
+    clientEmail: "sb-nsr1z4072854@business.example.com",
   };
 
   return (

@@ -9,7 +9,7 @@ class PayPalService extends HttpService {
           PAYPAL_SERVICE_ENDPOINTS.PAY,
         payload
       );
-      window.open(response.data); // redirection to PayPal site
+      window.open(response.data); // redirection to PayPal site or to fail page
       return response;
     } catch (e) {
       console.log(e);
@@ -22,6 +22,20 @@ class PayPalService extends HttpService {
         SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
           PAYPAL_SERVICE_ENDPOINTS.EXECUTE +
           `?paymentId=${paymentId}&PayerID=${PayerID}`
+      );
+      return response;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  };
+
+  cancelPayment = async (id) => {
+    try {
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
+          PAYPAL_SERVICE_ENDPOINTS.CANCEL +
+          `?id=${id}`
       );
       return response;
     } catch (e) {
