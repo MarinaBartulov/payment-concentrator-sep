@@ -1,2 +1,2 @@
 insert into merchant (merchant_id, password, error_url, failed_url, success_url)
-values ('AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA', 'aaaaaaaaaa', 'blah', 'blah', 'blah');
+values ('46QfIZh9KGe62AMDAStgnRbsK1fcX4', 'Merchant123!', 'http://localhost:3000/error', 'http://localhost:3000/failed', 'http://localhost:3000/success');

@@ -9,12 +9,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PaymentDetailsDTO {
+public class ResponseForLADTO {
 
-    // mozda mi ne treba id
-    private Long id;
+    private String redirectionURL;
     private String merchantId;
-    private String merchantPassword;
-    private double amount;
-    // mozda bi ipak trebalo i password da saljem sa LU
 }

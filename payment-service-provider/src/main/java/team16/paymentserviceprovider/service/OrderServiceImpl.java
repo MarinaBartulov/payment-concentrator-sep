@@ -22,7 +22,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Order getOne(Long id) {
-        return null;
+        return orderRepository.getOne(id);
     }
 
     @Override
