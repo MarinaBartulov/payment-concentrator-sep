@@ -10,11 +10,12 @@ import {
 class TestService extends HttpService {
   testBank = async () => {
     try {
-      const response = await this.client.get(
-        SERVICES_ENDPOINTS.BANK_PAYMENT_SERVICE + BANK_SERVICE_ENDPOINTS.TEST
+      const { data } = await this.client.get(
+        SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE + PSP_ENDPOINTS.PAYMENTS
       );
-      alert(response.data);
-      return response;
+      console.log(data)
+      window.open(data);
+      return data;
     } catch (e) {
       console.log(e);
     }

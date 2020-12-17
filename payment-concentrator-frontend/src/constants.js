@@ -21,4 +21,5 @@ export const BITCOIN_SERVICE_ENDPOINTS = {
 
 export const PSP_ENDPOINTS = {
   AVAILABLE_SERVICES: "/api/test/available-services",
+  PAYMENTS: "/api/payments"
 };

@@ -1,29 +1,20 @@
 import './App.css';
-import Button from "react-bootstrap/Button";
-import { testService } from "./services/test-service";
+import Home from './components/Home';
+import ClientForm from './components/ClientForm';
+import { Route, BrowserRouter as Router } from "react-router-dom";
 
 function App() {
 
-  function pay() {
-    testService.test();
-  }
-
   return (
     <div className="App">
-      <h1>UniCredit Bank</h1>
-      <header className="App-header">
-        <p>
-          <Button
-            variant="dark"
-            onClick={() => {
-              pay();
-            }}
-          >
-            {" "}
-            Pay{" "}
-          </Button>{" "}
-        </p>
-      </header>
+      <Router>
+        <Route exact path="/">
+          <Home />
+        </Route>
+        <Route path="/issuer">
+          <ClientForm />
+        </Route>
+      </Router>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 .App {
   text-align: center;
+  background-color: rgb(209, 255, 221);
 }
 
 .App-logo {
@@ -35,4 +36,15 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.formDiv {
+  margin-top: 30%;
+  height: 100%;
+  width: 50%;
+  border: 2px solid red;
+}
+
+.formDivLabel {
+  text-align: left;
 }
