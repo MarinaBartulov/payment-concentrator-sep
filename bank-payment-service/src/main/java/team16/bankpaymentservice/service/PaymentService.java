@@ -21,7 +21,7 @@ public class PaymentService {
         // nakon provere, ako je sve u redu, kreiraju se:
         // payment id i payment url - koji preusmerava kupca na sajt banke
         Payment payment = new Payment();
-        payment.setPayment_url("http://localhost:3002/issuer");
+        payment.setPayment_url("https://localhost:3002/issuer");
         Payment newPayment = paymentService.create(payment);
         return new PaymentResponseInfoDTO(newPayment.getPayment_id(), newPayment.getPayment_url());
     }

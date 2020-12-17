@@ -27,7 +27,7 @@ public class RestConfig {
 
     private static final String URL_FORMAT = "%s://%s:%s";
 
-    @Value("${PROTOCOL:http}")
+    @Value("${PROTOCOL:https}")
     private String protocol;
 
     @Value("${DOMAIN:localhost}")
@@ -41,11 +41,7 @@ public class RestConfig {
     }
 
     @Bean
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
-
-    @Bean
-    @LoadBalanced
+    //@LoadBalanced
     public RestTemplate restTemplate() {
 
 

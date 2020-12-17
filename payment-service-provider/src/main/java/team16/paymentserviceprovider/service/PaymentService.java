@@ -56,7 +56,7 @@ public class PaymentService {
         order.setApproved(false);
         Order newOrder = orderService.create(order);
 
-        return new ResponseForLADTO("http://localhost:3001", merchant.getMerchant_id());
+        return new ResponseForLADTO("https://localhost:3001", merchant.getMerchant_id());
     }
 
     public PaymentResponseInfoDTO createPaymentRequest() throws Exception {
