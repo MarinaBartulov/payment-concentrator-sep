@@ -21,7 +21,7 @@ public class TestController {
     ResponseEntity<?> testMethod(){
 
         System.out.println("Success");
-        return ResponseEntity.ok("http://localhost:3001");
+        return ResponseEntity.ok("https://localhost:3001");
 
     }
 

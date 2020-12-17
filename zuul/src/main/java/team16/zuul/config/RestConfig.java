@@ -1,11 +1,6 @@
-package team16.paymentserviceprovider.config;
+package team16.zuul.config;
 
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestTemplate;
-
+import org.apache.http.client.HttpClient;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
@@ -15,34 +10,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
-import org.apache.http.client.HttpClient;
 
 import javax.net.ssl.SSLContext;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 
-
 @Configuration
 public class RestConfig {
-
-    private static final String URL_FORMAT = "%s://%s:%s";
-
-    @Value("${PROTOCOL:http}")
-    private String protocol;
-
-    @Value("${DOMAIN:localhost}")
-    private String domain;
-
-    @Value("${PORT:8083}")  // svaki zahtev bi trebalo da se salje posredstvom zuul-a
-    private String port;
-
-    public String url() {
-        return String.format(URL_FORMAT, protocol, domain, port);
-    }
-
-    @Bean
-    public RestTemplate getRestTemplate() {
-        return new RestTemplate();
 
     @Bean
     @LoadBalanced
@@ -50,7 +24,7 @@ public class RestConfig {
 
 
         return new RestTemplate(new HttpComponentsClientHttpRequestFactory(
-                httpClient("PKCS12", "psp-service.p12", "password", "psp-service",
+                httpClient("PKCS12", "zuul.p12", "password", "zuul",
                         "PKCS12", "truststore.p12", "password")));
     }
 
@@ -60,7 +34,7 @@ public class RestConfig {
                                  String truststoreType, String truststore, String truststorePassword) {
         try {
 
-            ClassPathResource resource1 = new ClassPathResource("psp-service.p12");
+            ClassPathResource resource1 = new ClassPathResource("zuul.p12");
             ClassPathResource resource2 = new ClassPathResource("truststore.p12");
 
             KeyStore keyStore = KeyStore.getInstance(keystoreType);
