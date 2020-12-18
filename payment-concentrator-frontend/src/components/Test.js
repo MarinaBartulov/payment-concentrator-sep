@@ -5,7 +5,6 @@ import { payPalService } from "../services/paypal-service";
 import { useParams } from "react-router-dom";
 
 const Test = () => {
-
   const { orderId } = useParams();
 
   const onClickBank = () => {
@@ -13,7 +12,7 @@ const Test = () => {
   };
   const onClickPaypal = () => {
     //testService.testPayPal();
-    payPalService.pay(payPalData);
+    payPalService.pay(orderId, "paypal");
   };
 
   const onClickBitcoin = () => {
@@ -22,12 +21,6 @@ const Test = () => {
 
   const onClickAvailableServices = () => {
     testService.getAvailableServices();
-  };
-
-  const payPalData = {
-    price: 1,
-    currency: "USD",
-    clientEmail: "sb-nsr1z4072854@business.example.com",
   };
 
   return (

@@ -4,9 +4,10 @@ import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team16.paypalservice.dto.OrderDTO;
+import team16.paypalservice.dto.OrderInfoDTO;
 import team16.paypalservice.enums.PayPalTransactionStatus;
 import team16.paypalservice.model.Client;
 import team16.paypalservice.model.PayPalTransaction;
@@ -18,6 +19,7 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/api")
+@CrossOrigin(origins = "*", allowedHeaders = "*", maxAge = 3600)
 public class PayPalController {
 
     @Autowired
@@ -34,9 +36,10 @@ public class PayPalController {
     public static final String FAIL_URL = "https://localhost:3001/pay/return/fail";
 
     @PostMapping("/pay")
-    public ResponseEntity<?> payment(@RequestBody @Valid OrderDTO order) {
+    public ResponseEntity<?> payment(@RequestBody @Valid OrderInfoDTO order) {
 
-        Client client = clientService.findByEmail(order.getClientEmail());
+        System.out.println(order.getMerchantEmail());
+        Client client = clientService.findByEmail(order.getMerchantEmail());
         if (client == null) {
             return new ResponseEntity<>(FAIL_URL, HttpStatus.OK);
         }

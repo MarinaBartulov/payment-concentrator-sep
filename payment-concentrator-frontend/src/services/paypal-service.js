@@ -1,13 +1,19 @@
 import { HttpService } from "./http-service";
-import { SERVICES_ENDPOINTS, PAYPAL_SERVICE_ENDPOINTS } from "../constants";
+import {
+  SERVICES_ENDPOINTS,
+  PAYPAL_SERVICE_ENDPOINTS,
+  PSP_ENDPOINTS,
+} from "../constants";
 
 class PayPalService extends HttpService {
-  pay = async (payload) => {
+  pay = async (orderId, mode) => {
     try {
-      const response = await this.client.post(
-        SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
-          PAYPAL_SERVICE_ENDPOINTS.PAY,
-        payload
+      const response = await this.client.put(
+        SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+          PSP_ENDPOINTS.PAYMENTS +
+          "/" +
+          orderId,
+        mode
       );
       window.open(response.data); // redirection to PayPal site or to fail page
       return response;

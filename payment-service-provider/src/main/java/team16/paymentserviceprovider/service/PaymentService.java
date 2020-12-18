@@ -1,7 +1,11 @@
 package team16.paymentserviceprovider.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import team16.paymentserviceprovider.config.EndpointConfig;
 import team16.paymentserviceprovider.config.RestConfig;
@@ -51,6 +55,7 @@ public class PaymentService {
         Order order = new Order();
         order.setMerchant(merchant);
         order.setAmount(dto.getAmount());
+        order.setCurrency(dto.getCurrency());
         order.setMerchantOrderTimestamp(LocalDateTime.now());
         Order newOrder = orderService.create(order);
 
@@ -79,5 +84,26 @@ public class PaymentService {
 
     private URI getEndpoint() throws URISyntaxException {
         return new URI(configuration.url() + EndpointConfig.BANK_PAYMENT_SERVICE_BASE_URL + "/api/payments/request");
+    }
+
+    public String createGenericPaymentRequest(Order order, String paymentMethodName) throws URISyntaxException {
+        Merchant merchant = order.getMerchant();
+
+        OrderInfoDTO orderDTO = new OrderInfoDTO(merchant.getMerchantEmail(), order.getAmount(), order.getCurrency() );
+        HttpEntity<OrderInfoDTO> request = new HttpEntity<>(orderDTO);
+        ResponseEntity<String> response = null;
+
+        try {
+            response = restTemplate.exchange(
+                    getServiceEndpoint(paymentMethodName), HttpMethod.POST, request, String.class);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+        }
+
+        return response.getBody();
+    }
+
+    private URI getServiceEndpoint(String paymentMethodName) throws URISyntaxException {
+        return new URI(configuration.url() + "/" + paymentMethodName + "-payment-service/api/pay");
     }
 }

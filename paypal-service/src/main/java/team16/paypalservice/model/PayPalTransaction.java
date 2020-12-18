@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import team16.paypalservice.dto.OrderDTO;
+import team16.paypalservice.dto.OrderInfoDTO;
 import team16.paypalservice.enums.PayPalTransactionStatus;
 
 import javax.persistence.*;
@@ -55,12 +55,12 @@ public class PayPalTransaction {
     @Column(name = "failedUrl")
     private String failedUrl;*/
 
-    public PayPalTransaction(OrderDTO order, Client client)
+    public PayPalTransaction(OrderInfoDTO order, Client client)
     {
         this.client = client;
         this.createdAt = LocalDateTime.now();
         this.status = PayPalTransactionStatus.INITIATED;
-        this.price = order.getPrice();
+        this.price = order.getAmount();
         this.currency = order.getCurrency();
     }
 

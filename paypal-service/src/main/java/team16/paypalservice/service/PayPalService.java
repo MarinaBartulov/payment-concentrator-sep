@@ -2,12 +2,11 @@ package team16.paypalservice.service;
 
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
-import com.paypal.base.rest.OAuthTokenCredential;
 import com.paypal.base.rest.PayPalRESTException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import team16.paypalservice.dto.OrderDTO;
+import team16.paypalservice.dto.OrderInfoDTO;
 import team16.paypalservice.enums.PayPalTransactionStatus;
 import team16.paypalservice.model.Client;
 import team16.paypalservice.model.PayPalTransaction;
@@ -25,7 +24,7 @@ public class PayPalService {
     @Value("${paypal.mode}")
     private String mode;
 
-    public String createPayment(OrderDTO order, Client client, String RETURN_URL, String CANCEL_URL) throws PayPalRESTException {
+    public String createPayment(OrderInfoDTO order, Client client, String RETURN_URL, String CANCEL_URL) throws PayPalRESTException {
 
         PayPalTransaction payPalTransaction = new PayPalTransaction(order, client);
         PayPalTransaction savedPayPalTransaction = transactionService.save(payPalTransaction);
@@ -35,7 +34,7 @@ public class PayPalService {
 
         Amount amount = new Amount();
         amount.setCurrency(order.getCurrency());
-        amount.setTotal(order.getPrice().toString());
+        amount.setTotal(order.getAmount().toString());
 
         RedirectUrls redirectUrls = new RedirectUrls();
         redirectUrls.setCancelUrl(CANCEL_URL + savedPayPalTransaction.getId());

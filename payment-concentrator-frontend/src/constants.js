@@ -13,7 +13,7 @@ export const BANK_SERVICE_ENDPOINTS = {
 
 export const PAYPAL_SERVICE_ENDPOINTS = {
   TEST: "/api/test",
-  PAY: "/api/pay",
+  PAY: "/api/pay/",
   EXECUTE: "/api/pay/execute",
   CANCEL: "/api/pay/cancel/",
 };
@@ -24,5 +24,5 @@ export const BITCOIN_SERVICE_ENDPOINTS = {
 
 export const PSP_ENDPOINTS = {
   AVAILABLE_SERVICES: "/test/available-services",
-  PAYMENTS: "/payments"
+  PAYMENTS: "/payments",
 };

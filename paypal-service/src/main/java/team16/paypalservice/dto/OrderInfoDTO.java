@@ -13,18 +13,18 @@ import javax.validation.constraints.Positive;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class OrderDTO {
+public class OrderInfoDTO {
 
     @NotNull
     @Email
-    private String clientEmail;
+    private String merchantEmail;
 
    // @NotNull
    // private Long OrderId;
 
     @NotNull
     @Positive
-    private Double price;
+    private Double amount;
 
     @NotNull
     private String currency;

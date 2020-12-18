@@ -9,12 +9,12 @@ import PayPalFail from "./components/PayPalFail";
 function App() {
   return (
     <div className="App">
-      <Routes>
+      <Router>
         <Route exact path="/">
           <Test />
         </Route>
         <Route exact path="/:orderId">
-            <Test />
+          <Test />
         </Route>
         <Route exact path="/pay/return">
           <PayPalReturn />
@@ -28,7 +28,7 @@ function App() {
         <Route path="/pay/return/fail">
           <PayPalFail />
         </Route>
-      </Routes>
+      </Router>
     </div>
   );
 }
