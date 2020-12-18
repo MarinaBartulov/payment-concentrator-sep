@@ -25,6 +25,7 @@ public class Merchant {
     @Column(nullable = false, unique = true)
     private String merchantEmail;
 
+
     @Column(nullable = false)
     @Size(min = 10, max = 100)
     private String password;

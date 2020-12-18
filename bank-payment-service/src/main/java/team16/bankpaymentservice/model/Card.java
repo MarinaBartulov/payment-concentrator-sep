@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Entity
 @NoArgsConstructor
@@ -19,17 +21,17 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 10)
+    @Column(nullable = false, unique = true, length = 16)
     private String PAN;
 
-    @Column(nullable = false, length = 6)
+    @Column(nullable = false, length = 3)
     private String securityCode;
 
     @Column(nullable = false)
     private String cardHolderName;
 
     @Column(nullable = false)
-    private LocalDate expirationDate;
+    private YearMonth expirationDate;
 
     private double availableFunds;
 

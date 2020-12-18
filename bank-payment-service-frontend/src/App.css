@@ -49,3 +49,11 @@
   height: 3.5vh;
   padding: 5px;
 }
+
+.formInputField {
+  margin-bottom: 3vh;
+}
+
+.formInputFieldDatePicker {
+  height: 10vh;
+}
