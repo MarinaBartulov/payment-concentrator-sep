@@ -1,5 +1,5 @@
+import { Route, BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
-import { BrowserRouter as Routes, Route } from "react-router-dom";
 import Test from "./components/Test";
 import PayPalReturn from "./components/PayPalReturn";
 import PayPalCancel from "./components/PayPalCancel";
@@ -12,6 +12,9 @@ function App() {
       <Routes>
         <Route exact path="/">
           <Test />
+        </Route>
+        <Route exact path="/:orderId">
+            <Test />
         </Route>
         <Route exact path="/pay/return">
           <PayPalReturn />
