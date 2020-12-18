@@ -16,7 +16,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public Order create(Order order) {
-        order.setMerchant_order_timestamp(LocalDateTime.now());
+        order.setMerchantOrderTimestamp(LocalDateTime.now());
         return orderRepository.save(order);
     }
 

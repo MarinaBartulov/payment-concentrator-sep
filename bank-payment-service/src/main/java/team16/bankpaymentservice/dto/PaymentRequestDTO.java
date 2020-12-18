@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 @Setter
 public class PaymentRequestDTO {
 
-    private String merchant_id;
-    private String merchant_password;
+    private String merchantId;
+    private String merchantPassword;
     private double amount;
-    private Long merchant_order_id;
-    private LocalDateTime merchant_timestamp;
-    private String success_url;
-    private String failed_url;
-    private String error_url;
+    private Long merchantOrderId;
+    private LocalDateTime merchantTimestamp;
+    private String successUrl;
+    private String failedUrl;
+    private String errorUrl;
 }

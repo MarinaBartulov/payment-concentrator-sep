@@ -9,8 +9,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PaymentResponseInfoDTO {
+public class ClientAuthDTO {
 
-    private Long paymentId;
-    private String paymentUrl;
+    private String pan;
+    private String securityNumber;
+    private String cardHolderName;
+    private String expirationDate;
+
 }

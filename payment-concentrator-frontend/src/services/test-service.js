@@ -8,10 +8,12 @@ import {
 } from "../constants";
 
 class TestService extends HttpService {
-  testBank = async () => {
+  testBank = async (orderId) => {
     try {
+      console.log("order id")
+      console.log(orderId)
       const { data } = await this.client.get(
-        SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE + PSP_ENDPOINTS.PAYMENTS
+        SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE + PSP_ENDPOINTS.PAYMENTS + "/" + orderId
       );
       console.log(data)
       window.open(data);

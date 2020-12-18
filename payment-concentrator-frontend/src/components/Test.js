@@ -1,10 +1,14 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
+import { useParams } from "react-router-dom";
 
 const Test = () => {
+
+  const { orderId } = useParams();
+
   const onClickBank = () => {
-    testService.testBank();
+    testService.testBank(orderId);
   };
   const onClickPaypal = () => {
     testService.testPayPal();

@@ -23,20 +23,23 @@ public class Merchant {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 30)
-    private String merchant_id;
+    private String merchantId;
+
+    @Column(nullable = false, unique = true)
+    private String merchantEmail;
 
     @Column(nullable = false)
     @Size(min = 10, max = 100)
     private String password;
 
     @Column(name = "success_url")
-    private String merchant_success_url;
+    private String merchantSuccessUrl;
 
     @Column(name = "failed_url")
-    private String merchant_failed_url;
+    private String merchantFailedUrl;
 
     @Column(name = "error_url")
-    private String merchant_error_url;
+    private String merchantErrorUrl;
 
     @OneToMany(mappedBy = "merchant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Order> orders = new HashSet<>();

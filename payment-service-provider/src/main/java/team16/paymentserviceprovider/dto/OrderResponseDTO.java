@@ -9,8 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class ResponseForLADTO {
+public class OrderResponseDTO {
 
+    private Long orderId;
     private String redirectionURL;
     private String merchantId;
 }
