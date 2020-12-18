@@ -1,17 +1,18 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
+import { payPalService } from "../services/paypal-service";
 import { useParams } from "react-router-dom";
 
 const Test = () => {
-
   const { orderId } = useParams();
 
   const onClickBank = () => {
     testService.testBank(orderId);
   };
   const onClickPaypal = () => {
-    testService.testPayPal();
+    //testService.testPayPal();
+    payPalService.pay(orderId, "paypal");
   };
 
   const onClickBitcoin = () => {
@@ -24,6 +25,7 @@ const Test = () => {
 
   return (
     <div>
+      <h1>Payment Concentrator</h1>
       <h2>Payment methods</h2>
       <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank
