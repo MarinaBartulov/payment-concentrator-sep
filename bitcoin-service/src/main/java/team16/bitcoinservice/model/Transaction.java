@@ -25,11 +25,20 @@ public class Transaction {
     private Long orderId;
     private Date createdAt;
     private String priceCurrency;
-    private String priceAmount;
+    private Double priceAmount;
     private String receiveCurrency;
     private String receiveAmount;
+    private Long paymentId;
 
     @ManyToOne
     private Merchant merchant;
 
+    public Transaction(Long orderId, String priceCurrency, Double priceAmount, Merchant merchant) {
+        this.orderId = orderId;
+        this.priceCurrency = priceCurrency;
+        this.priceAmount = priceAmount;
+        this.merchant = merchant;
+        this.createdAt = new Date();
+        this.status = TransactionStatus.NEW;
+    }
 }
