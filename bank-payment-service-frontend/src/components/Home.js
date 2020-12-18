@@ -11,7 +11,7 @@ const Home = () => {
         style={{
           width: "25rem",
           margin: "auto",
-          backgroundColor: "rgb(207, 97, 64)",
+          backgroundColor: "white",
         }}
       >
         <h1>Welcome to UniCredit Bank</h1>

@@ -19,7 +19,7 @@ public class Payment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long payment_id;
+    private Long paymentId;
 
-    private String payment_url;
+    private String paymentUrl;
 }

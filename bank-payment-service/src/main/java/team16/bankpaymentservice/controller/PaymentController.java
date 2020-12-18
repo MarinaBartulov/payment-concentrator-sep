@@ -21,7 +21,8 @@ public class PaymentController {
     public ResponseEntity<PaymentResponseInfoDTO> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
         System.out.println("Usao u banku na request");
         PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
-        //PaymentResponseInfoDTO dto = new PaymentResponseInfoDTO(1L, "uspeo hihi");
+        System.out.println("sta ti je");
+        System.out.println(paymentResponseInfoDTO.getPaymentUrl());
         return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
     }
 

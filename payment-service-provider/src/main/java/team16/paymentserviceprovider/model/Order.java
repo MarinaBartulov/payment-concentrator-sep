@@ -18,15 +18,17 @@ public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long merchant_order_id;
+    private Long merchantOrderId;
 
     @Column(nullable = false)
     private double amount;
 
-    private LocalDateTime merchant_order_timestamp;
+    private String currency;
+
+    private LocalDateTime merchantOrderTimestamp;
 
     // order ce biti odobren ako kupac ima dovoljno sredstava
-    private boolean approved;
+    // private boolean approved;
 
     @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
     private Merchant merchant;

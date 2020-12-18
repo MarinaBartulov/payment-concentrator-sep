@@ -9,12 +9,15 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class PaymentDetailsDTO {
+public class OrderDTO {
 
-    // mozda mi ne treba id
-    private Long id;
+    private Long orderId;
     private String merchantId;
+    private String merchantEmail;
     private String merchantPassword;
+    private String currency;
     private double amount;
-    // mozda bi ipak trebalo i password da saljem sa LU
+    private String merchantSuccessUrl;
+    private String merchantErrorUrl;
+    private String merchantFailedUrl;
 }

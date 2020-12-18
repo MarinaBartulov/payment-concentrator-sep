@@ -11,6 +11,6 @@ import lombok.Setter;
 @Setter
 public class PaymentResponseInfoDTO {
 
-    private Long payment_id;
-    private String payment_url;
+    private Long paymentId;
+    private String paymentUrl;
 }

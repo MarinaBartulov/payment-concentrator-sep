@@ -7,4 +7,5 @@ public enum BankTransactionStatus {
     DENIED,
     CANCELLED,
     APPROVED
+    // initiated, created, completed, canceled, failed
 }

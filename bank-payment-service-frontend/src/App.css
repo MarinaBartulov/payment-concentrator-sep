@@ -1,6 +1,5 @@
 .App {
   text-align: center;
-  background-color: rgb(209, 255, 221);
 }
 
 .App-logo {
@@ -39,12 +38,6 @@
 }
 
 .formDiv {
-  margin-top: 30%;
   height: 100%;
-  width: 50%;
-  border: 2px solid red;
-}
-
-.formDivLabel {
-  text-align: left;
+  width: 100%;
 }
