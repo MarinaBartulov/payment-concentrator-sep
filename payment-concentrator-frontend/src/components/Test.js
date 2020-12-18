@@ -1,21 +1,31 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
+import { payPalService } from "../services/paypal-service";
+import { bitcoinService } from "../services/bitcoin-service";
 import { useParams } from "react-router-dom";
 
 const Test = () => {
-
   const { orderId } = useParams();
 
   const onClickBank = () => {
     testService.testBank(orderId);
   };
   const onClickPaypal = () => {
-    testService.testPayPal();
+    //testService.testPayPal();
+    payPalService.pay(orderId, "paypal");
   };
 
-  const onClickBitcoin = () => {
-    testService.testBitcoin();
+  const onClickBitcoin = async () => {
+    //testService.testBitcoin();
+    const payload = {
+      orderId: 1,
+      email: "merchant@gmail.com",
+      paymentAmount: 10,
+      paymentCurrency: "EUR",
+    };
+    const response = await bitcoinService.pay(payload);
+    window.location.replace(response.data);
   };
 
   const onClickAvailableServices = () => {
