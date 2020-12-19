@@ -2,6 +2,7 @@ import React from "react";
 import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
 import { payPalService } from "../services/paypal-service";
+import { bitcoinService } from "../services/bitcoin-service";
 import { useParams } from "react-router-dom";
 
 const Test = () => {
@@ -15,8 +16,24 @@ const Test = () => {
     payPalService.pay(orderId, "paypal");
   };
 
+  // const onClickBitcoin = async () => {
+  //   const payload = {
+  //     orderId: 1,
+  //     email: "merchant@gmail.com",
+  //     paymentAmount: 10,
+  //     paymentCurrency: "EUR",
+  //   };
+  //   const response = await bitcoinService.pay(payload);
+  //   if (response != null) {
+  //     window.location.replace(response.data);
+  //   } else {
+  //     alert("Error!");
+  //   }
+  // };
+
   const onClickBitcoin = () => {
-    testService.testBitcoin();
+    //testService.testPayPal();
+    bitcoinService.pay(orderId, "bitcoin");
   };
 
   const onClickAvailableServices = () => {
@@ -25,7 +42,6 @@ const Test = () => {
 
   return (
     <div>
-      <h1>Payment Concentrator</h1>
       <h2>Payment methods</h2>
       <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank

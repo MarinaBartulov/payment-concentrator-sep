@@ -1,15 +1,15 @@
-package team16.paymentserviceprovider.dto;
+package team16.bitcoinservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
-public class OrderInfoDTO {
+@NoArgsConstructor
+@AllArgsConstructor
+public class BitcoinPaymentDTO {
 
     private Long orderId;
     private String merchantEmail;

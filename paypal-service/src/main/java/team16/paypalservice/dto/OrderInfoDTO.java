@@ -29,4 +29,11 @@ public class OrderInfoDTO {
     @NotNull
     private String currency;
 
+    //ovo dodala
+    private Long orderId;
+    private String successUrl;
+    private String errorUrl;
+    private String failedUrl;
+
+
 }
