@@ -11,7 +11,11 @@ import lombok.Setter;
 @Setter
 public class OrderInfoDTO {
 
+    private Long orderId;
     private String merchantEmail;
     private Double amount;
     private String currency;
+    private String successUrl;
+    private String errorUrl;
+    private String failedUrl;
 }

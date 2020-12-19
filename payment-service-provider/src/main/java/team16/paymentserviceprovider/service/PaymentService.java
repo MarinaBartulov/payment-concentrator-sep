@@ -89,7 +89,8 @@ public class PaymentService {
     public String createGenericPaymentRequest(Order order, String paymentMethodName) throws URISyntaxException {
         Merchant merchant = order.getMerchant();
 
-        OrderInfoDTO orderDTO = new OrderInfoDTO(merchant.getMerchantEmail(), order.getAmount(), order.getCurrency() );
+        OrderInfoDTO orderDTO = new OrderInfoDTO(order.getMerchantOrderId(),merchant.getMerchantEmail(), order.getAmount(), order.getCurrency(),
+                merchant.getMerchantSuccessUrl(), merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
         HttpEntity<OrderInfoDTO> request = new HttpEntity<>(orderDTO);
         ResponseEntity<String> response = null;
 

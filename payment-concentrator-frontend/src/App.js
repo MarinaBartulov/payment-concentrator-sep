@@ -3,7 +3,6 @@ import "./App.css";
 import BitcoinCancel from "./components/BitcoinCancel";
 import BitcoinError from "./components/BitcoinError";
 import BitcoinSuccess from "./components/BitcoinSuccess";
-import BitcoinTestPayment from "./components/BitcoinTestPayment";
 import Test from "./components/Test";
 import PayPalReturn from "./components/PayPalReturn";
 import PayPalCancel from "./components/PayPalCancel";

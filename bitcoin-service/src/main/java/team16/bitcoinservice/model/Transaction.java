@@ -22,23 +22,18 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    private Long orderId;
+    private Long orderId; //nas id od ordera
     private Date createdAt;
     private String priceCurrency;
     private Double priceAmount;
     private String receiveCurrency;
-    private String receiveAmount;
-    private Long paymentId;
+    private Double receiveAmount;
+    private Long paymentId; //id koji dobijemo od CoinGate-a
+    private String successUrl;
+    private String errorUrl;
+    private String failedUrl;
 
     @ManyToOne
     private Merchant merchant;
 
-    public Transaction(Long orderId, String priceCurrency, Double priceAmount, Merchant merchant) {
-        this.orderId = orderId;
-        this.priceCurrency = priceCurrency;
-        this.priceAmount = priceAmount;
-        this.merchant = merchant;
-        this.createdAt = new Date();
-        this.status = TransactionStatus.NEW;
-    }
 }

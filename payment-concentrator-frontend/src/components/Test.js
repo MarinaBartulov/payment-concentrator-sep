@@ -16,16 +16,24 @@ const Test = () => {
     payPalService.pay(orderId, "paypal");
   };
 
-  const onClickBitcoin = async () => {
-    //testService.testBitcoin();
-    const payload = {
-      orderId: 1,
-      email: "merchant@gmail.com",
-      paymentAmount: 10,
-      paymentCurrency: "EUR",
-    };
-    const response = await bitcoinService.pay(payload);
-    window.location.replace(response.data);
+  // const onClickBitcoin = async () => {
+  //   const payload = {
+  //     orderId: 1,
+  //     email: "merchant@gmail.com",
+  //     paymentAmount: 10,
+  //     paymentCurrency: "EUR",
+  //   };
+  //   const response = await bitcoinService.pay(payload);
+  //   if (response != null) {
+  //     window.location.replace(response.data);
+  //   } else {
+  //     alert("Error!");
+  //   }
+  // };
+
+  const onClickBitcoin = () => {
+    //testService.testPayPal();
+    bitcoinService.pay(orderId, "bitcoin");
   };
 
   const onClickAvailableServices = () => {

@@ -17,7 +17,7 @@ import team16.bitcoinservice.service.MerchantService;
 import team16.bitcoinservice.service.TransactionService;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping("/api")
 public class BitcoinPaymentController {
 
     @Value("${success_url}")
@@ -43,16 +43,25 @@ public class BitcoinPaymentController {
     private TransactionService transactionService;
 
 
-    @PostMapping("/create")
+    //@PostMapping("/create")
+    @PostMapping("/pay")
     public ResponseEntity createPayment(@RequestBody BitcoinPaymentDTO bitcoinPaymentDTO){
 
 
-        Merchant merchant = this.merchantService.findByEmail(bitcoinPaymentDTO.getEmail());
+        Merchant merchant = this.merchantService.findByEmail(bitcoinPaymentDTO.getMerchantEmail());
+        if(merchant == null){
+            return ResponseEntity.badRequest().body("Merchant with that email does not exist.");
+        }
 
         Transaction transaction = this.transactionService.createTransaction(merchant,bitcoinPaymentDTO);
 
-        PaymentRequestDTO requestDTO = new PaymentRequestDTO(bitcoinPaymentDTO.getOrderId().toString(),bitcoinPaymentDTO.getPaymentAmount(),
-                bitcoinPaymentDTO.getPaymentCurrency(),"BTC",this.callbackUrl,
+        if(transaction == null){
+            return ResponseEntity.badRequest().body("Saving new transaction failed.");
+        }
+
+
+        PaymentRequestDTO requestDTO = new PaymentRequestDTO(bitcoinPaymentDTO.getOrderId().toString(),bitcoinPaymentDTO.getAmount(),
+                bitcoinPaymentDTO.getCurrency(),"BTC",this.callbackUrl,
                 this.cancelUrl + "/" + transaction.getId(),
                 this.successUrl + "/" + transaction.getId(),merchant.getToken());
 
@@ -61,10 +70,20 @@ public class BitcoinPaymentController {
         HttpEntity<PaymentRequestDTO> request = new HttpEntity<>(requestDTO, headers);
 
         ResponseEntity<PaymentResponseDTO> responseEntity = null;
-        responseEntity = restTemplate.exchange(this.sandboxUrl, HttpMethod.POST, request, PaymentResponseDTO.class);
+
+        try {
+            responseEntity = restTemplate.exchange(this.sandboxUrl, HttpMethod.POST, request, PaymentResponseDTO.class);
+        }catch(Exception e){
+             this.transactionService.changeTransactionStatus(transaction.getId(),"INVALID");
+             return ResponseEntity.badRequest().build();
+        }
 
         PaymentResponseDTO response = responseEntity.getBody();
+        transaction = this.transactionService.updateTransaction(transaction, response);
 
+        if(transaction == null){
+            return ResponseEntity.badRequest().build();
+        }
 
         return ResponseEntity.ok(response.getPayment_url());
     }
@@ -73,15 +92,33 @@ public class BitcoinPaymentController {
     public ResponseEntity success(@RequestParam Long id){
 
         System.out.println("Uslo u success");
-        return ResponseEntity.ok().build();
+        Transaction transaction = this.transactionService.findTransactionById(id);
+        if(transaction == null){
+            return ResponseEntity.notFound().build();
+        }
+
+        if(this.transactionService.updateTransactionFromCoinGate(transaction)){
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
+
     }
 
     @GetMapping("/cancel")
     public ResponseEntity cancel(@RequestParam Long id){
 
         System.out.println("Uslo u cancel: " + id);
+        Transaction transaction = this.transactionService.findTransactionById(id);
+        if(transaction == null){
+            return ResponseEntity.notFound().build();
+        }
 
-        return ResponseEntity.ok().build();
+        if(this.transactionService.updateTransactionFromCoinGate(transaction)){
+            return ResponseEntity.ok().build();
+        }else{
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 

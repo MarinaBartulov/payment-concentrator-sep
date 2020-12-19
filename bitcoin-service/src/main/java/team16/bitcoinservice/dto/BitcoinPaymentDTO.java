@@ -12,7 +12,10 @@ import lombok.Setter;
 public class BitcoinPaymentDTO {
 
     private Long orderId;
-    private String email;
-    private Double paymentAmount;
-    private String paymentCurrency;
+    private String merchantEmail;
+    private Double amount;
+    private String currency;
+    private String successUrl;
+    private String errorUrl;
+    private String failedUrl;
 }
