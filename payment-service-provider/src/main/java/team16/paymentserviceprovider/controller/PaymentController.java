@@ -1,5 +1,7 @@
 package team16.paymentserviceprovider.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,11 +24,22 @@ public class PaymentController {
     @Autowired
     private OrderService orderService;
 
+    Logger logger = LoggerFactory.getLogger(PaymentController.class);
+
     @PostMapping
     public ResponseEntity<?> getMerchantsInformationFromLA(@RequestBody OrderDTO dto) throws Exception {
         // proveri info o merchant-u sa onim sto imas u bazi
         System.out.println(dto.getMerchantId());
+
+        //provera svih poruka - obrisati kada proradi
+        //logger.trace("A TRACE Message");
+        //logger.debug("A DEBUG Message");
+        //logger.info("An INFO Message");
+        //logger.warn("A WARN Message");
+        //logger.error("An ERROR Message");
+
         OrderResponseDTO response = paymentService.createPaymentResponseToLA(dto);
+
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -42,12 +55,19 @@ public class PaymentController {
 
         if(order == null)
         {
+            logger.error("Order not found");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         //proveriti payment method
 
         String redirectUrl = paymentService.createGenericPaymentRequest(order, paymentMethodName);
+        if(redirectUrl == null)
+        {
+            logger.error("Failed to get URL");
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Sending redirection URL");
         System.out.println("Redirect url = " + redirectUrl);
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
     }
