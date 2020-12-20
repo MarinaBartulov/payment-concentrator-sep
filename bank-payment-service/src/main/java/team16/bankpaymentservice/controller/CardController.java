@@ -21,12 +21,26 @@ public class CardController {
         OnlyAcquirerTransactionResponseDTO response = new OnlyAcquirerTransactionResponseDTO();
         try {
             response = cardService.handleClientAuthentication(dto, paymentId);
+            System.out.println("---------------- Response DTO after transaction -------------");
+            System.out.println(response.getResponseMessage());
+            System.out.println(response.getRedirectionURL());
+            System.out.println(response.getTransactionStatus());
+
             if(!response.getTransactionStatus().equals("COMPLETED")) {
+                System.out.println("---------------- Response DTO after transaction -------------");
+                System.out.println(response.getResponseMessage());
+                System.out.println(response.getRedirectionURL());
+                System.out.println(response.getTransactionStatus());
                 return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
             }
+
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch(Exception e) {
             response.setResponseMessage(e.getMessage());
+            System.out.println("---------------- Response DTO after transaction -------------");
+            System.out.println(response.getResponseMessage());
+            System.out.println(response.getRedirectionURL());
+            System.out.println(response.getTransactionStatus());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }

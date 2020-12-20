@@ -23,6 +23,7 @@ public class CardOwner {
 
     private String name;
 
-    @OneToMany(mappedBy = "cardHolder", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Card> cards;
+    @OneToOne
+    @JoinColumn(name = "card_id", referencedColumnName = "id")
+    private Card card;
 }

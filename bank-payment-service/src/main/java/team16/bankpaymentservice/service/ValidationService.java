@@ -8,13 +8,13 @@ public class ValidationService {
         return data != null && !data.equals("");
     }
 
-    public YearMonth convertToYearMonth(String date) throws Exception {
+    public String convertToYearMonthFormat(String date) throws Exception {
         try {
             String[] arrOfStr = date.split("/");
             String month = arrOfStr[0];
             String year = arrOfStr[1];
-            YearMonth y = YearMonth.parse(year + "-" + month);
-            return y;
+            String ym = year + "-" + month;
+            return ym;
         } catch (Exception e) {
             throw new Exception("Invalid date form.");
         }

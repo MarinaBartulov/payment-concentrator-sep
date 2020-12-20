@@ -3,8 +3,11 @@ import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { authService } from "../services/authentication-service";
 import DatePicker from "react-datepicker";
+import { useParams } from "react-router-dom";
 
 const ClientForm = () => {
+
+    const { paymentId } = useParams();
 
     const formik = useFormik({
         initialValues: {
@@ -28,7 +31,7 @@ const ClientForm = () => {
                 month: "numeric"
               }).format(startDate);
             let payload = {...values, expirationDate};
-            const promise = authService.authenticate(payload);
+            const promise = authService.authenticate(payload, paymentId);
                 promise.then((res) => {
                     console.log(res);
             });

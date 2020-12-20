@@ -22,8 +22,12 @@ public class PaymentController {
     public ResponseEntity<?> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
         try {
             PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
+            System.out.println("///////// Payment Response INFO ////////////////");
+            System.out.println(paymentResponseInfoDTO.getPaymentUrl());
+            System.out.println(paymentResponseInfoDTO.getPaymentId());
             return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
         } catch (Exception e) {
+            System.out.println("///////// exception ////////////////");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

@@ -28,15 +28,11 @@ public class Card {
     private String securityCode;  // Card Verification Value
 
     @Column(nullable = false)
-    private YearMonth expirationDate;  // Datum isticanja kartice - posle kojeg ona nije validna u formi YYMM
+    private String expirationDate;  // Datum isticanja kartice - posle kojeg ona nije validna u formi YYMM
 
     @Column(nullable = false)
     private double availableFunds;
 
     private double reservedFunds;
-
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "card_holder_id", referencedColumnName = "id")
-    private CardOwner cardHolder;
 
 }
