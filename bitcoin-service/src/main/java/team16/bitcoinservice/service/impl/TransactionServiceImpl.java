@@ -1,5 +1,7 @@
 package team16.bitcoinservice.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import team16.bitcoinservice.model.TransactionStatus;
 import team16.bitcoinservice.repository.TransactionRepository;
 import team16.bitcoinservice.service.TransactionService;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 @Service
@@ -26,6 +29,8 @@ public class TransactionServiceImpl implements TransactionService {
     private TransactionRepository transactionRepository;
     @Autowired
     private RestTemplate restTemplate;
+
+    Logger logger = LoggerFactory.getLogger(TransactionServiceImpl.class);
 
     @Override
     public Transaction createTransaction(Merchant merchant, BitcoinPaymentDTO bitcoinPaymentDTO) {
@@ -45,20 +50,28 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public boolean changeTransactionStatus(Long id, String status) {
 
+        logger.info(MessageFormat.format("Changing transaction status | TransactionId: {0} | New status: {1}",
+                id, status));
         Transaction transaction = this.transactionRepository.findById(id).orElse(null);
 
         if(transaction == null){
+            logger.warn("Transaction not found | TransactionId: " + id);
             return false;
         }
         transaction.setStatus(TransactionStatus.valueOf(status));
         this.transactionRepository.save(transaction);
+
+        logger.info(MessageFormat.format("Transaction status changed | TransactionId: {0} | New status: {1}",
+                id, status));
         return true;
     }
 
     @Override
     public Transaction updateTransaction(Transaction transaction, PaymentResponseDTO paymentResponseDTO) {
 
-        System.out.println("Transaction status: " + paymentResponseDTO.getStatus());
+        logger.info(MessageFormat.format("Updating transaction | TransactionId: {0} | Status: {1}", transaction.getId(),
+                paymentResponseDTO.getStatus().toUpperCase()));
+
         transaction.setPaymentId(paymentResponseDTO.getId());
         transaction.setCreatedAt(paymentResponseDTO.getCreated_at());
         transaction.setStatus(TransactionStatus.valueOf(paymentResponseDTO.getStatus().toUpperCase()));
@@ -68,6 +81,7 @@ public class TransactionServiceImpl implements TransactionService {
             try{
                 transaction.setReceiveAmount(Double.parseDouble(paymentResponseDTO.getReceive_amount()));
             }catch(NumberFormatException e){
+                logger.error("Updating receive amount for transaction failed | TransactionId: " + transaction.getId());
                 return null;
             }
         }
@@ -93,6 +107,9 @@ public class TransactionServiceImpl implements TransactionService {
             responseEntity = this.restTemplate.exchange("https://api-sandbox.coingate.com/v2/orders/" + transaction.getPaymentId(),
                     HttpMethod.GET, request, PaymentResponseDTO.class);
         }catch(Exception e){
+
+            logger.error(MessageFormat.format("Communication with CoinGate api failed. Retrieving information for transaction | TransactionId: {0} | PaymentId: {1}",
+                    transaction.getId(), transaction.getPaymentId()));
             return false;
         }
 
@@ -114,9 +131,17 @@ public class TransactionServiceImpl implements TransactionService {
 
         List<Transaction> transactions = this.transactionRepository.findUnfinishedTransactions();
 
+        if(transactions.size() > 0){
+            logger.info("Updating unfinished transaction from CoinGate started.");
+        }
+
         for(Transaction t : transactions){
 
             this.updateTransactionFromCoinGate(t);
+        }
+
+        if(transactions.size() > 0){
+            logger.info("Updating unfinished transaction from CoinGate finished.");
         }
     }
 

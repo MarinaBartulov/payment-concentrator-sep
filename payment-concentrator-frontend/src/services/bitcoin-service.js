@@ -15,11 +15,11 @@ class BitcoinService extends HttpService {
           orderId,
         mode
       );
-      window.location.replace(response.data); // redirection to CoinGate site
+      //window.location.replace(response.data); // redirection to CoinGate site
       return response;
     } catch (e) {
       console.log(e);
-      alert("Error!");
+      //alert("Error!");
     }
   };
 
