@@ -20,7 +20,7 @@ public class OrderInfoDTO {
     private String merchantEmail;
 
     @NotNull
-    private Long OrderId;
+    private Long orderId;
 
     @NotNull
     @Positive
