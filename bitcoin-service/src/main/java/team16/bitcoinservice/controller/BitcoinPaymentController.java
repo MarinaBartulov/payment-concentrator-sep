@@ -1,5 +1,7 @@
 package team16.bitcoinservice.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -15,6 +17,8 @@ import team16.bitcoinservice.model.Merchant;
 import team16.bitcoinservice.model.Transaction;
 import team16.bitcoinservice.service.MerchantService;
 import team16.bitcoinservice.service.TransactionService;
+
+import java.text.MessageFormat;
 
 @RestController
 @RequestMapping("/api")
@@ -42,20 +46,30 @@ public class BitcoinPaymentController {
     @Autowired
     private TransactionService transactionService;
 
+    Logger logger = LoggerFactory.getLogger(BitcoinPaymentController.class);
+
 
     //@PostMapping("/create")
     @PostMapping("/pay")
     public ResponseEntity createPayment(@RequestBody BitcoinPaymentDTO bitcoinPaymentDTO){
 
+        logger.info(MessageFormat.format("Creating payment | OrderId: {0} | Amount: {1} {2} | Merchant email: {3}",
+                bitcoinPaymentDTO.getOrderId(), bitcoinPaymentDTO.getAmount(),bitcoinPaymentDTO.getCurrency(),
+                bitcoinPaymentDTO.getMerchantEmail()));
 
         Merchant merchant = this.merchantService.findByEmail(bitcoinPaymentDTO.getMerchantEmail());
         if(merchant == null){
+
+            logger.warn("Merchant not found | Email: " + bitcoinPaymentDTO.getMerchantEmail());
             return ResponseEntity.badRequest().body("Merchant with that email does not exist.");
         }
 
         Transaction transaction = this.transactionService.createTransaction(merchant,bitcoinPaymentDTO);
 
         if(transaction == null){
+
+            logger.error(MessageFormat.format("Saving new transaction for the order failed | OrderId: {0} | Merchant's email: {1}",
+                    bitcoinPaymentDTO.getOrderId(), bitcoinPaymentDTO.getMerchantEmail()));
             return ResponseEntity.badRequest().body("Saving new transaction failed.");
         }
 
@@ -74,6 +88,7 @@ public class BitcoinPaymentController {
         try {
             responseEntity = restTemplate.exchange(this.sandboxUrl, HttpMethod.POST, request, PaymentResponseDTO.class);
         }catch(Exception e){
+             logger.error("Communication with CoinGate api failed | TransactionId: " + transaction.getId());
              this.transactionService.changeTransactionStatus(transaction.getId(),"INVALID");
              return ResponseEntity.badRequest().build();
         }
@@ -82,8 +97,13 @@ public class BitcoinPaymentController {
         transaction = this.transactionService.updateTransaction(transaction, response);
 
         if(transaction == null){
+            logger.error(MessageFormat.format("Updating transaction for the payment failed | TransactionId: {0} | PaymentId: {1}",
+                    transaction.getId(), transaction.getPaymentId()));
             return ResponseEntity.badRequest().build();
         }
+
+        logger.info(MessageFormat.format("Creating payment completed | OrderId: {0} | Amount: {1} {2} | Merchant email: {3}",
+                bitcoinPaymentDTO.getOrderId(),bitcoinPaymentDTO.getAmount(), bitcoinPaymentDTO.getCurrency(), bitcoinPaymentDTO.getMerchantEmail()));
 
         return ResponseEntity.ok(response.getPayment_url());
     }
@@ -91,9 +111,12 @@ public class BitcoinPaymentController {
     @GetMapping("/success")
     public ResponseEntity success(@RequestParam Long id){
 
-        System.out.println("Uslo u success");
+        logger.info("SUCCESS endpoint | Changing transaction status | TransactionId: " + id);
+
         Transaction transaction = this.transactionService.findTransactionById(id);
         if(transaction == null){
+
+            logger.warn("Transaction not found | TransactionId: " + id);
             return ResponseEntity.notFound().build();
         }
 
@@ -108,9 +131,12 @@ public class BitcoinPaymentController {
     @GetMapping("/cancel")
     public ResponseEntity cancel(@RequestParam Long id){
 
-        System.out.println("Uslo u cancel: " + id);
+        logger.info("CANCEL endpoint | Changing transaction status | TransactionId: " + id);
+
         Transaction transaction = this.transactionService.findTransactionById(id);
         if(transaction == null){
+
+            logger.warn("Transaction not found | TransactionId: " + id);
             return ResponseEntity.notFound().build();
         }
 

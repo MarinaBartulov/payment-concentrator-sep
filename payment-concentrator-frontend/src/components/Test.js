@@ -3,10 +3,11 @@ import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
 import { payPalService } from "../services/paypal-service";
 import { bitcoinService } from "../services/bitcoin-service";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 
 const Test = () => {
   const { orderId } = useParams();
+  const history = useHistory();
 
   const onClickBank = () => {
     testService.testBank(orderId);
@@ -31,9 +32,13 @@ const Test = () => {
   //   }
   // };
 
-  const onClickBitcoin = () => {
-    //testService.testPayPal();
-    bitcoinService.pay(orderId, "bitcoin");
+  const onClickBitcoin = async () => {
+    const response = await bitcoinService.pay(orderId, "bitcoin");
+    if ((response != null) & (response != undefined)) {
+      window.location.replace(response.data); // redirection to CoinGate site
+    } else {
+      history.push("/bitcoin/error");
+    }
   };
 
   const onClickAvailableServices = () => {
