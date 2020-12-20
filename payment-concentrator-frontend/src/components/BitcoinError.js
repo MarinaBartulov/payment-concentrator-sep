@@ -1,5 +1,6 @@
 import React from "react";
-import cancelPhoto from "../assets/cancelPhoto.png";
+import bitcoinLogo from "../assets/bitcoin.png";
+import Button from "react-bootstrap/Button";
 
 const BitcoinError = () => {
   return (
@@ -16,8 +17,17 @@ const BitcoinError = () => {
           <h3>Your Bitcoin payment was unsuccessful!</h3>
         </span>
       </div>
-      <div style={{ display: "block" }}>
-        <img src={cancelPhoto} alt="cancel" width="300em" height="300em" />
+      <div style={{ display: "block", marginTop: "1em" }}>
+        <img src={bitcoinLogo} alt="error" width="300em" height="300em" />
+        <br></br>
+        <Button
+          style={{ marginTop: "1em" }}
+          onClick={() =>
+            window.location.replace("https://localhost:3000/error")
+          }
+        >
+          Return
+        </Button>
       </div>
     </>
   );
