@@ -6,7 +6,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.time.YearMonth;
 
 @Entity
 @NoArgsConstructor
@@ -19,18 +21,16 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 10)
-    private String PAN;
+    @Column(nullable = false, unique = true, length = 16)
+    private String PAN;  // broj racuna u Srbiji ima 16 brojeva
 
-    @Column(nullable = false, length = 6)
-    private String securityCode;
-
-    @Column(nullable = false)
-    private String cardHolderName;
+    @Column(nullable = false, length = 3)
+    private String securityCode;  // Card Verification Value
 
     @Column(nullable = false)
-    private LocalDate expirationDate;
+    private String expirationDate;  // Datum isticanja kartice - posle kojeg ona nije validna u formi YYMM
 
+    @Column(nullable = false)
     private double availableFunds;
 
     private double reservedFunds;

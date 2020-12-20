@@ -1,14 +1,21 @@
 import { HttpService } from "./http-service";
 import { ROUTES } from "../constants";
 
+
 class AuthenticationService extends HttpService {
-  authenticate = async (payload) => {
+  authenticate = async (payload, paymentId) => {
     try {
-      const response = await this.client.post(ROUTES.AUTH, payload);
-      //console.log(response);
+      console.log("Payload: ")
+      console.log(payload);
+      console.log("Payment id:")
+      console.log(paymentId)
+      const response = await this.client.post(ROUTES.AUTH + "/" + paymentId, payload);
+      console.log("Response: ")
+      console.log(response.data);
+      console.log("----------")
       return response;
     } catch (e) {
-      console.log(e);
+      console.log("ovde");
     }
   };
 }

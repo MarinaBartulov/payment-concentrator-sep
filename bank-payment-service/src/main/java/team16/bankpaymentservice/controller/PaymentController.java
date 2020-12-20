@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import team16.bankpaymentservice.dto.ClientAuthDTO;
 import team16.bankpaymentservice.dto.PaymentRequestDTO;
 import team16.bankpaymentservice.dto.PaymentResponseInfoDTO;
 import team16.bankpaymentservice.service.PaymentService;
@@ -20,12 +19,17 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @PostMapping(value = "/request")
-    public ResponseEntity<PaymentResponseInfoDTO> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
-        System.out.println("Usao u banku na request");
-        PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
-        System.out.println("sta ti je");
-        System.out.println(paymentResponseInfoDTO.getPaymentUrl());
-        return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
+    public ResponseEntity<?> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
+        try {
+            PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
+            System.out.println("///////// Payment Response INFO ////////////////");
+            System.out.println(paymentResponseInfoDTO.getPaymentUrl());
+            System.out.println(paymentResponseInfoDTO.getPaymentId());
+            return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            System.out.println("///////// exception ////////////////");
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

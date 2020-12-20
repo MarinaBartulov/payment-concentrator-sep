@@ -25,6 +25,7 @@ export class ApiService {
     try {
       const { status } = error.response;
       switch (status) {
+        case 400:
         case 401:
         case 403: {
           break;

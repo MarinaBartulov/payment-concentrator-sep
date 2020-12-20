@@ -8,19 +8,14 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
+@DiscriminatorValue("Client")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Payment {
+public class Client extends CardOwner {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private String lastName;
 
-    @Column(nullable = false)
-    private String paymentUrl;
-
-    @OneToOne
-    private Transaction transaction;
+    private String email;
 }

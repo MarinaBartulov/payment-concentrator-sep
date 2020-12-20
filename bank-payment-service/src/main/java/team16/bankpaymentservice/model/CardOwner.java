@@ -6,21 +6,24 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Set;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "type", discriminatorType = DiscriminatorType.STRING)
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Payment {
+public class CardOwner {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private Long id;
 
-    @Column(nullable = false)
-    private String paymentUrl;
+    private String name;
 
     @OneToOne
-    private Transaction transaction;
+    @JoinColumn(name = "card_id", referencedColumnName = "id")
+    private Card card;
 }

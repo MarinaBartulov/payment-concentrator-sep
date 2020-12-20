@@ -11,7 +11,7 @@ function App() {
         <Route exact path="/">
           <Home />
         </Route>
-        <Route path="/issuer">
+        <Route path="/issuer/:paymentId">
           <ClientForm />
         </Route>
       </Router>

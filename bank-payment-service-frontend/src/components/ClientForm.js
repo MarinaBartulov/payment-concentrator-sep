@@ -1,38 +1,44 @@
-import React from "react";
+import React, {useState} from "react";
 import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { authService } from "../services/authentication-service";
+import DatePicker from "react-datepicker";
+import { useParams } from "react-router-dom";
 
 const ClientForm = () => {
+
+    const { paymentId } = useParams();
 
     const formik = useFormik({
         initialValues: {
             pan: '',
             securityNumber: '',
-            cardHolderName: '',
-            expirationDate: ''
+            cardHolderName: ''
         },
         validationSchema: Yup.object().shape({
             pan: Yup.string()
-              .length(10, "PAN should be 10 caracters long.")
+              .length(16, "PAN should be 16 numbers long.")
               .required("PAN is required."),
             securityNumber: Yup.string()
-              .min(10, "Password must be 10 characters at minimum.")
-              .required("Password is required."),
+              .length(3, "Security number must be 3 numbers long.")
+              .required("Security number is required."),
             cardHolderName: Yup.string()
               .required("Card holder name is required."),
-            expirationDate: Yup.string()
-              .required("Expiration date is required.")
         }),
         onSubmit: values => {
-          console.log(JSON.stringify(values, null, 2));
-          console.log(values);
-          const promise = authService.authenticate(values);
-            promise.then((res) => {
-                console.log(res);
+            let expirationDate = new Intl.DateTimeFormat("en-GB", {
+                year: "numeric",
+                month: "numeric"
+              }).format(startDate);
+            let payload = {...values, expirationDate};
+            const promise = authService.authenticate(payload, paymentId);
+                promise.then((res) => {
+                    console.log(res);
             });
         },
       });
+
+      const [startDate, setStartDate] = useState(new Date());
 
 
   return (
@@ -40,6 +46,8 @@ const ClientForm = () => {
         <form onSubmit={formik.handleSubmit}>
             <div className="formFieldDiv">
             <label className="formDivLabel" htmlFor="pan">PAN:</label>
+            </div>
+            <div className="formInputField">
             <input
                 id="pan"
                 name="pan"
@@ -52,7 +60,9 @@ const ClientForm = () => {
             ) : null}
             </div>
             <div className="formFieldDiv">
-            <label className="formDivLabel" htmlFor="securityNumber">Security Number</label>
+            <label className="formDivLabel" htmlFor="securityNumber">Card Security Number:</label>
+            </div>
+            <div className="formInputField">
             <input
                 id="securityNumber"
                 name="securityNumber"
@@ -65,7 +75,9 @@ const ClientForm = () => {
             ) : null}
             </div>
             <div className="formFieldDiv">
-            <label className="formDivLabel" htmlFor="cardHolderName">Card Holder Name</label>
+            <label className="formDivLabel" htmlFor="cardHolderName">Card Holder Name:</label>
+            </div>
+            <div className="formInputField">
             <input
                 id="cardHolderName"
                 name="cardHolderName"
@@ -79,16 +91,16 @@ const ClientForm = () => {
             </div>
             <div className="formFieldDiv">
             <label className="formDivLabel" htmlFor="expirationDate">Expiration Date:</label>
-            <input
-                id="expirationDate"
-                name="expirationDate"
-                type="date"
-                onChange={formik.handleChange}
-                value={formik.values.expirationDate}
+            </div>
+            <div className="formInputFieldDatePicker">
+            <DatePicker
+                className="datePicker"
+                selected={startDate}
+                onChange={date => setStartDate(date)}
+                dateFormat="MM/yyyy"
+                minDate={new Date()}
+                showMonthYearPicker
             />
-            {formik.touched.expirationDate && formik.errors.expirationDate ? (
-                <div style={{color:"red"}}>{formik.errors.expirationDate}</div>
-            ) : null}
             </div>
             <div className="formFieldDiv">
                 <button type="submit">Submit</button>

@@ -12,9 +12,11 @@ import org.springframework.web.client.RestTemplate;
 import team16.paymentserviceprovider.config.EndpointConfig;
 import team16.paymentserviceprovider.config.RestConfig;
 import team16.paymentserviceprovider.dto.*;
+import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 
+import javax.xml.bind.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -34,37 +36,29 @@ public class PaymentService {
     @Autowired
     private OrderServiceImpl orderService;
 
+    private ValidationService validationService;
+
     Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
+    public PaymentService() {
+        validationService = new ValidationService();
+    }
+
     public OrderResponseDTO createPaymentResponseToLA(OrderDTO dto) throws Exception {
-        // proveravam da li su Merchant info okej - za sad imam samo id
-        if(dto.getMerchantId().equals("") || dto.getMerchantId() == null) {
-            logger.debug("Invalid merchantId");
-            logger.error("Failed to create Order due to invalid received data");
-            throw new Exception("Invalid merchant info."); // validacione poruke genericke, da ne iskazuju sta tacno ne valja
-        }
-        if(merchantService.findByMerchantId(dto.getMerchantId()) == null) {
-            logger.debug("Nonexistent merchant");
-            logger.error("Failed to create Order due to invalid received data");
-            throw new Exception("Nonexistent merchant.");
-        }
-        if(dto.getAmount() < 0) {
-            logger.debug("Invalid amount");
-            logger.error("Failed to create Order due to invalid received data");
-            throw new Exception("Amount cannot be negative.");
-        }
-        // amount se proverava tek kod banke, prilikom placanja
+        System.out.println("------------------------DTO from LA-------------------------------");
+        System.out.println(dto.getAmount());
+        System.out.println(dto.getCurrency());
+        System.out.println(dto.getMerchantEmail());
+        System.out.println(dto.getMerchantId());
+        System.out.println(dto.getMerchantPassword());
+        System.out.println(dto.getMerchantSuccessUrl());
+        System.out.println(dto.getMerchantFailedUrl());
+        System.out.println(dto.getMerchantErrorUrl());
+
+        validateDTO(dto);
+
         Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
-        if(dto.getMerchantPassword().equals("") || dto.getMerchantPassword() == null) {
-            logger.debug("Invalid merchant password");
-            logger.error("Failed to create Order due to invalid received data");
-            throw new Exception("Invalid merchant info."); // validacione poruke genericke, da ne iskazuju sta tacno ne valja
-        }
-        if(!merchant.getPassword().equals(dto.getMerchantPassword())) {
-            logger.debug("Invalid merchant password");
-            logger.error("Failed to create Order due to invalid received data");
-            throw new Exception("Invalid merchant info.");
-        }
+        System.out.println("Found merchant: " + merchant.getMerchantEmail() + "|" + merchant.getMerchantId());
 
         Order order = new Order();
         order.setMerchant(merchant);
@@ -72,6 +66,7 @@ public class PaymentService {
         order.setCurrency(dto.getCurrency());
         order.setMerchantOrderTimestamp(LocalDateTime.now());
         Order newOrder = orderService.create(order);
+        System.out.println("Create Order: " + newOrder.getMerchantOrderId());
 
         logger.info("New Order created");
 
@@ -80,29 +75,87 @@ public class PaymentService {
     }
 
     public PaymentResponseInfoDTO createPaymentRequest(Long orderId) throws Exception {
-        // amount se proverava tek kod banke, prilikom placanja
-        // kreira se novi order, povezuje se sa ovm merchant-om i timestamp ce mu biti now
+        System.out.println("------------------------Order from PC front-------------------------------");
         Order order = orderService.getOne(orderId);
+        System.out.println("Found Order: " + order.getMerchantOrderId());
+        if(order == null) {
+            System.out.println("Not Found Order");
+            throw new InvalidDataException("Nonexistent order.");
+        }
         Merchant merchant = order.getMerchant();
         Long merchantOrderId = order.getMerchantOrderId();
+        System.out.println("Found Merchant Order: " + order.getMerchantOrderId());
+
         // kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke
+        System.out.println("kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke");
+
         PaymentRequestDTO paymentRequestDTO =
                 new PaymentRequestDTO(merchant.getMerchantId(), merchant.getPassword(), order.getAmount(),
                         merchantOrderId, order.getMerchantOrderTimestamp(), merchant.getMerchantSuccessUrl(),
                         merchant.getMerchantFailedUrl(), merchant.getMerchantErrorUrl());
+
         // saljem zahtev za dobijanje payment url i id na servis banke prodavca
+        System.out.println("saljem zahtev za dobijanje payment url i id na servis banke prodavca");
         logger.info("Sending request to bank service");
         PaymentResponseInfoDTO response
                 = restTemplate.postForObject(getEndpoint(),
                 paymentRequestDTO, PaymentResponseInfoDTO.class);
+
         logger.info("Received response from bank service");
 
         System.out.println(response.getPaymentUrl());
+        System.out.println(response.getPaymentId());
+
         return response;
     }
 
     private URI getEndpoint() throws URISyntaxException {
         return new URI(configuration.url() + EndpointConfig.BANK_PAYMENT_SERVICE_BASE_URL + "/api/payments/request");
+    }
+
+    private void validateDTO(OrderDTO dto) throws InvalidDataException {
+        System.out.println("------------------------DTO from LA validation-------------------------------");
+        if(!validationService.validateString(dto.getMerchantId()) ||
+                !validationService.validateString(dto.getMerchantPassword()) ||
+                !validationService.validateString(dto.getMerchantEmail())) {
+            System.out.println("Id, pass or email null or empty");
+            logger.debug("Invalid merchantId, password or email");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid merchant info.");
+        }
+        if(merchantService.findByMerchantId(dto.getMerchantId()) == null) {
+            System.out.println("nonexistent merchant");
+            logger.debug("Nonexistent merchant");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Nonexistent merchant.");
+        }
+        if(!validationService.validateString(dto.getCurrency())) {
+            System.out.println("currency null or empty");
+            logger.debug("Invalid currency");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid currency.");
+        }
+        if(dto.getAmount() < 0) {
+            System.out.println("negative amount");
+            logger.debug("Invalid amount");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Amount cannot be negative.");
+        }
+        Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
+        if(!merchant.getPassword().equals(dto.getMerchantPassword())) {
+            System.out.println("passwords dont match");
+            logger.debug("Invalid merchant password");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid merchant info.");
+        }
+        if(!validationService.validateString(dto.getMerchantSuccessUrl()) ||
+                !validationService.validateString(dto.getMerchantFailedUrl()) ||
+                !validationService.validateString(dto.getMerchantErrorUrl())) {
+            System.out.println("invalid urls - null or empty");
+            logger.debug("Invalid redirection URLs");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid URLs.");
+        }
     }
 
     public String createGenericPaymentRequest(Order order, String paymentMethodName) throws URISyntaxException {
