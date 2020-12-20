@@ -1,21 +1,43 @@
 import React from "react";
 import Button from "react-bootstrap/Button";
 import { testService } from "../services/test-service";
-import { useParams } from "react-router-dom";
+import { payPalService } from "../services/paypal-service";
+import { bitcoinService } from "../services/bitcoin-service";
+import { useParams, useHistory } from "react-router-dom";
 
 const Test = () => {
-
   const { orderId } = useParams();
+  const history = useHistory();
 
   const onClickBank = () => {
     testService.testBank(orderId);
   };
   const onClickPaypal = () => {
-    testService.testPayPal();
+    payPalService.pay(orderId, "paypal");
   };
 
-  const onClickBitcoin = () => {
-    testService.testBitcoin();
+  // const onClickBitcoin = async () => {
+  //   const payload = {
+  //     orderId: 1,
+  //     email: "merchant@gmail.com",
+  //     paymentAmount: 10,
+  //     paymentCurrency: "EUR",
+  //   };
+  //   const response = await bitcoinService.pay(payload);
+  //   if (response != null) {
+  //     window.location.replace(response.data);
+  //   } else {
+  //     alert("Error!");
+  //   }
+  // };
+
+  const onClickBitcoin = async () => {
+    const response = await bitcoinService.pay(orderId, "bitcoin");
+    if ((response != null) & (response != undefined)) {
+      window.location.replace(response.data); // redirection to CoinGate site
+    } else {
+      history.push("/bitcoin/error");
+    }
   };
 
   const onClickAvailableServices = () => {
@@ -24,6 +46,7 @@ const Test = () => {
 
   return (
     <div>
+      <h1>Payment Concentrator</h1>
       <h2>Payment methods</h2>
       <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank
