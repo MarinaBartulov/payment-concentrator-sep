@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import cancelPhoto from "../assets/cancelPhoto.png";
 import { bitcoinService } from "../services/bitcoin-service";
 import Spinner from "react-bootstrap/Spinner";
+import bitcoinLogo from "../assets/bitcoin.png";
+import Button from "react-bootstrap/Button";
 
 const BitcoinCancel = () => {
   const { id } = useParams();
@@ -10,7 +11,7 @@ const BitcoinCancel = () => {
 
   const cancel = async (id) => {
     const response = await bitcoinService.cancel(id);
-    if (response != null) {
+    if (response != null && response != undefined) {
       setCancelShow(1);
     } else {
       setCancelShow(2);
@@ -39,12 +40,21 @@ const BitcoinCancel = () => {
         >
           <span>
             <h2 style={{ color: "black", padding: "1em" }}>
-              Your Bitcoin payment was canceled!
+              Your Bitcoin payment was canceled or expired!
             </h2>
           </span>
         </div>
-        <div style={{ display: "block" }}>
-          <img src={cancelPhoto} alt="cancel" width="300em" height="300em" />
+        <div style={{ display: "block", marginTop: "1em" }}>
+          <img src={bitcoinLogo} alt="error" width="300em" height="300em" />
+          <br></br>
+          <Button
+            style={{ marginTop: "1em" }}
+            onClick={() =>
+              window.location.replace("https://localhost:3000/failed")
+            }
+          >
+            Return
+          </Button>
         </div>
       </>
     );
