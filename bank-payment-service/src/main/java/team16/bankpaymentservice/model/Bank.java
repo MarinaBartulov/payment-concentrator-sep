@@ -12,15 +12,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Payment {
+public class Bank {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
+    private Long id;
 
-    @Column(nullable = false)
-    private String paymentUrl;
-
-    @OneToOne
-    private Transaction transaction;
+    @Column(nullable = false, unique = true, length = 3)
+    private String code;
 }

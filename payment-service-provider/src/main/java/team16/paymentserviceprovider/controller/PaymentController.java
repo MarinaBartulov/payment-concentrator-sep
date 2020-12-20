@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.*;
+import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.service.PaymentService;
 
 @RestController
@@ -16,10 +17,14 @@ public class PaymentController {
 
     @PostMapping
     public ResponseEntity<?> getMerchantsInformationFromLA(@RequestBody OrderDTO dto) throws Exception {
-        // proveri info o merchant-u sa onim sto imas u bazi
-        System.out.println(dto.getMerchantId());
-        OrderResponseDTO response = paymentService.createPaymentResponseToLA(dto);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        try {
+            OrderResponseDTO response = paymentService.createPaymentResponseToLA(dto);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (InvalidDataException ide) {
+            return new ResponseEntity<>(ide.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
     @GetMapping(value = "/{orderId}")

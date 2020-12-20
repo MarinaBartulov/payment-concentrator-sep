@@ -12,6 +12,11 @@ public class PaymentServiceImpl implements IPaymentService {
     private PaymentRepository paymentRepository;
 
     @Override
+    public Payment findById(Long id) {
+        return paymentRepository.getOne(id);
+    }
+
+    @Override
     public Payment create(Payment payment) {
         return paymentRepository.save(payment);
     }

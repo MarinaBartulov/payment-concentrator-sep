@@ -4,7 +4,8 @@ import { ROUTES } from "../constants";
 class AuthenticationService extends HttpService {
   authenticate = async (payload) => {
     try {
-      const response = await this.client.post(ROUTES.AUTH, payload);
+      console.log(payload);
+      const response = await this.client.post(ROUTES.AUTH + "/1", payload);
       //console.log(response);
       return response;
     } catch (e) {

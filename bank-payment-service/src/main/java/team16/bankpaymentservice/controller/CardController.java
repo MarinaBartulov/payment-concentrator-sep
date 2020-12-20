@@ -4,12 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import team16.bankpaymentservice.dto.ClientAuthDTO;
-import team16.bankpaymentservice.model.Card;
+import team16.bankpaymentservice.dto.OnlyAcquirerTransactionResponseDTO;
 import team16.bankpaymentservice.service.CardServiceImpl;
 
 @RestController
@@ -19,17 +16,18 @@ public class CardController {
     @Autowired
     private CardServiceImpl cardService;
 
-    @PostMapping(value = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> authenticateClient(@RequestBody ClientAuthDTO dto) {
-        System.out.println(dto.getCardHolderName());
-        Card card = new Card();
-        card.setAvailableFunds(10000);
-        card.setCardHolderName("Hhjhjhiu");
-        card.setPAN("1111111111111111");
-        card.setReservedFunds(300);
-        card.setSecurityCode("111");
-        Card newCard = cardService.create(card);
-        System.out.println(newCard.getExpirationDate());
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+    @PostMapping(value = "/client-auth/{paymentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> authenticateClient(@PathVariable Long paymentId, @RequestBody ClientAuthDTO dto) {
+        OnlyAcquirerTransactionResponseDTO response = new OnlyAcquirerTransactionResponseDTO();
+        try {
+            response = cardService.handleClientAuthentication(dto, paymentId);
+            if(!response.getTransactionStatus().equals("COMPLETED")) {
+                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            }
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch(Exception e) {
+            response.setResponseMessage(e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
     }
 }

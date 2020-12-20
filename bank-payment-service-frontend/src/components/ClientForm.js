@@ -23,11 +23,11 @@ const ClientForm = () => {
               .required("Card holder name is required."),
         }),
         onSubmit: values => {
-            let date = new Intl.DateTimeFormat("en-GB", {
+            let expirationDate = new Intl.DateTimeFormat("en-GB", {
                 year: "numeric",
                 month: "numeric"
               }).format(startDate);
-            let payload = {...values, date};
+            let payload = {...values, expirationDate};
             const promise = authService.authenticate(payload);
                 promise.then((res) => {
                     console.log(res);
