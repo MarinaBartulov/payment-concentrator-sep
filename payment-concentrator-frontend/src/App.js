@@ -12,7 +12,6 @@ import PayPalFail from "./components/PayPalFail";
 function App() {
   return (
     <div className="App">
-      <h1>Payment Concentrator</h1>
       <Router>
         <Route exact path="/">
           <Test />

@@ -3,6 +3,8 @@ package team16.paypalservice.service;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,10 +26,13 @@ public class PayPalService {
     @Value("${paypal.mode}")
     private String mode;
 
+    Logger logger = LoggerFactory.getLogger(PayPalService.class);
+
     public String createPayment(OrderInfoDTO order, Client client, String RETURN_URL, String CANCEL_URL) throws PayPalRESTException {
 
         PayPalTransaction payPalTransaction = new PayPalTransaction(order, client);
         PayPalTransaction savedPayPalTransaction = transactionService.save(payPalTransaction);
+        logger.info("Created transaction | ID: " + savedPayPalTransaction.getId());
 
         Payer payer = new Payer();
         payer.setPaymentMethod("paypal");
@@ -58,7 +63,9 @@ public class PayPalService {
         String redirectUrl = "";
 
         try {
+            logger.info("Creating payment for merchant | Email: " + order.getMerchantEmail());
             Payment newPayment = payment.create(context);
+            logger.info("Created payment for merchant | Email: "+ order.getMerchantEmail());
 
             for(Links link:newPayment.getLinks()) {
                 if(link.getRel().equals("approval_url")) {
@@ -69,13 +76,16 @@ public class PayPalService {
             savedPayPalTransaction.setPaymentId(newPayment.getId());
         }
         catch (PayPalRESTException e) {
+            logger.error("Failed creating PayPal payment");
             savedPayPalTransaction.setStatus(PayPalTransactionStatus.FAILED);
             transactionService.save(savedPayPalTransaction);
+            logger.info("Saved transaction status | FAILED");
             throw e;
         }
 
         savedPayPalTransaction.setStatus(PayPalTransactionStatus.CREATED);
         transactionService.save(savedPayPalTransaction);
+        logger.info("Saved transaction status | CREATED");
 
         return redirectUrl;
     }
@@ -94,14 +104,26 @@ public class PayPalService {
 
         try {
             Payment createdPayment = payment.execute(context, paymentExecute);
-            transaction.setStatus(PayPalTransactionStatus.COMPLETED);
             transaction.setExecutedAt(LocalDateTime.now());
             transactionService.save(transaction);
-            return createdPayment;
+            if (createdPayment.getState().equals("approved")) {
+                transaction.setStatus(PayPalTransactionStatus.COMPLETED);
+                logger.info("Saved transaction state | COMPLETED");
+                return createdPayment;
+            }
+            else{
+                transaction.setStatus(PayPalTransactionStatus.FAILED);
+                logger.info("Saved transaction state | FAILED");
+                return createdPayment;
+            }
+
         }
         catch (PayPalRESTException e) {
+            logger.error("Failed executing PayPal payment");
             transaction.setStatus(PayPalTransactionStatus.FAILED);
             transactionService.save(transaction);
+            logger.info("Saved transaction status | FAILED");
+
             throw e;
         }
     }

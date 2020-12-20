@@ -12,13 +12,14 @@ const PayPalReturn = () => {
   const PayerID = values.PayerID;
 
   useEffect(() => {
-    payPalService.executePayment(paymentId, PayerID).then((response) => {
+    payPalService.executePayment(paymentId, PayerID);
+    /*.then(() => {
       if (response != null && response.data === "approved") {
         history.push("/pay/return/success");
       } else {
         history.push("/pay/return/fail");
       }
-    });
+    })*/
   }, []);
   return <Spinner />;
 };

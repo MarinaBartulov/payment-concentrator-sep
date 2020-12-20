@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import team16.paypalservice.converter.SensitiveDataConverter;
 
 import javax.persistence.*;
 
@@ -22,10 +23,10 @@ public class Client {
     private String email;
 
     @Column
-    //@Convert(converter = CryptoConverter.class)
+    @Convert(converter = SensitiveDataConverter.class)
     private String clientId;
 
     @Column
-    //@Convert(converter = CryptoConverter.class)
+    @Convert(converter = SensitiveDataConverter.class)
     private String clientSecret;
 }
