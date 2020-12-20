@@ -31,13 +31,6 @@ public class PaymentController {
         // proveri info o merchant-u sa onim sto imas u bazi
         System.out.println(dto.getMerchantId());
 
-        //provera svih poruka - obrisati kada proradi
-        //logger.trace("A TRACE Message");
-        //logger.debug("A DEBUG Message");
-        //logger.info("An INFO Message");
-        //logger.warn("A WARN Message");
-        //logger.error("An ERROR Message");
-
         OrderResponseDTO response = paymentService.createPaymentResponseToLA(dto);
 
         return new ResponseEntity<>(response, HttpStatus.OK);

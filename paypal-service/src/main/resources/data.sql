@@ -1,2 +1,4 @@
 insert into client(email, client_id, client_secret)
-values ('sb-nsr1z4072854@business.example.com', 'AQQgvQUpcyUvTN3fEeoPiRWQ_yWMp4HMEkduJ5pscZwIf_I24h5DCI-k69q0XRY_SJs3DHEJvzwM6kE_', 'EKoMus9EHdXZtJ2yppid53lwF3v5_nm9EUlVT_CfHSNrTpoyLt5nRjfHLdKXiUG4CBWG0tfpfmg5cfcO');
+values ('sb-nsr1z4072854@business.example.com',
+'u/jN9uFMqgUAjMb9dnYH49uyk5ZkBLDMDIt3VK63izVoViUV701iqrC2DjpLqv9P8Lnd9EVb9bhjDiPSRgsa/tmFaijVhsfq8LIF2SPk8ISJkdG1b6vpQtVTh4audYpe|5asrCwrjMnqfcnVGalpV2Q==',
+'eabBeqyKj2bEZZeGVp74YsHW3Jb1lwsNoTC9uiJKbG8f3vgQgQTnEKYKIIXWX/1GOgq53ZzDwQlu4tpTlf6Yt9hDfD+Px6yIcy8Y3FeXyp4Nz9q1aYeRnK+zj8yMQgpo|5asrCwrjMnqfcnVGalpV2Q==');

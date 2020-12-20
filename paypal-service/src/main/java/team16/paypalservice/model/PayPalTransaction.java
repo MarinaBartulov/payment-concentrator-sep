@@ -43,8 +43,8 @@ public class PayPalTransaction {
     @Column
     private String paymentId;
 
-    //@Column
-    //private Long orderId;
+    @Column
+    private Long orderId;
 
     /*@Column(name = "successUrl")
     private String successUrl;
@@ -62,6 +62,7 @@ public class PayPalTransaction {
         this.status = PayPalTransactionStatus.INITIATED;
         this.price = order.getAmount();
         this.currency = order.getCurrency();
+        this.orderId = order.getOrderId();
     }
 
 }

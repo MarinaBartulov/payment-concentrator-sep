@@ -15,9 +15,12 @@ const PayPalCancel = () => {
     <div>
       <img src={paypal} alt="img" />
       <h1> Payment canceled </h1> <br />
-      <Button variant="btn btn-danger" onClick={() => window.close()}>
+      <Button
+        variant="btn btn-primary"
+        onClick={() => window.location.replace("https://localhost:3000/error")}
+      >
         {" "}
-        Close{" "}
+        Return{" "}
       </Button>
     </div>
   );

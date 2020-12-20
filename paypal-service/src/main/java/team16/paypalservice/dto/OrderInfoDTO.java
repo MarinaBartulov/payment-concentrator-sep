@@ -19,8 +19,8 @@ public class OrderInfoDTO {
     @Email
     private String merchantEmail;
 
-   // @NotNull
-   // private Long OrderId;
+    @NotNull
+    private Long OrderId;
 
     @NotNull
     @Positive
@@ -30,7 +30,6 @@ public class OrderInfoDTO {
     private String currency;
 
     //ovo dodala
-    private Long orderId;
     private String successUrl;
     private String errorUrl;
     private String failedUrl;

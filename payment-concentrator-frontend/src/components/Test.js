@@ -13,7 +13,6 @@ const Test = () => {
     testService.testBank(orderId);
   };
   const onClickPaypal = () => {
-    //testService.testPayPal();
     payPalService.pay(orderId, "paypal");
   };
 
@@ -47,6 +46,7 @@ const Test = () => {
 
   return (
     <div>
+      <h1>Payment Concentrator</h1>
       <h2>Payment methods</h2>
       <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank

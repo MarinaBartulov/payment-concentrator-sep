@@ -15,7 +15,7 @@ class PayPalService extends HttpService {
           orderId,
         mode
       );
-      window.open(response.data); // redirection to PayPal site or to fail page
+      window.location.replace(response.data); // redirection to PayPal site or to fail page
       return response;
     } catch (e) {
       console.log(e);
@@ -29,6 +29,7 @@ class PayPalService extends HttpService {
           PAYPAL_SERVICE_ENDPOINTS.EXECUTE +
           `?paymentId=${paymentId}&PayerID=${PayerID}`
       );
+      window.location.replace(response.data);
       return response;
     } catch (e) {
       console.log(e);
