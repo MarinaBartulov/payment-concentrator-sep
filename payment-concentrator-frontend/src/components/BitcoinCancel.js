@@ -39,9 +39,10 @@ const BitcoinCancel = () => {
           }}
         >
           <span>
-            <h2 style={{ color: "black", padding: "1em" }}>
-              Your Bitcoin payment was canceled or expired!
+            <h2 style={{ color: "black", padding: "1em", paddingBottom: "0" }}>
+              Your Bitcoin payment failed!
             </h2>
+            <h3>(canceled, expired or invalid)</h3>
           </span>
         </div>
         <div style={{ display: "block", marginTop: "1em" }}>
