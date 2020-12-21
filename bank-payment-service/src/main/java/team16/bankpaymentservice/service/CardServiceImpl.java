@@ -1,5 +1,7 @@
 package team16.bankpaymentservice.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team16.bankpaymentservice.dto.ClientAuthDTO;
@@ -10,8 +12,6 @@ import team16.bankpaymentservice.exceptions.InvalidDataException;
 import team16.bankpaymentservice.exceptions.LackingFundsException;
 import team16.bankpaymentservice.model.*;
 import team16.bankpaymentservice.repository.CardRepository;
-
-import java.time.YearMonth;
 
 @Service
 public class CardServiceImpl implements CardService {
@@ -32,6 +32,8 @@ public class CardServiceImpl implements CardService {
     private CardOwnerServiceImpl cardOwnerService;
 
     private ValidationService validationService;
+
+    Logger logger = LoggerFactory.getLogger(CardServiceImpl.class);
 
     public CardServiceImpl() {
         validationService = new ValidationService();
@@ -63,6 +65,7 @@ public class CardServiceImpl implements CardService {
         System.out.println("------------------------DTO from Bank Fron to Bank for Client authentication and Transaction-------------------------------");
         if(paymentService.findById(paymentId) == null) {
             System.out.println("Nonexistent payment");
+            logger.error("Nonexistent payment");
             throw new Exception("Nonexistent payment.");
         }
 
@@ -101,11 +104,13 @@ public class CardServiceImpl implements CardService {
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
+            logger.error("Invalid client data.");
             return responseDTO;
         } catch(InappropriateBankException ibe) {
             responseDTO.setRedirectionURL("Ide na PCC.");
             responseDTO.setTransactionStatus(transaction.getStatus().toString());
             responseDTO.setResponseMessage(ibe.getMessage());
+            logger.info("Redirection to PCC");
             return responseDTO;
         } catch (Exception e) {
             responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
@@ -113,6 +118,7 @@ public class CardServiceImpl implements CardService {
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
             responseDTO.setResponseMessage(e.getMessage());
+            logger.error("Error validating client input");
             return responseDTO;
         }
 
@@ -128,6 +134,7 @@ public class CardServiceImpl implements CardService {
         try {
             checkClientFunds(clientCard, transaction);
             System.out.println("Check funds proslo");
+            logger.info("Enough available funds");
         } catch (LackingFundsException lfe) {
             System.out.println("Check funds nije proslo");
             responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
@@ -135,6 +142,7 @@ public class CardServiceImpl implements CardService {
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
             responseDTO.setResponseMessage(lfe.getMessage());
+            logger.error("Not enough available funds");
             return responseDTO;
         }
 
@@ -157,12 +165,14 @@ public class CardServiceImpl implements CardService {
         responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
         responseDTO.setTransactionStatus(transaction.getStatus().toString());
         responseDTO.setResponseMessage("Transaction completed successfully.");
+        logger.info("Transaction completed successfully");
         return responseDTO;
     }
 
     private void checkClientFunds(Card clientCard, Transaction transaction) throws LackingFundsException {
         if(clientCard.getAvailableFunds() < transaction.getAmount()) {
             System.out.println("Lacking funds.");
+            logger.error("Not enough available funds");
             throw new LackingFundsException("Lacking funds.");
         } else {
             transaction.setStatus(TransactionStatus.CREATED);
@@ -177,6 +187,7 @@ public class CardServiceImpl implements CardService {
             !validationService.validateString(dto.getCardHolderName()) ||
             !validationService.validateString(dto.getCardHolderName())) {
             System.out.println("Invalid client information.");
+            logger.error("Invalid client information");
             throw new InvalidDataException("Invalid client information.");
         }
         Bank bank = bankService.findById(1L);
@@ -185,10 +196,12 @@ public class CardServiceImpl implements CardService {
         System.out.println(bankCode);
         if(!dto.getPan().substring(0, 3).equals(bankCode)) {
             System.out.println("Client doesn't have an account in this bank.");
+            logger.error("Client doesn't have an account in this bank");
             throw new InappropriateBankException("Client doesn't have an account in this bank.");
         }
         if(cardRepository.findByPan(dto.getPan()) == null) {
             System.out.println("Invalid client information.");
+            logger.error("Invalid client information - Non existent client account");
             throw new InvalidDataException("Invalid client information.");
         }
 
@@ -199,16 +212,19 @@ public class CardServiceImpl implements CardService {
 
         if(!card.getSecurityCode().equals(dto.getSecurityNumber())) {
             System.out.println("Invalid client information. Security code doesnt match");
+            logger.error("Invalid client information - security codes don't match");
             throw new InvalidDataException("Invalid client information.");
         }
 
         Client client = cardOwnerService.findClientByCardId(card.getId());
         if(!client.getName().equals(dto.getCardHolderName())) {
             System.out.println("Invalid client information. CHD name doesnt match");
+            logger.error("Invalid client information - Card Holder Name not valid");
             throw new InvalidDataException("Invalid client information.");
         }
         if(!validationService.convertToYearMonthFormat(dto.getExpirationDate()).equals(card.getExpirationDate())) {
             System.out.println("Invalid client information. Not good year month");
+            logger.error("Invalid client information - false expiration date");
             throw new InvalidDataException("Invalid client information.");
         }
     }
