@@ -86,7 +86,7 @@ public class PayPalController {
         if(transaction == null)
         {
             logger.error("Transaction not found | PaymentId: " + paymentId);
-            return new ResponseEntity<>(FAIL_URL, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(FAIL_URL, HttpStatus.OK);
         }
 
         try {
@@ -102,6 +102,6 @@ public class PayPalController {
             logger.error("Failed executing payment | PaymentId: " + paymentId);
             System.out.println(e.getMessage());
         }
-        return new ResponseEntity<>(FAIL_URL, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(FAIL_URL, HttpStatus.OK);
     }
 }

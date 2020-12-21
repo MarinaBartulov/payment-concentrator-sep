@@ -6,13 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import team16.paymentserviceprovider.dto.*;
+import team16.paymentserviceprovider.dto.OrderDTO;
+import team16.paymentserviceprovider.dto.OrderResponseDTO;
+import team16.paymentserviceprovider.dto.PaymentResponseInfoDTO;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
-
-import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.service.OrderService;
-
 import team16.paymentserviceprovider.service.PaymentService;
 
 import java.net.URISyntaxException;
@@ -30,7 +29,7 @@ public class PaymentController {
     Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
     @PostMapping
-    public ResponseEntity<?> getMerchantsInformationFromLA(@RequestBody OrderDTO dto) throws Exception {
+    public ResponseEntity<?> getMerchantsInformationFromLA(@RequestBody OrderDTO dto) {
 
         try {
             OrderResponseDTO response = paymentService.createPaymentResponseToLA(dto);
@@ -38,11 +37,14 @@ public class PaymentController {
             System.out.println(response.getMerchantId());
             System.out.println(response.getOrderId());
             System.out.println(response.getRedirectionURL());
+            logger.info("Order successfully created. Sending redirection URL");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (InvalidDataException ide) {
+            logger.error("Invalid Data Exception whle creating order");
             System.out.println("Invalid Data Exception");
             return new ResponseEntity<>(ide.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
+            logger.error("Exception while creating order");
             System.out.println("Exception");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
@@ -54,13 +56,16 @@ public class PaymentController {
         try {
             PaymentResponseInfoDTO response = paymentService.createPaymentRequest(orderId);
             System.out.println("Response OK");
+            logger.info("Request for creating bank payment failed.");
             return ResponseEntity.ok(response.getPaymentUrl());
         } catch (InvalidDataException ide) {
             System.out.println("Response Invalid Data Exception");
+            logger.error("Request for creating bank payment failed because of invalid data.");
             return new ResponseEntity<>(ide.getMessage(), HttpStatus.BAD_REQUEST);
         }
         catch (Exception e) {
             System.out.println("Response Exception");
+            logger.error("Request for creating bank payment failed.");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

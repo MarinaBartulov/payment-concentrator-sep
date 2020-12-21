@@ -16,7 +16,6 @@ import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 
-import javax.xml.bind.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -58,6 +57,7 @@ public class PaymentService {
         validateDTO(dto);
 
         Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
+        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
         System.out.println("Found merchant: " + merchant.getMerchantEmail() + "|" + merchant.getMerchantId());
 
         Order order = new Order();
@@ -68,7 +68,7 @@ public class PaymentService {
         Order newOrder = orderService.create(order);
         System.out.println("Create Order: " + newOrder.getMerchantOrderId());
 
-        logger.info("New Order created");
+        logger.info("New Order created: " + newOrder.getMerchantOrderId());
 
         return new OrderResponseDTO(newOrder.getMerchantOrderId(),
                 "https://localhost:3001/" + newOrder.getMerchantOrderId(), merchant.getMerchantId());
@@ -78,8 +78,10 @@ public class PaymentService {
         System.out.println("------------------------Order from PC front-------------------------------");
         Order order = orderService.getOne(orderId);
         System.out.println("Found Order: " + order.getMerchantOrderId());
+        logger.info("Found Order: " + order.getMerchantOrderId());
         if(order == null) {
             System.out.println("Not Found Order");
+            logger.error("Not Found Order");
             throw new InvalidDataException("Nonexistent order.");
         }
         Merchant merchant = order.getMerchant();
