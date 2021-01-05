@@ -1,20 +1,20 @@
 import Button from "react-bootstrap/Button";
 import { useParams } from "react-router-dom";
 import { useEffect } from "react";
-import { payPalService } from "../services/paypal-service";
-import paypal from "../paypal.jpg";
+import { payPalService } from "../../services/paypal-service";
+import paypal from "../../paypal.jpg";
 
-const PayPalCancel = () => {
+const PayPalSubscriptionCancel = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    payPalService.cancelPayment(id);
+    payPalService.cancelSubscription(id);
   }, []);
 
   return (
     <div>
       <img src={paypal} alt="img" />
-      <h1> Payment canceled </h1> <br />
+      <h1> Subscription canceled </h1> <br />
       <Button
         variant="btn btn-primary"
         onClick={() => window.location.replace("https://localhost:3000/error")}
@@ -26,4 +26,4 @@ const PayPalCancel = () => {
   );
 };
 
-export default PayPalCancel;
+export default PayPalSubscriptionCancel;

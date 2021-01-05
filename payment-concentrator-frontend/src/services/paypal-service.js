@@ -50,6 +50,50 @@ class PayPalService extends HttpService {
       return null;
     }
   };
+
+  createSubscription = async (subscriptionId) => {
+    try {
+      const response = await this.client.put(
+        SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+          PSP_ENDPOINTS.SUBSCRIPTION +
+          "/" +
+          subscriptionId
+      );
+      window.location.replace(response.data); // redirection to PayPal site or to fail page
+      return response;
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  executeSubscription = async (id, token) => {
+    try {
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
+          PAYPAL_SERVICE_ENDPOINTS.EXECUTE_SUBSCRIPTION +
+          `?subscriptionId=${id}&token=${token}`
+      );
+      window.location.replace(response.data);
+      return response;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  };
+
+  cancelSubscription = async (id) => {
+    try {
+      const response = await this.client.get(
+        SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
+          PAYPAL_SERVICE_ENDPOINTS.CANCEL_SUBSCRIPTION +
+          `?subscriptionId=${id}`
+      );
+      return response;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  };
 }
 
 export const payPalService = new PayPalService();
