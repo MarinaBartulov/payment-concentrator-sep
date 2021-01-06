@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import queryString from "query-string";
-import { payPalService } from "../services/paypal-service";
-import Spinner from "./Spinner";
+import { payPalService } from "../../services/paypal-service";
+import Spinner from "../Spinner";
 
 const PayPalReturn = () => {
   let history = useHistory();

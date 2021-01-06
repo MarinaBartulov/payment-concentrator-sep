@@ -1,5 +1,5 @@
 import Button from "react-bootstrap/Button";
-import paypal from "../paypal.jpg";
+import paypal from "..//../paypal.jpg";
 
 const PayPalFail = () => {
   return (

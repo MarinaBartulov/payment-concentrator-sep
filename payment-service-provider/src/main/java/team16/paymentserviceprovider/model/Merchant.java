@@ -46,4 +46,11 @@ public class Merchant {
 
     @OneToMany(mappedBy = "merchant", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<Order> orders = new HashSet<>();
+
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private App app;
+
+    @ManyToMany
+    @JoinTable(name = "merchants_paymentMethods", joinColumns = @JoinColumn(name = "merchant_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "payment_method_id", referencedColumnName = "id"))
+    private Set<PaymentMethod> paymentMethods = new HashSet<>();
 }

@@ -16,6 +16,9 @@ export const PAYPAL_SERVICE_ENDPOINTS = {
   PAY: "/api/pay/",
   EXECUTE: "/api/pay/execute",
   CANCEL: "/api/pay/cancel/",
+  CREATE_SUBSCRIPTION: "/api/subscription/create",
+  EXECUTE_SUBSCRIPTION: "/api/subscription/execute",
+  CANCEL_SUBSCRIPTION: "/api/subscription/cancel/",
 };
 
 export const BITCOIN_SERVICE_ENDPOINTS = {
@@ -25,4 +28,6 @@ export const BITCOIN_SERVICE_ENDPOINTS = {
 export const PSP_ENDPOINTS = {
   AVAILABLE_SERVICES: "/test/available-services",
   PAYMENTS: "/payments",
+  APP: "/app",
+  SUBSCRIPTION: "/payments/subscription",
 };
