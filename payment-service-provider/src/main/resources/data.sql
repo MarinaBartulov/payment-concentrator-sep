@@ -1,2 +1,2 @@
 insert into merchant (merchant_id, merchant_email, password, error_url, failed_url, success_url)
-values ('46QfIZh9KGe62AMDAStgnRbsK1fcX4', 'sb-nsr1z4072854@business.example.com', 'Merchant123!', 'https://localhost:3000/error', 'https://localhost:3000/failed', 'https://localhost:3000/success');
+values ('cVnsMpdb6OIwN8y9yPkVqVScGi1q5RGKh8nsmZjUgsk=|8bAC7Y7K5L8cDdoBhj2Erw==', 'sb-nsr1z4072854@business.example.com', 'eqRcB55gBHQwhvVZpnqxwg==|zZ/AAJw9MZUDdfXbipfbDw==', 'https://localhost:3000/error', 'https://localhost:3000/failed', 'https://localhost:3000/success');

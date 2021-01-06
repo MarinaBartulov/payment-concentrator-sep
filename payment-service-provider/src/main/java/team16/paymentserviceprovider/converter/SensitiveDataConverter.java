@@ -1,4 +1,4 @@
-package team16.bitcoinservice.converter;
+package team16.paymentserviceprovider.converter;
 
 import lombok.SneakyThrows;
 import org.springframework.core.io.ClassPathResource;
@@ -19,7 +19,6 @@ public class SensitiveDataConverter implements AttributeConverter<String, String
     //IvParameterSpec class specifies an initialization vector (IV)
     //IvParameterSpec(byte[] iv) - creates an IvParameterSpec object using the bytes in iv as the IV
     //za svaki token se mora cuvati iv da bi se mogao dekriptovati
-
 
     @SneakyThrows
     @Override

@@ -27,10 +27,7 @@ public class Order {
 
     private LocalDateTime merchantOrderTimestamp;
 
-    // order ce biti odobren ako kupac ima dovoljno sredstava
-    // private boolean approved;
-
-    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.LAZY)
     private Merchant merchant;
 
 }

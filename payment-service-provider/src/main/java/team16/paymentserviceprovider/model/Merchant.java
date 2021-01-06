@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import team16.paymentserviceprovider.converter.SensitiveDataConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -22,14 +23,16 @@ public class Merchant {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 30)
+    @Convert(converter = SensitiveDataConverter.class)
+    @Column(nullable = false) // , unique = true , length = 30
     private String merchantId;
 
     @Column(nullable = false, unique = true)
     private String merchantEmail;
 
+    @Convert(converter = SensitiveDataConverter.class)
     @Column(nullable = false)
-    @Size(min = 10, max = 100)
+    //@Size(min = 10, max = 100)
     private String password;
 
     @Column(name = "success_url")

@@ -13,6 +13,9 @@ public interface CardOwnerRepository extends JpaRepository<CardOwner, Long> {
     @Query(value = "select * from card_owner m where m.type = 'Merchant' and m.merchant_id = ?1", nativeQuery = true)
     Merchant findByMerchantId(String merchantId);
 
+    @Query(value = "select * from card_owner m where m.type = 'Merchant' and m.merchant_email = ?1", nativeQuery = true)
+    Merchant findCardOwnerByMerchantEmail(String mercahntEmail);
+
     @Query(value = "select * from card_owner c where c.type = 'Client' and c.card_id = ?1", nativeQuery = true)
     Client findClientByCardId(Long cardId);
 }

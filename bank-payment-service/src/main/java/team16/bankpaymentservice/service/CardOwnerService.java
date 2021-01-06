@@ -7,8 +7,7 @@ import team16.bankpaymentservice.model.Merchant;
 public interface CardOwnerService {
 
     CardOwner findOne(Long id);
-
     Merchant findByMerchantId(String merchantId);
-
+    Merchant findByMerchantEmail(String merchantEmail);
     Client findClientByCardId(Long id);
 }

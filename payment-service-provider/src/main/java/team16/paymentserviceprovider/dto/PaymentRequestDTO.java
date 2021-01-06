@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 public class PaymentRequestDTO {
 
     private String merchantId;
+    private String merchantEmail;
     private String merchantPassword;
     private double amount;
     private Long merchantOrderId;
