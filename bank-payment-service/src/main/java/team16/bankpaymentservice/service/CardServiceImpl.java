@@ -91,7 +91,7 @@ public class CardServiceImpl implements CardService {
         System.out.println(merchant.getMerchantEmail());
         System.out.println(merchant.getPassword());
 
-        //Card merchantCard = cardRepository.findByCardHolderId(merchant.getId());
+        Card merchantCard = merchant.getCard();
 
         OnlyAcquirerTransactionResponseDTO responseDTO = new OnlyAcquirerTransactionResponseDTO();
 
@@ -148,7 +148,7 @@ public class CardServiceImpl implements CardService {
 
         // update sredstava sa kartica sa proverom sredstava klijenta
         clientCard.setAvailableFunds(clientCard.getAvailableFunds() - transaction.getAmount());
-        //merchantCard.setAvailableFunds(merchantCard.getAvailableFunds() + transaction.getAmount());
+        merchantCard.setAvailableFunds(merchantCard.getAvailableFunds() + transaction.getAmount());
         transaction.setStatus(TransactionStatus.COMPLETED);
 
         update(clientCard);

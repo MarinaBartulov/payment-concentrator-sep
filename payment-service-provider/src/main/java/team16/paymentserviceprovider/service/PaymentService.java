@@ -23,6 +23,7 @@ import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class PaymentService {
@@ -66,7 +67,7 @@ public class PaymentService {
 
         validateDTO(dto);
 
-        Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
+        Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
         logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
         System.out.println("Found merchant: " + merchant.getMerchantEmail() + "|" + merchant.getMerchantId());
 
@@ -116,7 +117,7 @@ public class PaymentService {
         System.out.println("kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke");
 
         PaymentRequestDTO paymentRequestDTO =
-                new PaymentRequestDTO(merchant.getMerchantId(), merchant.getPassword(), order.getAmount(),
+                new PaymentRequestDTO(merchant.getMerchantId(), merchant.getMerchantEmail(), merchant.getPassword(), order.getAmount(),
                         merchantOrderId, order.getMerchantOrderTimestamp(), merchant.getMerchantSuccessUrl(),
                         merchant.getMerchantFailedUrl(), merchant.getMerchantErrorUrl());
 
@@ -149,7 +150,7 @@ public class PaymentService {
             logger.error("Failed to create Order due to invalid received data");
             throw new InvalidDataException("Invalid merchant info.");
         }
-        if(merchantService.findByMerchantId(dto.getMerchantId()) == null) {
+        if(merchantService.findByMerchantEmail(dto.getMerchantEmail()) == null) {
             System.out.println("nonexistent merchant");
             logger.debug("Nonexistent merchant");
             logger.error("Failed to create Order due to invalid received data");
@@ -167,7 +168,7 @@ public class PaymentService {
             logger.error("Failed to create Order due to invalid received data");
             throw new InvalidDataException("Amount cannot be negative.");
         }
-        Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
+        Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
         if(!merchant.getPassword().equals(dto.getMerchantPassword())) {
             System.out.println("passwords dont match");
             logger.debug("Invalid merchant password");

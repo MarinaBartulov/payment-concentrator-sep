@@ -21,9 +21,11 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // treba enkriptovati - ne sme ceo da se cuva u bazi
     @Column(nullable = false, unique = true, length = 16)
     private String PAN;  // broj racuna u Srbiji ima 16 brojeva
 
+    // treba enkriptovati
     @Column(nullable = false, length = 3)
     private String securityCode;  // Card Verification Value
 

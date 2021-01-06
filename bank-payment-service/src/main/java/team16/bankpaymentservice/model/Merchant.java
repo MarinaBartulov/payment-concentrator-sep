@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import team16.bankpaymentservice.converter.SensitiveDataConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -17,13 +18,16 @@ import java.util.Set;
 @Setter
 public class Merchant extends CardOwner {
 
-    @Column(unique = true, length = 30)
+    @Convert(converter = SensitiveDataConverter.class)
+    @Column(unique = true) //, length = 30; nullable = false, zbog klijenta
     private String merchantId;
 
-    @Column(unique = true)
+    @Column(unique = true) // nullable = false,  zbog klijenta
     private String merchantEmail;
 
-    @Size(min = 10, max = 100)
+    @Convert(converter = SensitiveDataConverter.class)
+    //@Column(nullable = false) zbog klijenta
+    //@Size(min = 10, max = 100)
     private String password;
 
     @Column(name = "success_url")

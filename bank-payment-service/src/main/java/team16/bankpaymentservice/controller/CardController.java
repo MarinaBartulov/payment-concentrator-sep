@@ -35,7 +35,7 @@ public class CardController {
                 System.out.println(response.getResponseMessage());
                 System.out.println(response.getRedirectionURL());
                 System.out.println(response.getTransactionStatus());
-                return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>(response, HttpStatus.OK);
             }
             logger.info("Transaction successfully completed. Sending redirection URL");
             return new ResponseEntity<>(response, HttpStatus.OK);
@@ -46,7 +46,7 @@ public class CardController {
             System.out.println(response.getRedirectionURL());
             System.out.println(response.getTransactionStatus());
             logger.error("Exception while completing transaction");
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
 }
