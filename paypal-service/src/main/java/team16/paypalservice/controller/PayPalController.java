@@ -9,11 +9,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paypalservice.dto.OrderInfoDTO;
-import team16.paypalservice.enums.PayPalTransactionStatus;
+import team16.paypalservice.dto.SubscriptionDTO;
 import team16.paypalservice.model.Client;
+import team16.paypalservice.model.PayPalSubscription;
 import team16.paypalservice.model.PayPalTransaction;
 import team16.paypalservice.service.PayPalService;
 import team16.paypalservice.service.impl.ClientServiceImpl;
+import team16.paypalservice.service.impl.PayPalSubscriptionServiceImpl;
 import team16.paypalservice.service.impl.PayPalTransactionServiceImpl;
 
 import javax.validation.Valid;
@@ -32,15 +34,23 @@ public class PayPalController {
     @Autowired
     private PayPalTransactionServiceImpl transactionService;
 
+    @Autowired
+    private PayPalSubscriptionServiceImpl payPalSubscriptionService;
+
     public static final String RETURN_URL = "https://localhost:3001/pay/return";
     public static final String CANCEL_URL = "https://localhost:3001/pay/cancel/";
     public static final String FAIL_URL = "https://localhost:3001/pay/return/fail";
     public static final String SUCCESS_URL = "https://localhost:3001/pay/return/success";
 
+    public static final String SUBSCRIPTION_RETURN_URL = "https://localhost:3001/subscription/return/";
+    public static final String SUBSCRIPTION_CANCEL_URL = "https://localhost:3001/subscription/cancel/";
+    public static final String SUBSCRIPTION_FAIL_URL = "https://localhost:3001/subscription/fail";
+    public static final String SUBSCRIPTION_SUCCESS_URL = "https://localhost:3001/subscription/success";
+
     Logger logger = LoggerFactory.getLogger(PayPalController.class);
 
     @PostMapping("/pay")
-    public ResponseEntity<?> payment(@RequestBody @Valid OrderInfoDTO order) {
+    public ResponseEntity<?> createPayment(@RequestBody @Valid OrderInfoDTO order) {
 
         Client client = clientService.findByEmail(order.getMerchantEmail());
         if (client == null) {
@@ -63,19 +73,21 @@ public class PayPalController {
     }
 
     @GetMapping("/pay/cancel")
-    public ResponseEntity<?> cancelPay(@RequestParam("id") Long transactionId) {
+    public ResponseEntity<?> cancelPayment(@RequestParam("id") Long transactionId) {
 
         PayPalTransaction transaction = transactionService.findById(transactionId);
+        logger.error("Transaction found | ID: " + transactionId);
         if(transaction == null)
         {
             logger.error("Transaction not found | ID: " + transactionId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        transaction.setStatus(PayPalTransactionStatus.CANCELED);
-        transactionService.save(transaction);
-        logger.info("Saved transaction state | CANCELED");
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        if(payPalService.cancelPayment(transaction))
+        {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @GetMapping("/pay/execute")
@@ -86,7 +98,7 @@ public class PayPalController {
         if(transaction == null)
         {
             logger.error("Transaction not found | PaymentId: " + paymentId);
-            return new ResponseEntity<>(FAIL_URL, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(FAIL_URL, HttpStatus.OK);
         }
 
         try {
@@ -102,6 +114,86 @@ public class PayPalController {
             logger.error("Failed executing payment | PaymentId: " + paymentId);
             System.out.println(e.getMessage());
         }
-        return new ResponseEntity<>(FAIL_URL, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(FAIL_URL, HttpStatus.OK);
+    }
+
+    @PostMapping("/subscription/create")
+    public ResponseEntity<?> createSubscription(@RequestBody @Valid SubscriptionDTO subscriptionDTO) {
+
+        Client client = clientService.findByEmail(subscriptionDTO.getEmail());
+        logger.error("Merchant found | Email: " + subscriptionDTO.getEmail());
+        if(client == null) {
+            logger.error("Merchant not found | Email: " + subscriptionDTO.getEmail());
+            return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
+        }
+
+        /*PayPalSubscription subscription = new PayPalSubscription(subscriptionDTO, client);
+        PayPalSubscription savedSubscription = payPalSubscriptionService.save(subscription);
+        Long subscriptionId = savedSubscription.getId();*/
+
+        Long subscriptionId;
+        try {
+            subscriptionId = payPalService.createBillingPlan(subscriptionDTO, client, SUBSCRIPTION_RETURN_URL, SUBSCRIPTION_CANCEL_URL);
+        }
+        catch (PayPalRESTException e) {
+            logger.error("PayPal REST Exception occurred, billing plan not created");
+            return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
+        }
+
+        String redirectUrl = "";
+        try {
+            redirectUrl = payPalService.createBillingAgreement(client, subscriptionId);
+        }
+        catch (PayPalRESTException e) {
+            logger.error("PayPal REST Exception occurred, billing agreement not created");
+            return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
+        }
+        catch (Exception e) {
+            logger.error("Exception occurred, billing agreement not created");
+            return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/subscription/execute")
+    public ResponseEntity<?> executeSubscription(@RequestParam Long subscriptionId, @RequestParam String token) {
+
+        PayPalSubscription subscription = payPalSubscriptionService.getOne(subscriptionId);
+        if(subscription == null)
+        {
+            logger.error("Subscription not found | SubscriptionId: " + subscriptionId);
+            return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
+        }
+
+        try {
+            payPalService.executeBillingAgreement(subscription, token);
+        }
+        catch(PayPalRESTException e) {
+            logger.error("CANCELED | PayPal Subscription Execution");
+            return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
+        }
+
+        logger.info("COMPLETED | PayPal Subscription Execution");
+
+        return new ResponseEntity<>(SUBSCRIPTION_SUCCESS_URL, HttpStatus.OK);
+    }
+
+    @GetMapping("/subscription/cancel")
+    public ResponseEntity<?> cancelSubscription(@RequestParam Long subscriptionId) {
+
+        PayPalSubscription subscription = payPalSubscriptionService.getOne(subscriptionId);
+        if(subscription == null)
+        {
+            logger.error("Subscription not found | ID: " + subscriptionId);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        if (payPalService.cancelSubscription(subscription))
+        {
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+        else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+
     }
 }

@@ -5,6 +5,6 @@ import team16.paymentserviceprovider.model.App;
 
 public interface AppService {
 
-      String addNewApp(AppDTO appDTO);
+      AppDTO addNewApp(AppDTO appDTO);
       App findByEmail(String email);
 }

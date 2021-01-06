@@ -15,3 +15,7 @@ insert into merchants_payment_methods (merchant_id, payment_method_id) values (1
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (1,2);
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (1,3);
 
+
+insert into billing_plan ( billing_plan_id, cycles_number, merchant_id, type, frequency )
+values ( 'P-1A648881X5345862WL7ZRIDY', 2, 1, 'FIXED', 'MONTH');
+

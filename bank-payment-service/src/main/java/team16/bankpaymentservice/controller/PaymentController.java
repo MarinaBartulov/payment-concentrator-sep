@@ -1,5 +1,7 @@
 package team16.bankpaymentservice.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,8 @@ public class PaymentController {
     @Autowired
     private PaymentService paymentService;
 
+    Logger logger = LoggerFactory.getLogger(PaymentController.class);
+
     @PostMapping(value = "/request")
     public ResponseEntity<?> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
         try {
@@ -25,9 +29,11 @@ public class PaymentController {
             System.out.println("///////// Payment Response INFO ////////////////");
             System.out.println(paymentResponseInfoDTO.getPaymentUrl());
             System.out.println(paymentResponseInfoDTO.getPaymentId());
+            logger.info("Payment successfully created. Sending payment URL");
             return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
         } catch (Exception e) {
             System.out.println("///////// exception ////////////////");
+            logger.error("Exception while creating payment");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

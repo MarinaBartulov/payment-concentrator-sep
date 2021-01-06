@@ -1,26 +1,29 @@
 package team16.paymentserviceprovider.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppDTO {
+public class SubscriptionRequestDTO {
 
     @NotNull
-    private String appName;
+    @Positive
+    private Double price;
+
     @NotNull
-    private String webAddress;
+    private String currency;
+
     @NotNull
     @Email
-    private String officialEmail;
-    private String appId;
+    private String merchantEmail;
 
+    @NotNull
+    private String merchantId;
 }

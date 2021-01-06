@@ -13,10 +13,13 @@ import team16.paymentserviceprovider.config.EndpointConfig;
 import team16.paymentserviceprovider.config.RestConfig;
 import team16.paymentserviceprovider.dto.*;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
+import team16.paymentserviceprovider.model.BillingPlan;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
+import team16.paymentserviceprovider.model.Subscription;
+import team16.paymentserviceprovider.service.impl.BillingPlanServiceImpl;
+import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
 
-import javax.xml.bind.ValidationException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
@@ -35,6 +38,12 @@ public class PaymentService {
 
     @Autowired
     private OrderServiceImpl orderService;
+
+    @Autowired
+    private SubscriptionServiceImpl subscriptionService;
+
+    @Autowired
+    private BillingPlanServiceImpl billingPlanService;
 
     private ValidationService validationService;
 
@@ -58,6 +67,7 @@ public class PaymentService {
         validateDTO(dto);
 
         Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
+        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
         System.out.println("Found merchant: " + merchant.getMerchantEmail() + "|" + merchant.getMerchantId());
 
         Order order = new Order();
@@ -68,18 +78,34 @@ public class PaymentService {
         Order newOrder = orderService.create(order);
         System.out.println("Create Order: " + newOrder.getMerchantOrderId());
 
-        logger.info("New Order created");
+        logger.info("New Order created: " + newOrder.getMerchantOrderId());
 
         return new OrderResponseDTO(newOrder.getMerchantOrderId(),
-                "https://localhost:3001/" + newOrder.getMerchantOrderId(), merchant.getMerchantId());
+                "https://localhost:3001/order/" + newOrder.getMerchantOrderId(), merchant.getMerchantId());
     }
+
+    public String saveSubscriptionFromLA(SubscriptionRequestDTO dto) {
+
+        Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
+        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
+
+        Subscription subscription = new Subscription(dto, merchant);
+        Subscription savedSubscription = subscriptionService.save(subscription);
+        logger.info("Saved subscription | ID " + savedSubscription.getId());
+        String redirectionURL = "https://localhost:3001/subscription/id/" + savedSubscription.getId();
+
+        return redirectionURL;
+    }
+
 
     public PaymentResponseInfoDTO createPaymentRequest(Long orderId) throws Exception {
         System.out.println("------------------------Order from PC front-------------------------------");
         Order order = orderService.getOne(orderId);
         System.out.println("Found Order: " + order.getMerchantOrderId());
+        logger.info("Found Order: " + order.getMerchantOrderId());
         if(order == null) {
             System.out.println("Not Found Order");
+            logger.error("Not Found Order");
             throw new InvalidDataException("Nonexistent order.");
         }
         Merchant merchant = order.getMerchant();
@@ -187,5 +213,40 @@ public class PaymentService {
 
     private URI getServiceEndpoint(String paymentMethodName) throws URISyntaxException {
         return new URI(configuration.url() + "/" + paymentMethodName + "-payment-service/api/pay");
+    }
+
+    public String createSubscription(Subscription subscription) throws URISyntaxException {
+        Merchant merchant = subscription.getMerchant();
+        logger.info("Found Merchant | ID: " + merchant.getId());
+        if(merchant == null){
+            logger.error("Failed to find Merchant | ID: " + subscription.getMerchant().getMerchantId());
+            return null;
+        }
+
+        // pronaci odgovarajuci plan
+        BillingPlan billingPlan = billingPlanService.getOne(1L);
+        logger.info("Found Billing plan | ID: 1");
+        if(billingPlan == null)
+        {
+            logger.error("Failed to find Billing plan | ID: 1");
+            return null;
+        }
+
+        SubscriptionInfoDTO subscriptionInfoDTO = new SubscriptionInfoDTO(subscription, merchant, billingPlan);
+
+        HttpEntity<SubscriptionInfoDTO> request = new HttpEntity<>(subscriptionInfoDTO);
+        ResponseEntity<String> response = null;
+
+        try {
+            logger.info("Sending request to paypal payment service");
+            response = restTemplate.exchange( configuration.url() + EndpointConfig.PAYPAL_PAYMENT_SERVICE_BASE_URL + "/api/subscription/create"
+                    ,HttpMethod.POST, request, String.class);
+            logger.info("Received response from paypal payment service");
+        } catch (RestClientException e) {
+            logger.error("RestTemplate error");
+            e.printStackTrace();
+        }
+
+        return response.getBody();
     }
 }

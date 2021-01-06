@@ -24,7 +24,7 @@ public class AppController {
           if(this.appService.findByEmail(appDto.getOfficialEmail()) != null){
               return ResponseEntity.badRequest().body("Application with that email already exists.");
           }
-          String appId = this.appService.addNewApp(appDto);
-          return ResponseEntity.ok(appId);
+          AppDTO appDTO = this.appService.addNewApp(appDto);
+          return ResponseEntity.ok(appDTO);
     }
 }

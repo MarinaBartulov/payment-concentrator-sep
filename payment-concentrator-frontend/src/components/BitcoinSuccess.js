@@ -11,7 +11,7 @@ const BitcoinSuccess = () => {
 
   const success = async (id) => {
     const response = await bitcoinService.success(id);
-    if (response != null && response != undefined) {
+    if (response !== null && response !== undefined) {
       setSuccessShow(1);
     } else {
       setSuccessShow(2);

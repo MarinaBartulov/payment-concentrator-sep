@@ -1,7 +1,10 @@
 package team16.bankpaymentservice.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import team16.bankpaymentservice.controller.CardController;
 import team16.bankpaymentservice.dto.PaymentRequestDTO;
 import team16.bankpaymentservice.dto.PaymentResponseInfoDTO;
 import team16.bankpaymentservice.enums.TransactionStatus;
@@ -23,6 +26,8 @@ public class PaymentService {
     private TransactionServiceImpl transactionService;
 
     private ValidationService validationService;
+
+    Logger logger = LoggerFactory.getLogger(PaymentService.class);
 
     public PaymentService() {
         validationService = new ValidationService();
@@ -61,6 +66,8 @@ public class PaymentService {
         System.out.println(newPayment.getPaymentUrl());
         System.out.println(newPayment.getTransaction().getId());
 
+        logger.info("New payment and transaction created. Sending redirection URL");
+
         return new PaymentResponseInfoDTO(newPayment.getPaymentId(),
                 newPayment.getPaymentUrl() + "/" + newPayment.getPaymentId());
     }
@@ -70,34 +77,41 @@ public class PaymentService {
         if(!validationService.validateString(dto.getMerchantId()) ||
                 !validationService.validateString(dto.getMerchantPassword())) {
             System.out.println("Id, pass null or empty");
+            logger.error("Invalid merchant info. Id, pass null or empty");
             throw new InvalidDataException("Invalid merchant info.");
         }
         if(cardOwnerService.findByMerchantId(dto.getMerchantId()) == null) {
             System.out.println("nonexistent merchant");
+            logger.error("Nonexistent merchant");
             throw new InvalidDataException("Nonexistent merchant.");
         }
 
         Merchant merchant = cardOwnerService.findByMerchantId(dto.getMerchantId());
         if(!merchant.getPassword().equals(dto.getMerchantPassword())) {
             System.out.println("passwords dont match");
+            logger.error("Invalid merchant info. Passwords don't match");
             throw new InvalidDataException("Invalid merchant info.");
         }
         if(dto.getAmount() < 0) {
             System.out.println("negative amount");
+            logger.error("Amount cannot be negative");
             throw new InvalidDataException("Amount cannot be negative.");
         }
         if(dto.getMerchantOrderId() == null) {
             System.out.println("merchant order id null");
+            logger.error("Invalid merchant order id");
             throw new InvalidDataException("Invalid merchant order id."); // validacione poruke genericke, da ne iskazuju sta tacno ne valja
         }
         if(dto.getMerchantTimestamp() == null) {
             System.out.println("merchant timestamp null");
+            logger.error("Invalid merchant timestamp");
             throw new InvalidDataException("Invalid merchant timestamp."); // validacione poruke genericke, da ne iskazuju sta tacno ne valja
         }
         if(!validationService.validateString(dto.getSuccessUrl()) ||
                 !validationService.validateString(dto.getFailedUrl()) ||
                 !validationService.validateString(dto.getErrorUrl())) {
             System.out.println("invalid urls - null or empty");
+            logger.error("Invalid URLs");
             throw new InvalidDataException("Invalid URLs.");
         }
     }

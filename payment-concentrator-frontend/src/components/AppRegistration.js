@@ -25,11 +25,11 @@ const AppRegistration = () => {
     onSubmit: async (values, { resetForm }) => {
       console.log(values);
       try {
-        setShowAppID(false);
+        setShowNewApp(false);
         resetForm();
         const response = await appService.addNewApp(values);
-        setAppID(response);
-        setShowAppID(true);
+        setNewApp(response);
+        setShowNewApp(true);
         toast.success("You have successfully registered a new application.", {
           hideProgressBar: true,
         });
@@ -44,8 +44,8 @@ const AppRegistration = () => {
     },
   });
 
-  const [appID, setAppID] = useState("");
-  const [showAppID, setShowAppID] = useState(false);
+  const [newApp, setNewApp] = useState({});
+  const [showNewApp, setShowNewApp] = useState(false);
 
   return (
     <div>
@@ -114,7 +114,7 @@ const AppRegistration = () => {
           </button>
         </form>
       </div>
-      {showAppID && (
+      {showNewApp && (
         <div
           className="card mt-3 mr-auto ml-auto"
           style={{
@@ -123,7 +123,12 @@ const AppRegistration = () => {
           }}
         >
           <h3>Application ID:</h3>
-          <h4>{appID}</h4>
+          <h4>{newApp.appId}</h4>
+          <h6 className="text-left ml-5">Application name: {newApp.appName}</h6>
+          <h6 className="text-left ml-5">Web address: {newApp.webAddress}</h6>
+          <h6 className="text-left ml-5">
+            Official email: {newApp.officialEmail}
+          </h6>
         </div>
       )}
     </div>
