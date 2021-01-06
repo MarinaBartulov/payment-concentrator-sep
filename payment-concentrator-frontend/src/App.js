@@ -4,6 +4,8 @@ import BitcoinCancel from "./components/BitcoinCancel";
 import BitcoinError from "./components/BitcoinError";
 import BitcoinSuccess from "./components/BitcoinSuccess";
 import Test from "./components/Test";
+import AppRegistration from "./components/AppRegistration";
+import { ToastContainer } from "react-toastify";
 import PayPalReturn from "./components/paypal/PayPalReturn";
 import PayPalCancel from "./components/paypal/PayPalCancel";
 import PayPalSuccess from "./components/paypal/PayPalSuccess";
@@ -17,6 +19,17 @@ import Subscription from "./components/Subscription";
 function App() {
   return (
     <div className="App">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Router>
         <Route exact path="/">
           <Test />
@@ -59,6 +72,9 @@ function App() {
         </Route>
         <Route exact path="/bitcoin/error">
           <BitcoinError />
+        </Route>
+        <Route exact path="/appRegistration">
+          <AppRegistration />
         </Route>
       </Router>
     </div>

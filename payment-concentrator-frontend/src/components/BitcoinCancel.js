@@ -11,7 +11,7 @@ const BitcoinCancel = () => {
 
   const cancel = async (id) => {
     const response = await bitcoinService.cancel(id);
-    if (response != null && response != undefined) {
+    if (response !== null && response !== undefined) {
       setCancelShow(1);
     } else {
       setCancelShow(2);
