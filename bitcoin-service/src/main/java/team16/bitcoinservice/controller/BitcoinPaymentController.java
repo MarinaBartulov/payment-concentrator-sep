@@ -18,6 +18,7 @@ import team16.bitcoinservice.model.Transaction;
 import team16.bitcoinservice.service.MerchantService;
 import team16.bitcoinservice.service.TransactionService;
 
+import javax.validation.Valid;
 import java.text.MessageFormat;
 
 @RestController
@@ -51,7 +52,7 @@ public class BitcoinPaymentController {
 
     //@PostMapping("/create")
     @PostMapping("/pay")
-    public ResponseEntity createPayment(@RequestBody BitcoinPaymentDTO bitcoinPaymentDTO){
+    public ResponseEntity createPayment(@RequestBody @Valid BitcoinPaymentDTO bitcoinPaymentDTO){
 
         logger.info(MessageFormat.format("Creating payment | OrderId: {0} | Amount: {1} {2} | Merchant email: {3}",
                 bitcoinPaymentDTO.getOrderId(), bitcoinPaymentDTO.getAmount(),bitcoinPaymentDTO.getCurrency(),

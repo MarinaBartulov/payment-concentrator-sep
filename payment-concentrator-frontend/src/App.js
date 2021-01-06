@@ -8,15 +8,28 @@ import PayPalReturn from "./components/PayPalReturn";
 import PayPalCancel from "./components/PayPalCancel";
 import PayPalSuccess from "./components/PayPalSuccess";
 import PayPalFail from "./components/PayPalFail";
+import AppRegistration from "./components/AppRegistration";
+import { ToastContainer } from "react-toastify";
 
 function App() {
   return (
     <div className="App">
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={true}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
       <Router>
         <Route exact path="/">
           <Test />
         </Route>
-        <Route exact path="/:orderId">
+        <Route exact path="/order/:orderId">
           <Test />
         </Route>
         <Route exact path="/pay/return">
@@ -39,6 +52,9 @@ function App() {
         </Route>
         <Route exact path="/bitcoin/error">
           <BitcoinError />
+        </Route>
+        <Route exact path="/appRegistration">
+          <AppRegistration />
         </Route>
       </Router>
     </div>
