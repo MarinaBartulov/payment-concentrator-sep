@@ -16,24 +16,9 @@ const Test = () => {
     payPalService.pay(orderId, "paypal");
   };
 
-  // const onClickBitcoin = async () => {
-  //   const payload = {
-  //     orderId: 1,
-  //     email: "merchant@gmail.com",
-  //     paymentAmount: 10,
-  //     paymentCurrency: "EUR",
-  //   };
-  //   const response = await bitcoinService.pay(payload);
-  //   if (response != null) {
-  //     window.location.replace(response.data);
-  //   } else {
-  //     alert("Error!");
-  //   }
-  // };
-
   const onClickBitcoin = async () => {
     const response = await bitcoinService.pay(orderId, "bitcoin");
-    if ((response != null) & (response != undefined)) {
+    if ((response !== null) & (response !== undefined)) {
       window.location.replace(response.data); // redirection to CoinGate site
     } else {
       history.push("/bitcoin/error");
