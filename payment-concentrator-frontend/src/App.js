@@ -15,24 +15,27 @@ import PayPalSubscriptionCancel from "./components/paypal/PayPalSubscriptionCanc
 import PayPalSubscriptionSuccess from "./components/paypal/PayPalSubscriptionSuccess";
 import PayPalSubscriptionFail from "./components/paypal/PayPalSubscriptionFail";
 import Subscription from "./components/Subscription";
+import Header from "./components/Header";
+import Home from "./components/Home";
 
 function App() {
   return (
-    <div className="App">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={true}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <Router>
+    <Router>
+      <div className="App">
+        <Header />
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         <Route exact path="/">
-          <Test />
+          <Home />
         </Route>
         <Route exact path="/order/:orderId">
           <Test />
@@ -76,8 +79,8 @@ function App() {
         <Route exact path="/appRegistration">
           <AppRegistration />
         </Route>
-      </Router>
-    </div>
+      </div>
+    </Router>
   );
 }
 
