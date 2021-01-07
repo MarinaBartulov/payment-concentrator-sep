@@ -5,7 +5,7 @@ import { payPalService } from "../services/paypal-service";
 import { bitcoinService } from "../services/bitcoin-service";
 import { useParams, useHistory } from "react-router-dom";
 
-const Test = () => {
+const Payment = () => {
   const { orderId } = useParams();
   const history = useHistory();
 
@@ -32,7 +32,7 @@ const Test = () => {
   return (
     <div>
       <h1>Payment Concentrator</h1>
-      <h2>Payment methods</h2>
+      <h2>Choose payment method to finish your order:</h2>
       <Button variant="dark" className="myBtn" onClick={onClickBank}>
         Bank
       </Button>
@@ -51,4 +51,4 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default Payment;
