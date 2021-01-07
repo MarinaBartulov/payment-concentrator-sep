@@ -24,6 +24,11 @@ public class CardOwnerServiceImpl implements CardOwnerService {
     }
 
     @Override
+    public Merchant findByMerchantEmail(String merchantEmail) {
+        return cardOwnerRepository.findCardOwnerByMerchantEmail(merchantEmail);
+    }
+
+    @Override
     public Client findClientByCardId(Long id) {
         return cardOwnerRepository.findClientByCardId(id);
     }

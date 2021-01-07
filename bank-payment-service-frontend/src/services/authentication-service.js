@@ -13,6 +13,7 @@ class AuthenticationService extends HttpService {
       console.log("Response: ")
       console.log(response.data);
       console.log("----------")
+      window.location.replace(response.data.redirectionURL);
       return response;
     } catch (e) {
       console.log("ovde");

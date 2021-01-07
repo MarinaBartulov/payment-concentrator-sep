@@ -8,6 +8,7 @@ import team16.paymentserviceprovider.model.Merchant;
 @Repository
 public interface MerchantRepository extends JpaRepository<Merchant, Long> {
 
-    @Query(value = "select * from merchant m where m.merchant_id = ?1", nativeQuery = true)
-    Merchant findByMerchantId(String merchantId);
+    Merchant findMerchantByMerchantId(String merchantId);
+
+    Merchant findMerchantByMerchantEmail(String email);
 }

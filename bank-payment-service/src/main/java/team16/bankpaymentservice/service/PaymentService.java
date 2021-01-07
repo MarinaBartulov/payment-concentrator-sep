@@ -40,7 +40,7 @@ public class PaymentService {
         Payment payment = new Payment();
         payment.setPaymentUrl("https://localhost:3002/issuer");
 
-        Merchant merchant = cardOwnerService.findByMerchantId(dto.getMerchantId());
+        Merchant merchant = cardOwnerService.findByMerchantEmail(dto.getMerchantEmail());
         System.out.println("Merchant id: " + merchant.getMerchantId());
 
         Transaction transaction = new Transaction();
@@ -75,18 +75,24 @@ public class PaymentService {
     private void validateRequestData(PaymentRequestDTO dto) throws InvalidDataException {
         System.out.println("------------------------DTO from PSP to Bank validation-------------------------------");
         if(!validationService.validateString(dto.getMerchantId()) ||
+                !validationService.validateString(dto.getMerchantEmail()) ||
                 !validationService.validateString(dto.getMerchantPassword())) {
             System.out.println("Id, pass null or empty");
             logger.error("Invalid merchant info. Id, pass null or empty");
             throw new InvalidDataException("Invalid merchant info.");
         }
-        if(cardOwnerService.findByMerchantId(dto.getMerchantId()) == null) {
+        if(cardOwnerService.findByMerchantEmail(dto.getMerchantEmail()) == null) {
             System.out.println("nonexistent merchant");
             logger.error("Nonexistent merchant");
             throw new InvalidDataException("Nonexistent merchant.");
         }
 
-        Merchant merchant = cardOwnerService.findByMerchantId(dto.getMerchantId());
+        Merchant merchant = cardOwnerService.findByMerchantEmail(dto.getMerchantEmail());
+        if(!merchant.getMerchantId().equals(dto.getMerchantId())) {
+            System.out.println("merchant ids dont match");
+            logger.error("Invalid merchant info. Merchant ids don't match");
+            throw new InvalidDataException("Invalid merchant info.");
+        }
         if(!merchant.getPassword().equals(dto.getMerchantPassword())) {
             System.out.println("passwords dont match");
             logger.error("Invalid merchant info. Passwords don't match");

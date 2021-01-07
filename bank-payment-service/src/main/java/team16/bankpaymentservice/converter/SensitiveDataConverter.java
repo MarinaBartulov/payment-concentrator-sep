@@ -1,4 +1,4 @@
-package team16.bitcoinservice.converter;
+package team16.bankpaymentservice.converter;
 
 import lombok.SneakyThrows;
 import org.springframework.core.io.ClassPathResource;
