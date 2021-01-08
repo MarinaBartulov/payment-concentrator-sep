@@ -10,6 +10,9 @@ const Header = () => {
   const goToRegisterApp = () => {
     history.push("/appRegistration");
   };
+  const goToLogin = () => {
+    history.push("/login");
+  };
   return (
     <div>
       <Navbar bg="primary" variant="dark">
@@ -22,6 +25,14 @@ const Header = () => {
             onClick={goToRegisterApp}
           >
             Register app
+          </Button>
+          <Button
+            style={{ color: "white" }}
+            className="ml-2"
+            variant="link"
+            onClick={goToLogin}
+          >
+            Login
           </Button>
         </Nav>
       </Navbar>

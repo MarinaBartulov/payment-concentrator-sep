@@ -1,10 +1,11 @@
-package team16.paymentserviceprovider.service;
+package team16.paymentserviceprovider.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team16.paymentserviceprovider.dto.AppDTO;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.repository.AppRepository;
+import team16.paymentserviceprovider.service.AppService;
 
 import java.util.UUID;
 
@@ -31,5 +32,10 @@ public class AppServiceImpl implements AppService {
     @Override
     public App findByEmail(String email) {
         return this.appRepository.findByOfficialEmail(email);
+    }
+
+    @Override
+    public App findByAppId(String appId) {
+        return this.appRepository.findByAppId(appId);
     }
 }

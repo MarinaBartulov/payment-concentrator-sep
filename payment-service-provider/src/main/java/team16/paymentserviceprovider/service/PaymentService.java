@@ -18,12 +18,12 @@ import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.model.Subscription;
 import team16.paymentserviceprovider.service.impl.BillingPlanServiceImpl;
+import team16.paymentserviceprovider.service.impl.MerchantServiceImpl;
 import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class PaymentService {

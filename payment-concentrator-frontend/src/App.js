@@ -3,7 +3,7 @@ import "./App.css";
 import BitcoinCancel from "./components/BitcoinCancel";
 import BitcoinError from "./components/BitcoinError";
 import BitcoinSuccess from "./components/BitcoinSuccess";
-import Test from "./components/Test";
+import Payment from "./components/Payment";
 import AppRegistration from "./components/AppRegistration";
 import { ToastContainer } from "react-toastify";
 import PayPalReturn from "./components/paypal/PayPalReturn";
@@ -17,6 +17,7 @@ import PayPalSubscriptionFail from "./components/paypal/PayPalSubscriptionFail";
 import Subscription from "./components/Subscription";
 import Header from "./components/Header";
 import Home from "./components/Home";
+import Login from "./components/Login";
 
 function App() {
   return (
@@ -38,7 +39,7 @@ function App() {
           <Home />
         </Route>
         <Route exact path="/order/:orderId">
-          <Test />
+          <Payment />
         </Route>
         <Route exact path="/pay/return">
           <PayPalReturn />
@@ -78,6 +79,9 @@ function App() {
         </Route>
         <Route exact path="/appRegistration">
           <AppRegistration />
+        </Route>
+        <Route exact path="/login">
+          <Login />
         </Route>
       </div>
     </Router>

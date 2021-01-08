@@ -24,6 +24,9 @@ public class SensitiveDataConverter implements AttributeConverter<String, String
     @Override
     public String convertToDatabaseColumn(String data) {
 
+        if(data == null)
+            return null;
+
         byte[] ivParameterVector = new byte[16];
         new SecureRandom().nextBytes(ivParameterVector);
         String ivString = Base64.getEncoder().encodeToString(ivParameterVector);
@@ -55,6 +58,9 @@ public class SensitiveDataConverter implements AttributeConverter<String, String
     @SneakyThrows
     @Override
     public String convertToEntityAttribute(String dataDB) {
+
+        if(dataDB == null)
+            return null;
 
         String ivString = dataDB.split("\\|")[1];
         byte[] ivParameterVector = Base64.getDecoder().decode(ivString);
