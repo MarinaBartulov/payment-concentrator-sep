@@ -10,7 +10,12 @@ export class ApiService {
       this.handleSuccessResponse,
       this.handleErrorResponse
     );
-    this.unauthorizedCallback = () => {};
+    this.client.interceptors.request.use((config) => {
+      console.log(sessionStorage.getItem("token"));
+      const token = sessionStorage.getItem("token");
+      config.headers.Authorization = token ? `Bearer ${token}` : "";
+      return config;
+    });
   }
 
   addHeader(headers) {
