@@ -68,8 +68,8 @@ public class PaymentService {
         validateDTO(dto);
 
         Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
-        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
-        System.out.println("Found merchant: " + merchant.getMerchantEmail() + "|" + merchant.getMerchantId());
+        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
+        System.out.println("Found merchant: " + merchant.getEmail() + "|" + merchant.getMerchantId());
 
         Order order = new Order();
         order.setMerchant(merchant);
@@ -88,7 +88,7 @@ public class PaymentService {
     public String saveSubscriptionFromLA(SubscriptionRequestDTO dto) {
 
         Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
-        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
+        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
 
         Subscription subscription = new Subscription(dto, merchant);
         Subscription savedSubscription = subscriptionService.save(subscription);
@@ -117,7 +117,7 @@ public class PaymentService {
         System.out.println("kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke");
 
         PaymentRequestDTO paymentRequestDTO =
-                new PaymentRequestDTO(merchant.getMerchantId(), merchant.getMerchantEmail(), merchant.getPassword(), order.getAmount(),
+                new PaymentRequestDTO(merchant.getMerchantId(), merchant.getEmail(), merchant.getPassword(), order.getAmount(),
                         merchantOrderId, order.getMerchantOrderTimestamp(), merchant.getMerchantSuccessUrl(),
                         merchant.getMerchantFailedUrl(), merchant.getMerchantErrorUrl());
 
@@ -192,7 +192,7 @@ public class PaymentService {
             return null;
         }
 
-        OrderInfoDTO orderDTO = new OrderInfoDTO(order.getMerchantOrderId(),merchant.getMerchantEmail(), order.getAmount(), order.getCurrency(),
+        OrderInfoDTO orderDTO = new OrderInfoDTO(order.getMerchantOrderId(),merchant.getEmail(), order.getAmount(), order.getCurrency(),
                 merchant.getMerchantSuccessUrl(), merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
 
 

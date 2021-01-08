@@ -18,12 +18,14 @@ import Subscription from "./components/Subscription";
 import Header from "./components/Header";
 import Home from "./components/Home";
 import Login from "./components/Login";
+import AdminPanel from "./components/AdminPanel";
+import MerchantChoosePM from "./components/MerchantChoosePM";
+import MerchantChangePM from "./components/MerchantChangePM";
 
 function App() {
   return (
     <Router>
       <div className="App">
-        <Header />
         <ToastContainer
           position="top-right"
           autoClose={5000}
@@ -77,11 +79,17 @@ function App() {
         <Route exact path="/bitcoin/error">
           <BitcoinError />
         </Route>
-        <Route exact path="/appRegistration">
-          <AppRegistration />
-        </Route>
         <Route exact path="/login">
           <Login />
+        </Route>
+        <Route exact path="/adminPanel">
+          <AdminPanel />
+        </Route>
+        <Route exact path="/merchantChoosePM">
+          <MerchantChoosePM />
+        </Route>
+        <Route exact path="/merchantChangePM">
+          <MerchantChangePM />
         </Route>
       </div>
     </Router>

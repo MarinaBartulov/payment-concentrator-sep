@@ -10,5 +10,5 @@ import team16.paymentserviceprovider.model.Merchant;
 public interface MerchantRepository extends JpaRepository<Merchant, Long> {
 
     Merchant findMerchantByMerchantId(String merchantId);
-    Merchant findMerchantByMerchantEmail(String email);
+    Merchant findMerchantByEmail(String email);
 }

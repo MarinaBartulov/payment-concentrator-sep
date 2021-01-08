@@ -50,7 +50,7 @@ public class SubscriptionInfoDTO {
         this.subscriptionId = subscription.getId();
         this.price = subscription.getPrice();
         this.currency = subscription.getCurrency();
-        this.email = merchant.getMerchantEmail();
+        this.email = merchant.getEmail();
         this.billingPlanId = billingPlan.getBillingPlanId();
         this.cyclesNumber = billingPlan.getCyclesNumber();
         this.type = billingPlan.getType();

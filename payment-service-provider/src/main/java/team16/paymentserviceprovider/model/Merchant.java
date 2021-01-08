@@ -12,31 +12,21 @@ import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 @Entity
+@DiscriminatorValue("Merchant")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class Merchant {
+public class Merchant extends User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
     private String merchantName;
-
-    @Column(nullable = false)
-    private String merchantEmail;
-
     @Convert(converter = SensitiveDataConverter.class)
     @Column(unique = true)
     private String merchantId;
-
     @Convert(converter = SensitiveDataConverter.class)
     private String merchantPassword;
-
-    private String password;
-    private boolean activated;
+    private boolean passwordChanged;
+    private boolean pmChosen; //tek kada izabere paymentMethods postaje aktivan na LA
     private String activationUrl;
 
     @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -61,8 +51,9 @@ public class Merchant {
 
     public Merchant(MerchantPCDTO merchantPCDTO, App app){
         this.merchantName = merchantPCDTO.getMerchantName();
-        this.merchantEmail = merchantPCDTO.getMerchantEmail();
-        this.activated = false;
+        super.setEmail(merchantPCDTO.getMerchantEmail());
+        this.passwordChanged = false;
+        this.pmChosen = false;
         this.activationUrl = merchantPCDTO.getActivationUrl();
         this.merchantSuccessUrl = merchantPCDTO.getSuccessUrl();
         this.merchantFailedUrl = merchantPCDTO.getFailedUrl();
