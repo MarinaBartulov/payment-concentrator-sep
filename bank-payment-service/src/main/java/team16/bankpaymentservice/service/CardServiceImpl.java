@@ -13,6 +13,8 @@ import team16.bankpaymentservice.exceptions.LackingFundsException;
 import team16.bankpaymentservice.model.*;
 import team16.bankpaymentservice.repository.CardRepository;
 
+import java.time.LocalDateTime;
+
 @Service
 public class CardServiceImpl implements CardService {
 
@@ -30,6 +32,9 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     private CardOwnerServiceImpl cardOwnerService;
+
+    @Autowired
+    private OrderServiceImpl orderService;
 
     private ValidationService validationService;
 
@@ -111,6 +116,19 @@ public class CardServiceImpl implements CardService {
             responseDTO.setTransactionStatus(transaction.getStatus().toString());
             responseDTO.setResponseMessage(ibe.getMessage());
             logger.info("Redirection to PCC");
+
+            // generise se ACQUIRER_ORDER_ID i ACQUIRER_TIMESTAMP
+
+            Order order = new Order();
+            order.setAmount(transaction.getAmount());
+            order.setAcquirerTimestamp(LocalDateTime.now());
+            Order newOrder = orderService.create(order);
+            Long acquirerOrderId = newOrder.getAcquirerOrderId();
+
+            // zajedno sa podacima o kartici - podaci uneti sa fronta za autentifikaciju klijenta i kartice
+            
+            // zahtev se salje na PCC
+
             return responseDTO;
         } catch (Exception e) {
             responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
