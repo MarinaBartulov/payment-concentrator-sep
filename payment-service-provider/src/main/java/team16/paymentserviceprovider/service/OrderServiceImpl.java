@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService{
             System.out.println("kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke");
 
             PaymentRequestDTO paymentRequestDTO =
-                    new PaymentRequestDTO(merchant.getMerchantId(), merchant.getEmail(), merchant.getPassword(), order.getAmount(),
+                    new PaymentRequestDTO(merchant.getMerchantId(), merchant.getEmail(), merchant.getMerchantPassword(), order.getAmount(),
                             merchantOrderId, order.getMerchantOrderTimestamp(), merchant.getMerchantSuccessUrl(),
                             merchant.getMerchantFailedUrl(), merchant.getMerchantErrorUrl());
 

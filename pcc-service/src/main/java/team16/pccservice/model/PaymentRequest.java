@@ -41,6 +41,8 @@ public class PaymentRequest {
 
     private LocalDateTime createTime;
 
+    @Column
+    @Enumerated(EnumType.STRING)
     private Status status;
 
 }

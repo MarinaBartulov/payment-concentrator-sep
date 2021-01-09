@@ -82,7 +82,7 @@ public class PCCService {
         if(dto.getAcquirerTimestamp() == null) {
             throw new InvalidDataException("Empty acquirer timestamp");
         }
-        if(paymentRequestService.findByAcquirerOrderId(dto.getAcquirerOrderId()) == null) {
+        if(paymentRequestService.findByAcquirerOrderId(dto.getAcquirerOrderId()) != null) {
             throw new ExistingAcquirerOrder("Payment request with existing acquirer order id already exists");
         }
     }

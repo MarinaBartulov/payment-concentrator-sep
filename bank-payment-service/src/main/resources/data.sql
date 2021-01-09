@@ -8,6 +8,6 @@ values ('1703456879231111', '333', '2023-04', 5, 0);
 insert into bank (code) values ('170');
 
 insert into card_owner (type, merchant_id, merchant_email, password, success_url, failed_url, error_url, card_id)
-values ('Merchant', 'xsnktW85z0LIRG77uT+kGhxIpyiBUSAJouFW9UATYWY=|gwXO84nWT2N5WkwrNMUsUQ==', 'sb-nsr1z4072854@business.example.com', 'y4VmB/aNE+IHvtVX2TpzGQ==|stJRe4RnNU2UyyYvX861vw==', 'https://localhost:3000/success', 'https://localhost:3000/failed', 'https://localhost:3000/error', 2);
+values ('Merchant', 'jlSuwpyB4v62M7KBc4dXiXuwSg53AsnKtWV/zP9E0cA=|zj3rWlhdDkkqWcfAf9hMfw==', 'sb-nsr1z4072854@business.example.com', '4bgphCgirDKF3SYl4LvFRQ==|YA7u//HlmBJoA2EevRphGw==', 'https://localhost:3000/success', 'https://localhost:3000/failed', 'https://localhost:3000/error', 2);
 insert into card_owner (type, name, last_name, email, card_id) values ('Client', 'Jovan', 'Jovanovic', 'jovanj@maildrop.cc', 1);
 insert into card_owner (type, name, last_name, email, card_id) values ('Client', 'Milan', 'Milanovic', 'milanm@maildrop.cc', 3);
