@@ -3,9 +3,18 @@ package team16.bankpaymentservice.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import team16.bankpaymentservice.config.EndpointConfig;
+import team16.bankpaymentservice.config.RestConfig;
 import team16.bankpaymentservice.dto.ClientAuthDTO;
 import team16.bankpaymentservice.dto.OnlyAcquirerTransactionResponseDTO;
+import team16.bankpaymentservice.dto.PCCRequestDTO;
+import team16.bankpaymentservice.dto.PCCResponseDTO;
 import team16.bankpaymentservice.enums.TransactionStatus;
 import team16.bankpaymentservice.exceptions.InappropriateBankException;
 import team16.bankpaymentservice.exceptions.InvalidDataException;
@@ -13,6 +22,8 @@ import team16.bankpaymentservice.exceptions.LackingFundsException;
 import team16.bankpaymentservice.model.*;
 import team16.bankpaymentservice.repository.CardRepository;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 
 @Service
@@ -35,6 +46,12 @@ public class CardServiceImpl implements CardService {
 
     @Autowired
     private OrderServiceImpl orderService;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private RestConfig configuration;
 
     private ValidationService validationService;
 
@@ -123,11 +140,30 @@ public class CardServiceImpl implements CardService {
             order.setAmount(transaction.getAmount());
             order.setAcquirerTimestamp(LocalDateTime.now());
             Order newOrder = orderService.create(order);
-            Long acquirerOrderId = newOrder.getAcquirerOrderId();
 
             // zajedno sa podacima o kartici - podaci uneti sa fronta za autentifikaciju klijenta i kartice
-            
+            PCCRequestDTO pccRequestDTO = new PCCRequestDTO(dto.getPan(), dto.getSecurityNumber(),
+                    dto.getCardHolderName(), dto.getExpirationDate(), transaction.getMerchantOrderId(),
+                    transaction.getMerchantTimestamp(), payment.getPaymentId(), newOrder.getAcquirerOrderId(),
+                    newOrder.getAcquirerTimestamp(), merchantCard.getPAN());
+
             // zahtev se salje na PCC
+            HttpEntity<PCCRequestDTO> request = new HttpEntity<>(pccRequestDTO);
+            ResponseEntity<PCCResponseDTO> response = null;
+
+            try {
+                logger.info("Sending request to PCC service");
+                response = restTemplate.exchange(
+                        getEndpoint(), HttpMethod.POST, request, PCCResponseDTO.class);
+                logger.info("Received response from corresponding payment service");
+            } catch (RestClientException e) {
+                logger.error("RestTemplate error");
+                e.printStackTrace();
+            }
+
+            System.out.println("Response from pcc: ");
+            System.out.println(response.getBody());
+            System.out.println(response.getBody().getStatus());
 
             return responseDTO;
         } catch (Exception e) {
@@ -245,5 +281,9 @@ public class CardServiceImpl implements CardService {
             logger.error("Invalid client information - false expiration date");
             throw new InvalidDataException("Invalid client information.");
         }
+    }
+
+    private URI getEndpoint() throws URISyntaxException {
+        return new URI(configuration.url() + EndpointConfig.PCC_SERVICE_BASE_URL + "/api/redirect");
     }
 }
