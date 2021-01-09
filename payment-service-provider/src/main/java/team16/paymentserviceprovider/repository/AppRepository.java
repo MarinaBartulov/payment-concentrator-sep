@@ -6,4 +6,5 @@ import team16.paymentserviceprovider.model.App;
 public interface AppRepository extends JpaRepository<App, Long> {
 
     App findByOfficialEmail(String email);
+    App findByAppId(String appId);
 }

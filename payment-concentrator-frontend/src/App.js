@@ -3,8 +3,7 @@ import "./App.css";
 import BitcoinCancel from "./components/BitcoinCancel";
 import BitcoinError from "./components/BitcoinError";
 import BitcoinSuccess from "./components/BitcoinSuccess";
-import Test from "./components/Test";
-import AppRegistration from "./components/AppRegistration";
+import Payment from "./components/Payment";
 import { ToastContainer } from "react-toastify";
 import PayPalReturn from "./components/paypal/PayPalReturn";
 import PayPalCancel from "./components/paypal/PayPalCancel";
@@ -15,27 +14,32 @@ import PayPalSubscriptionCancel from "./components/paypal/PayPalSubscriptionCanc
 import PayPalSubscriptionSuccess from "./components/paypal/PayPalSubscriptionSuccess";
 import PayPalSubscriptionFail from "./components/paypal/PayPalSubscriptionFail";
 import Subscription from "./components/Subscription";
+import Home from "./components/Home";
+import Login from "./components/Login";
+import AdminPanel from "./components/AdminPanel";
+import MerchantChoosePM from "./components/MerchantChoosePM";
+import MerchantChangePM from "./components/MerchantChangePM";
 
 function App() {
   return (
-    <div className="App">
-      <ToastContainer
-        position="top-right"
-        autoClose={5000}
-        hideProgressBar={true}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-      <Router>
+    <Router>
+      <div className="App">
+        <ToastContainer
+          position="top-right"
+          autoClose={5000}
+          hideProgressBar={true}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+        />
         <Route exact path="/">
-          <Test />
+          <Home />
         </Route>
         <Route exact path="/order/:orderId">
-          <Test />
+          <Payment />
         </Route>
         <Route exact path="/pay/return">
           <PayPalReturn />
@@ -73,11 +77,20 @@ function App() {
         <Route exact path="/bitcoin/error">
           <BitcoinError />
         </Route>
-        <Route exact path="/appRegistration">
-          <AppRegistration />
+        <Route exact path="/login">
+          <Login />
         </Route>
-      </Router>
-    </div>
+        <Route exact path="/adminPanel">
+          <AdminPanel />
+        </Route>
+        <Route exact path="/merchantChoosePM">
+          <MerchantChoosePM />
+        </Route>
+        <Route exact path="/merchantChangePM">
+          <MerchantChangePM />
+        </Route>
+      </div>
+    </Router>
   );
 }
 

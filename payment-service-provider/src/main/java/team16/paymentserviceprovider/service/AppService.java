@@ -7,4 +7,5 @@ public interface AppService {
 
       AppDTO addNewApp(AppDTO appDTO);
       App findByEmail(String email);
+      App findByAppId(String appId);
 }

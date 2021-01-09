@@ -62,7 +62,7 @@ const AppRegistration = () => {
           style={{ width: "90%", margin: "auto" }}
         >
           <div className="form-group">
-            <label for="appName">Application name:</label>
+            <label htmlFor="appName">Application name:</label>
             <input
               className="form-control"
               id="appName"
@@ -78,7 +78,7 @@ const AppRegistration = () => {
             ) : null}
           </div>
           <div className="form-group">
-            <label for="webAddress">Web address:</label>
+            <label htmlFor="webAddress">Web address:</label>
             <input
               className="form-control"
               id="webAddress"
@@ -94,7 +94,7 @@ const AppRegistration = () => {
             ) : null}
           </div>
           <div className="form-group">
-            <label for="officialEmail">Official email:</label>
+            <label htmlFor="officialEmail">Official email:</label>
             <input
               className="form-control"
               id="officialEmail"

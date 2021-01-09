@@ -18,12 +18,12 @@ import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.model.Subscription;
 import team16.paymentserviceprovider.service.impl.BillingPlanServiceImpl;
+import team16.paymentserviceprovider.service.impl.MerchantServiceImpl;
 import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 public class PaymentService {
@@ -68,8 +68,8 @@ public class PaymentService {
         validateDTO(dto);
 
         Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
-        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
-        System.out.println("Found merchant: " + merchant.getMerchantEmail() + "|" + merchant.getMerchantId());
+        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
+        System.out.println("Found merchant: " + merchant.getEmail() + "|" + merchant.getMerchantId());
 
         Order order = new Order();
         order.setMerchant(merchant);
@@ -88,7 +88,7 @@ public class PaymentService {
     public String saveSubscriptionFromLA(SubscriptionRequestDTO dto) {
 
         Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
-        logger.info("Found merchant: " + merchant.getMerchantEmail() + " | " + merchant.getMerchantId());
+        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
 
         Subscription subscription = new Subscription(dto, merchant);
         Subscription savedSubscription = subscriptionService.save(subscription);
@@ -99,42 +99,42 @@ public class PaymentService {
     }
 
 
-    public PaymentResponseInfoDTO createPaymentRequest(Long orderId) throws Exception {
-        System.out.println("------------------------Order from PC front-------------------------------");
-        Order order = orderService.getOne(orderId);
-        System.out.println("Found Order: " + order.getMerchantOrderId());
-        logger.info("Found Order: " + order.getMerchantOrderId());
-        if(order == null) {
-            System.out.println("Not Found Order");
-            logger.error("Not Found Order");
-            throw new InvalidDataException("Nonexistent order.");
-        }
-        Merchant merchant = order.getMerchant();
-        Long merchantOrderId = order.getMerchantOrderId();
-        System.out.println("Found Merchant Order: " + order.getMerchantOrderId());
-
-        // kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke
-        System.out.println("kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke");
-
-        PaymentRequestDTO paymentRequestDTO =
-                new PaymentRequestDTO(merchant.getMerchantId(), merchant.getMerchantEmail(), merchant.getPassword(), order.getAmount(),
-                        merchantOrderId, order.getMerchantOrderTimestamp(), merchant.getMerchantSuccessUrl(),
-                        merchant.getMerchantFailedUrl(), merchant.getMerchantErrorUrl());
-
-        // saljem zahtev za dobijanje payment url i id na servis banke prodavca
-        System.out.println("saljem zahtev za dobijanje payment url i id na servis banke prodavca");
-        logger.info("Sending request to bank service");
-        PaymentResponseInfoDTO response
-                = restTemplate.postForObject(getEndpoint(),
-                paymentRequestDTO, PaymentResponseInfoDTO.class);
-
-        logger.info("Received response from bank service");
-
-        System.out.println(response.getPaymentUrl());
-        System.out.println(response.getPaymentId());
-
-        return response;
-    }
+//    public PaymentResponseInfoDTO createPaymentRequest(Long orderId) throws Exception {
+//        System.out.println("------------------------Order from PC front-------------------------------");
+//        Order order = orderService.getOne(orderId);
+//        System.out.println("Found Order: " + order.getMerchantOrderId());
+//        logger.info("Found Order: " + order.getMerchantOrderId());
+//        if(order == null) {
+//            System.out.println("Not Found Order");
+//            logger.error("Not Found Order");
+//            throw new InvalidDataException("Nonexistent order.");
+//        }
+//        Merchant merchant = order.getMerchant();
+//        Long merchantOrderId = order.getMerchantOrderId();
+//        System.out.println("Found Merchant Order: " + order.getMerchantOrderId());
+//
+//        // kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke
+//        System.out.println("kreiram novi PaymentRequestDTO koji cu da posaljem na servis banke");
+//
+//        PaymentRequestDTO paymentRequestDTO =
+//                new PaymentRequestDTO(merchant.getMerchantId(), merchant.getEmail(), merchant.getPassword(), order.getAmount(),
+//                        merchantOrderId, order.getMerchantOrderTimestamp(), merchant.getMerchantSuccessUrl(),
+//                        merchant.getMerchantFailedUrl(), merchant.getMerchantErrorUrl());
+//
+//        // saljem zahtev za dobijanje payment url i id na servis banke prodavca
+//        System.out.println("saljem zahtev za dobijanje payment url i id na servis banke prodavca");
+//        logger.info("Sending request to bank service");
+//        PaymentResponseInfoDTO response
+//                = restTemplate.postForObject(getEndpoint(),
+//                paymentRequestDTO, PaymentResponseInfoDTO.class);
+//
+//        logger.info("Received response from bank service");
+//
+//        System.out.println(response.getPaymentUrl());
+//        System.out.println(response.getPaymentId());
+//
+//        return response;
+//    }
 
     private URI getEndpoint() throws URISyntaxException {
         return new URI(configuration.url() + EndpointConfig.BANK_PAYMENT_SERVICE_BASE_URL + "/api/payments/request");
@@ -169,7 +169,7 @@ public class PaymentService {
             throw new InvalidDataException("Amount cannot be negative.");
         }
         Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
-        if(!merchant.getPassword().equals(dto.getMerchantPassword())) {
+        if(!merchant.getMerchantPassword().equals(dto.getMerchantPassword())) {
             System.out.println("passwords dont match");
             logger.debug("Invalid merchant password");
             logger.error("Failed to create Order due to invalid received data");
@@ -185,32 +185,32 @@ public class PaymentService {
         }
     }
 
-    public String createGenericPaymentRequest(Order order, String paymentMethodName) throws URISyntaxException {
-        Merchant merchant = order.getMerchant();
-        if(merchant == null){
-            logger.error("Failed to find Merchant");
-            return null;
-        }
-
-        OrderInfoDTO orderDTO = new OrderInfoDTO(order.getMerchantOrderId(),merchant.getMerchantEmail(), order.getAmount(), order.getCurrency(),
-                merchant.getMerchantSuccessUrl(), merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
-
-
-        HttpEntity<OrderInfoDTO> request = new HttpEntity<>(orderDTO);
-        ResponseEntity<String> response = null;
-
-        try {
-            logger.info("Sending request to corresponding payment service");
-            response = restTemplate.exchange(
-                    getServiceEndpoint(paymentMethodName), HttpMethod.POST, request, String.class);
-            logger.info("Received response from corresponding payment service");
-        } catch (RestClientException e) {
-            logger.error("RestTemplate error");
-            e.printStackTrace();
-        }
-
-        return response.getBody();
-    }
+//    public String createGenericPaymentRequest(Order order, String paymentMethodName) throws URISyntaxException {
+//        Merchant merchant = order.getMerchant();
+//        if(merchant == null){
+//            logger.error("Failed to find Merchant");
+//            return null;
+//        }
+//
+//        OrderInfoDTO orderDTO = new OrderInfoDTO(order.getMerchantOrderId(),merchant.getEmail(), order.getAmount(), order.getCurrency(),
+//                merchant.getMerchantSuccessUrl(), merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
+//
+//
+//        HttpEntity<OrderInfoDTO> request = new HttpEntity<>(orderDTO);
+//        ResponseEntity<String> response = null;
+//
+//        try {
+//            logger.info("Sending request to corresponding payment service");
+//            response = restTemplate.exchange(
+//                    getServiceEndpoint(paymentMethodName), HttpMethod.POST, request, String.class);
+//            logger.info("Received response from corresponding payment service");
+//        } catch (RestClientException e) {
+//            logger.error("RestTemplate error");
+//            e.printStackTrace();
+//        }
+//
+//        return response.getBody();
+//    }
 
     private URI getServiceEndpoint(String paymentMethodName) throws URISyntaxException {
         return new URI(configuration.url() + "/" + paymentMethodName + "-payment-service/api/pay");

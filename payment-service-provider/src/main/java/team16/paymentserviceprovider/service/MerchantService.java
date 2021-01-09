@@ -1,7 +1,12 @@
 package team16.paymentserviceprovider.service;
 
+import org.springframework.security.core.Authentication;
+import team16.paymentserviceprovider.dto.MerchantInfoDTO;
+import team16.paymentserviceprovider.dto.MerchantPCDTO;
+import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
 
+import javax.mail.MessagingException;
 import java.util.List;
 
 public interface MerchantService {
@@ -10,4 +15,7 @@ public interface MerchantService {
     List<Merchant> findAll();
     Merchant findByMerchantId(String id);
     Merchant findByMerchantEmail(String email);
+    boolean registerNewMerchant(MerchantPCDTO merchantPCDTO) throws MessagingException, InterruptedException;
+    MerchantInfoDTO getMyInfo(Authentication currentUser);
+    Merchant save(Merchant merchant);
 }

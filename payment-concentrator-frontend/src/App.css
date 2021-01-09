@@ -75,3 +75,10 @@
     transform: rotate(360deg);
   }
 }
+
+.homeDiv {
+  min-height: 92.5vh;
+  padding-top: 15%;
+  background-image: url("../src/assets/home.jpg");
+  background-size: cover;
+}
