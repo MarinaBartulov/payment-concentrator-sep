@@ -9,13 +9,16 @@ import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.*;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.model.Order;
+import team16.paymentserviceprovider.model.PaymentMethod;
 import team16.paymentserviceprovider.model.Subscription;
 import team16.paymentserviceprovider.service.OrderService;
+import team16.paymentserviceprovider.service.PaymentMethodService;
 import team16.paymentserviceprovider.service.PaymentService;
 import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
 
 import java.net.URISyntaxException;
 
+// TREBA RAZDVOJITI OVAJ KONTROLER NA DVA KONTROLERA, ZA ORDERE I SUBSCRIPTION JER OVAJ PAYMENT NEMA SMISLA
 @RestController
 @RequestMapping(value = "/api/payments")
 public class PaymentController {
@@ -28,6 +31,9 @@ public class PaymentController {
 
     @Autowired
     private SubscriptionServiceImpl subscriptionService;
+
+    @Autowired
+    private PaymentMethodService paymentMethodService;
 
     Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
@@ -69,47 +75,47 @@ public class PaymentController {
 
     }
 
-    @GetMapping(value = "/{orderId}")
-    public ResponseEntity<?> createBankOrder(@PathVariable Long orderId) throws Exception{
-        try {
-            PaymentResponseInfoDTO response = paymentService.createPaymentRequest(orderId);
-            System.out.println("Response OK");
-            logger.info("Request for creating bank payment failed.");
-            return ResponseEntity.ok(response.getPaymentUrl());
-        } catch (InvalidDataException ide) {
-            System.out.println("Response Invalid Data Exception");
-            logger.error("Request for creating bank payment failed because of invalid data.");
-            return new ResponseEntity<>(ide.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-        catch (Exception e) {
-            System.out.println("Response Exception");
-            logger.error("Request for creating bank payment failed.");
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
+//    @GetMapping(value = "/{orderId}")
+//    public ResponseEntity<?> createBankOrder(@PathVariable Long orderId) throws Exception{
+//        try {
+//            PaymentResponseInfoDTO response = paymentService.createPaymentRequest(orderId);
+//            System.out.println("Response OK");
+//            logger.info("Request for creating bank payment failed.");
+//            return ResponseEntity.ok(response.getPaymentUrl());
+//        } catch (InvalidDataException ide) {
+//            System.out.println("Response Invalid Data Exception");
+//            logger.error("Request for creating bank payment failed because of invalid data.");
+//            return new ResponseEntity<>(ide.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
+//        catch (Exception e) {
+//            System.out.println("Response Exception");
+//            logger.error("Request for creating bank payment failed.");
+//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+//        }
+//    }
 
-    @PutMapping(value="/{orderId}")
-    public ResponseEntity<?> createGenericOrder(@PathVariable Long orderId, @RequestBody String paymentMethodName) throws URISyntaxException {
-        Order order = orderService.getOne(orderId);
-
-        if(order == null)
-        {
-            logger.error("Order not found");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        //proveriti payment method
-
-        String redirectUrl = paymentService.createGenericPaymentRequest(order, paymentMethodName);
-        if(redirectUrl == null)
-        {
-            logger.error("Failed to get URL");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Sending redirection URL");
-        System.out.println("Redirect url = " + redirectUrl);
-        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
-    }
+//    @PutMapping(value="/{orderId}")
+//    public ResponseEntity<?> createGenericOrder(@PathVariable Long orderId, @RequestBody String paymentMethodName) throws URISyntaxException {
+//        Order order = orderService.getOne(orderId);
+//
+//        if(order == null)
+//        {
+//            logger.error("Order not found");
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//
+//        //proveriti payment method
+//
+//        String redirectUrl = paymentService.createGenericPaymentRequest(order, paymentMethodName);
+//        if(redirectUrl == null)
+//        {
+//            logger.error("Failed to get URL");
+//            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+//        }
+//        logger.info("Sending redirection URL");
+//        System.out.println("Redirect url = " + redirectUrl);
+//        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
+//    }
 
     @PutMapping(value="/subscription/{subscriptionId}")
     public ResponseEntity<?> createSubscription(@PathVariable Long subscriptionId) throws URISyntaxException {
@@ -130,6 +136,38 @@ public class PaymentController {
         logger.info("Sending redirection URL");
         System.out.println("Redirect url = " + redirectUrl);
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
+    }
+
+    @GetMapping(value="/order/{id}/paymentMethods")
+    public ResponseEntity getAvailablePaymentMethodsForOrder(@PathVariable("id") Long id){
+
+        Order order = this.orderService.findById(id);
+        if(order == null){
+            return ResponseEntity.badRequest().body("Order with that id does not exist.");
+        }
+        return new ResponseEntity(this.orderService.getAvailablePaymentMethodsForOrder(order), HttpStatus.OK);
+    }
+
+    @PutMapping(value="/order/{id}/choosePaymentMethod")
+    public ResponseEntity choosePaymentMethodForOrder(@PathVariable("id") Long id, @RequestBody String paymentMethodName){
+
+        Order order = this.orderService.findById(id);
+        if(order == null){
+            return ResponseEntity.badRequest().body("Order with that id does not exist.");
+        }
+
+        PaymentMethod paymentMethod = this.paymentMethodService.findByName(paymentMethodName);
+        if(paymentMethod == null){
+            return ResponseEntity.badRequest().body("Payment method with that name does not exist.");
+        }
+
+        String redirectUrl = this.orderService.choosePaymentMethodForOrderAndSend(order, paymentMethodName);
+        if(redirectUrl == null){
+            return ResponseEntity.badRequest().body("Something went wrong while sending order to the payment service.");
+        }else{
+            return ResponseEntity.ok().body(redirectUrl);
+        }
+
     }
 
 }

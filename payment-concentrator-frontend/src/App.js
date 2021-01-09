@@ -4,7 +4,6 @@ import BitcoinCancel from "./components/BitcoinCancel";
 import BitcoinError from "./components/BitcoinError";
 import BitcoinSuccess from "./components/BitcoinSuccess";
 import Payment from "./components/Payment";
-import AppRegistration from "./components/AppRegistration";
 import { ToastContainer } from "react-toastify";
 import PayPalReturn from "./components/paypal/PayPalReturn";
 import PayPalCancel from "./components/paypal/PayPalCancel";
@@ -15,7 +14,6 @@ import PayPalSubscriptionCancel from "./components/paypal/PayPalSubscriptionCanc
 import PayPalSubscriptionSuccess from "./components/paypal/PayPalSubscriptionSuccess";
 import PayPalSubscriptionFail from "./components/paypal/PayPalSubscriptionFail";
 import Subscription from "./components/Subscription";
-import Header from "./components/Header";
 import Home from "./components/Home";
 import Login from "./components/Login";
 import AdminPanel from "./components/AdminPanel";
