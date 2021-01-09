@@ -1,0 +1,87 @@
+import { HttpService } from "./http-service";
+import { SERVICES_ENDPOINTS, PSP_ENDPOINTS } from "../constants";
+
+class PaymentService extends HttpService {
+  getAvailablePaymentMethods = async (id) => {
+    const response = await this.client.get(
+      SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+        PSP_ENDPOINTS.PAYMENTS_ORDER +
+        "/" +
+        id +
+        "/paymentMethods"
+    );
+    return response.data;
+  };
+
+  choosePaymentMethodForOrder = async (id, paymentMethod) => {
+    const response = await this.client.put(
+      SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+        PSP_ENDPOINTS.PAYMENTS_ORDER +
+        "/" +
+        id +
+        "/choosePaymentMethod",
+      paymentMethod
+    );
+    return response.data;
+  };
+
+  // testBank = async (orderId) => {
+  //   try {
+  //     console.log("order id");
+  //     console.log(orderId);
+  //     const { data } = await this.client.get(
+  //       SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+  //         PSP_ENDPOINTS.PAYMENTS +
+  //         "/" +
+  //         orderId
+  //     );
+  //     console.log(data);
+  //     window.open(data);
+  //     return data;
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
+
+  // testBitcoin = async () => {
+  //   try {
+  //     const response = await this.client.get(
+  //       SERVICES_ENDPOINTS.BITCOIN_PAYMENT_SERVICE +
+  //         BITCOIN_SERVICE_ENDPOINTS.TEST
+  //     );
+  //     alert(response.data);
+  //     return response;
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
+
+  // testPayPal = async () => {
+  //   try {
+  //     const response = await this.client.get(
+  //       SERVICES_ENDPOINTS.PAYPAL_PAYMENT_SERVICE +
+  //         PAYPAL_SERVICE_ENDPOINTS.TEST
+  //     );
+  //     alert(response.data);
+  //     return response;
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
+
+  // getAvailableServices = async () => {
+  //   try {
+  //     const response = await this.client.get(
+  //       SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+  //         PSP_ENDPOINTS.AVAILABLE_SERVICES
+  //     );
+  //     alert("Available services are: " + response.data);
+  //     console.log(response);
+  //     return response;
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
+}
+
+export const paymentService = new PaymentService();
