@@ -121,7 +121,7 @@ public class PayPalController {
     public ResponseEntity<?> createSubscription(@RequestBody @Valid SubscriptionDTO subscriptionDTO) {
 
         Client client = clientService.findByEmail(subscriptionDTO.getEmail());
-        logger.error("Merchant found | Email: " + subscriptionDTO.getEmail());
+        logger.info("Merchant found | Email: " + subscriptionDTO.getEmail());
         if(client == null) {
             logger.error("Merchant not found | Email: " + subscriptionDTO.getEmail());
             return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
