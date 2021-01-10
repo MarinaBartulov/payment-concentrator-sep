@@ -85,10 +85,7 @@ public class PaymentService {
                 "https://localhost:3001/order/" + newOrder.getMerchantOrderId(), merchant.getMerchantId());
     }
 
-    public String saveSubscriptionFromLA(SubscriptionRequestDTO dto) {
-
-        Merchant merchant = merchantService.findByMerchantId(dto.getMerchantId());
-        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
+    public String saveSubscriptionFromLA(SubscriptionRequestDTO dto, Merchant merchant) {
 
         Subscription subscription = new Subscription(dto, merchant);
         Subscription savedSubscription = subscriptionService.save(subscription);
