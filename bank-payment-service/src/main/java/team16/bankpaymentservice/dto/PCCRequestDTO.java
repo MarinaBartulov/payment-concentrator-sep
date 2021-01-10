@@ -22,6 +22,7 @@ public class PCCRequestDTO {
     private LocalDateTime merchantTimestamp;
 
     private Long paymentId;
+    private Long paymentRequestId;
 
     private Long acquirerOrderId;
     private LocalDateTime acquirerTimestamp;

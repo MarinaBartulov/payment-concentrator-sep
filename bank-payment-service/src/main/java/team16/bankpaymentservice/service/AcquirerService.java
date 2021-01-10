@@ -101,7 +101,7 @@ public class AcquirerService {
             // zajedno sa podacima o kartici - podaci uneti sa fronta za autentifikaciju klijenta i kartice
             PCCRequestDTO pccRequestDTO = new PCCRequestDTO(dto.getPan(), dto.getSecurityNumber(),
                     dto.getCardHolderName(), dto.getExpirationDate(), t1.getMerchantOrderId(),
-                    t1.getMerchantTimestamp(), payment.getPaymentId(), t1.getAcquirerOrderId(),
+                    t1.getMerchantTimestamp(), payment.getPaymentId(), null, t1.getAcquirerOrderId(),
                     t1.getAcquirerTimestamp(), merchantCard.getPAN());
 
             // zahtev se salje na PCC

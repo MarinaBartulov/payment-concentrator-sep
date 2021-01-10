@@ -18,6 +18,11 @@ public class PaymentServiceImpl implements IPaymentService {
     }
 
     @Override
+    public Payment findByTransactionId(Long transactionId) {
+        return paymentRepository.findPaymentByTransactionId(transactionId);
+    }
+
+    @Override
     public Payment update(Payment payment) {
         return paymentRepository.save(payment);
     }

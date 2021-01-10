@@ -65,15 +65,25 @@ public class PCCService {
         PaymentRequest newRequest = paymentRequestService.update(paymentRequest);
         logger.info("PCC Payment Request updated");
 
+        PCCRequestDTO requestDTO = new PCCRequestDTO(dto.getClientPan(), dto.getSecurityNumber(), dto.getCardHolderName(),
+                dto.getExpirationDate(), dto.getMerchantOrderId(), dto.getMerchantTimestamp(), dto.getPaymentId(),
+                newRequest.getId(), dto.getAcquirerOrderId(), dto.getAcquirerTimestamp(), dto.getMerchantPan());
+
         // zahtev se salje na Issuer Bank
-        HttpEntity<PCCRequestDTO> request = new HttpEntity<>(dto);
-        ResponseEntity<String> response = null;
+        HttpEntity<PCCRequestDTO> request = new HttpEntity<>(requestDTO);
+        ResponseEntity<PCCResponseDTO> response = null;
 
         try {
             logger.info("Sending request to Issuer Bank service");
             response = restTemplate.exchange(
-                    getEndpoint(), HttpMethod.POST, request, String.class);
-            System.out.println(response.getBody());
+                    getEndpoint(), HttpMethod.POST, request, PCCResponseDTO.class);
+            System.out.println(response.getBody().getStatus());
+            System.out.println(response.getBody().getAcquirerOrderId());
+            System.out.println(response.getBody().getAcquirerTimestamp());
+            System.out.println(response.getBody().getIssuerOrderId());
+            System.out.println(response.getBody().getIssuerTimestamp());
+            System.out.println(response.getBody().getMerchantOrderId());
+            System.out.println(response.getBody().getPaymentId());
             logger.info("Received response from Issuer Bank service");
         } catch (RestClientException e) {
             logger.error("RestTemplate error");

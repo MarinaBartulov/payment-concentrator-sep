@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team16.bankpaymentservice.dto.PCCRequestDTO;
+import team16.bankpaymentservice.dto.PCCResponseDTO;
 import team16.bankpaymentservice.service.IssuerService;
 
 @RestController
@@ -24,12 +25,11 @@ public class IssuerController {
 
     @PostMapping(value = "/pcc-payment-request", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> handlePCCPaymentRequest(@RequestBody PCCRequestDTO dto) {
-        String response;
+        PCCResponseDTO response = null;
         try {
             response = issuerService.handlePCCPaymentRequest(dto);
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch(Exception e) {
-            response = "auc";
             logger.error("ERROR | while completing transaction: " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }

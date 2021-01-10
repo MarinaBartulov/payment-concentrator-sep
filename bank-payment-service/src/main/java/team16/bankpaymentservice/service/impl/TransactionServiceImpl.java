@@ -18,6 +18,11 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public Transaction findByAcquirerOrderId(Long id) {
+        return transactionRepository.findTransactionByAcquirerOrderId(id);
+    }
+
+    @Override
     public Transaction create(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
