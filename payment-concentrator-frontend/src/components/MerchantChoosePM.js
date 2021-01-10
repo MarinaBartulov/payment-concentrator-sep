@@ -3,6 +3,7 @@ import Header from "./Header";
 import { paymentMethodService } from "../services/payment-method-service";
 import { merchantService } from "../services/merchant-service";
 import { toast } from "react-toastify";
+import { useHistory } from "react-router-dom";
 
 const MerchantChoosePM = () => {
   const [step, setStep] = useState(0);
@@ -11,25 +12,31 @@ const MerchantChoosePM = () => {
   const [formsData, setFormsData] = useState([]);
   const [formValues, setFormValues] = useState({});
   const [showSuccessMsg, setShowSuccessMsg] = useState(false);
+  const history = useHistory();
 
   const getFormsDataForAvailablePaymentMethods = async () => {
-    try {
-      const response = await paymentMethodService.getFormsDataForAvailablePaymentMethods();
-      setFormsData(response);
-      let tempArr = [];
-      tempArr[0] = true;
-      for (let i = 1; i < formsData.length; i++) {
-        tempArr[i] = false;
+    const response = await merchantService.getMyInfo();
+    if (response.pmChosen) {
+      history.push("/merchantChangePM");
+    } else {
+      try {
+        const response = await paymentMethodService.getFormsDataForAvailablePaymentMethods();
+        setFormsData(response);
+        let tempArr = [];
+        tempArr[0] = true;
+        for (let i = 1; i < formsData.length; i++) {
+          tempArr[i] = false;
+        }
+        setSteps(tempArr);
+        initValues(response);
+      } catch (error) {
+        if (error.response) {
+          console.log("Error: " + JSON.stringify(error.response));
+        }
+        toast.error(error.response ? error.response.data : error.message, {
+          hideProgressBar: true,
+        });
       }
-      setSteps(tempArr);
-      initValues(response);
-    } catch (error) {
-      if (error.response) {
-        console.log("Error: " + JSON.stringify(error.response));
-      }
-      toast.error(error.response ? error.response.data : error.message, {
-        hideProgressBar: true,
-      });
     }
   };
 
@@ -37,7 +44,7 @@ const MerchantChoosePM = () => {
     getFormsDataForAvailablePaymentMethods();
   }, []);
 
-  //inicijalnizacija polja svih formi
+  //inicijalizacija polja svih formi
   const initValues = (formsData) => {
     let tempFormValues = {};
     for (let i = 0; i < formsData.length; i++) {
