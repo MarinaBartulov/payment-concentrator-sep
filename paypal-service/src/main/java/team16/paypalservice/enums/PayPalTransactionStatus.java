@@ -5,5 +5,6 @@ public enum PayPalTransactionStatus {
     CREATED,
     COMPLETED,
     CANCELED,
+    EXPIRED,
     FAILED
 }
