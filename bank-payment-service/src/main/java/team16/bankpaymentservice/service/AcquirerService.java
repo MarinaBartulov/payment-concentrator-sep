@@ -215,15 +215,48 @@ public class AcquirerService {
         return new URI(configuration.url() + EndpointConfig.PCC_SERVICE_BASE_URL + "/api/redirect");
     }
 
-    public TransactionDTO finishPayment(PCCResponseDTO dto) {
-        TransactionDTO response = new TransactionDTO();
-        response.setPaymentId(dto.getPaymentId());
-        response.setMerchantOrderId(dto.getMerchantOrderId());
-        response.setAcquirerOrderId(dto.getAcquirerOrderId());
-        response.setAcquirerTimestamp(dto.getAcquirerTimestamp());
-        response.setIssuerOrderId(dto.getIssuerOrderId());
-        response.setIssuerTimestamp(dto.getIssuerTimestamp());
-        response.setStatus(dto.getStatus().toString());
-        return response;
+    public TransactionDTO finishPayment(PCCResponseDTO dto) throws Exception {
+
+        Payment payment = paymentService.findById(dto.getPaymentId());
+
+        if(payment == null) {
+            throw new Exception("Nonexistent payment");
+        }
+
+        Transaction transaction = payment.getTransaction();
+
+        if(transaction == null) {
+            throw new Exception("Nonexistent transaction");
+        }
+
+        TransactionDTO responseDTO = new TransactionDTO();
+        responseDTO.setPaymentId(dto.getPaymentId());
+        responseDTO.setMerchantOrderId(dto.getMerchantOrderId());
+        responseDTO.setAcquirerOrderId(dto.getAcquirerOrderId());
+        responseDTO.setAcquirerTimestamp(dto.getAcquirerTimestamp());
+        responseDTO.setIssuerOrderId(dto.getIssuerOrderId());
+        responseDTO.setIssuerTimestamp(dto.getIssuerTimestamp());
+        responseDTO.setStatus(dto.getStatus().toString());
+
+        // zahtev se salje na PSP
+        HttpEntity<TransactionDTO> request = new HttpEntity<>(responseDTO);
+        ResponseEntity<String> response = null;
+
+        try {
+            logger.info("Sending request to PSP service");
+            response = restTemplate.exchange(
+                    getEndpointPSP(), HttpMethod.POST, request, String.class);
+            System.out.println(response.getBody());
+            logger.info("Received response from PSP service");
+        } catch (RestClientException e) {
+            logger.error("RestTemplate error");
+            e.printStackTrace();
+        }
+
+        return responseDTO;
+    }
+
+    private URI getEndpointPSP() throws URISyntaxException {
+        return new URI(configuration.url() + EndpointConfig.PSP_SERVICE_BASE_URL + "/api/redirect");
     }
 }

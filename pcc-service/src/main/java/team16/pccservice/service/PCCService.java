@@ -77,13 +77,6 @@ public class PCCService {
             logger.info("Sending request to Issuer Bank service");
             response = restTemplate.exchange(
                     getEndpoint(), HttpMethod.POST, request, PCCResponseDTO.class);
-            System.out.println(response.getBody().getStatus());
-            System.out.println(response.getBody().getAcquirerOrderId());
-            System.out.println(response.getBody().getAcquirerTimestamp());
-            System.out.println(response.getBody().getIssuerOrderId());
-            System.out.println(response.getBody().getIssuerTimestamp());
-            System.out.println(response.getBody().getMerchantOrderId());
-            System.out.println(response.getBody().getPaymentId());
             logger.info("Received response from Issuer Bank service");
         } catch (RestClientException e) {
             logger.error("RestTemplate error");

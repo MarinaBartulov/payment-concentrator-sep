@@ -44,16 +44,22 @@ public class AcquirerController {
 
     @PostMapping(value = "/finish-payment", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> finishPaymentFromIssuerBank(@RequestBody PCCResponseDTO dto) {
-        TransactionDTO transactionDTO = acquirerService.finishPayment(dto);
-        System.out.println("Response sa PCC-a");
-        System.out.println(transactionDTO.getPaymentId());
-        System.out.println(transactionDTO.getMerchantOrderId());
-        System.out.println(transactionDTO.getAcquirerOrderId());
-        System.out.println(transactionDTO.getAcquirerTimestamp());
-        System.out.println(transactionDTO.getIssuerOrderId());
-        System.out.println(transactionDTO.getIssuerTimestamp());
-        System.out.println(transactionDTO.getStatus());
-        return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+        TransactionDTO transactionDTO = null;
+        try {
+            transactionDTO = acquirerService.finishPayment(dto);
+            System.out.println("Response sa PCC-a");
+            System.out.println(transactionDTO.getPaymentId());
+            System.out.println(transactionDTO.getMerchantOrderId());
+            System.out.println(transactionDTO.getAcquirerOrderId());
+            System.out.println(transactionDTO.getAcquirerTimestamp());
+            System.out.println(transactionDTO.getIssuerOrderId());
+            System.out.println(transactionDTO.getIssuerTimestamp());
+            System.out.println(transactionDTO.getStatus());
+            return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
     }
 
 }
