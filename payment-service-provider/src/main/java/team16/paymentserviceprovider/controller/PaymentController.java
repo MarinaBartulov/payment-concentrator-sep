@@ -8,9 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.*;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
+import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.model.PaymentMethod;
 import team16.paymentserviceprovider.model.Subscription;
+import team16.paymentserviceprovider.service.MerchantService;
 import team16.paymentserviceprovider.service.OrderService;
 import team16.paymentserviceprovider.service.PaymentMethodService;
 import team16.paymentserviceprovider.service.PaymentService;
@@ -34,6 +36,9 @@ public class PaymentController {
 
     @Autowired
     private PaymentMethodService paymentMethodService;
+
+    @Autowired
+    private MerchantService merchantService;
 
     Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
@@ -62,9 +67,17 @@ public class PaymentController {
 
     @PostMapping(value="/subscribe")
     public ResponseEntity<?> saveSubscriptionFromLA(@RequestBody SubscriptionRequestDTO dto) {
+        System.out.println("Usao u save subscription from LA");
 
+        Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
+        if(merchant == null)
+        {
+            logger.error("Merchant not found | Email: " + dto.getMerchantEmail());
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
         try {
-            String redirectURL = paymentService.saveSubscriptionFromLA(dto);
+            String redirectURL = paymentService.saveSubscriptionFromLA(dto, merchant);
             logger.info("Subscription successfully created. Sending redirection URL to LA");
             System.out.println(redirectURL);
             return new ResponseEntity<>(redirectURL, HttpStatus.OK);
