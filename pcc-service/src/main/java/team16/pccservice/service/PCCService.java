@@ -3,8 +3,14 @@ package team16.pccservice.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+import team16.pccservice.config.EndpointConfig;
+import team16.pccservice.config.RestConfig;
 import team16.pccservice.dto.PCCRequestDTO;
 import team16.pccservice.dto.PCCResponseDTO;
 import team16.pccservice.enums.Status;
@@ -13,6 +19,9 @@ import team16.pccservice.exceptions.ExistingAcquirerOrder;
 import team16.pccservice.exceptions.InvalidDataException;
 import team16.pccservice.model.Bank;
 import team16.pccservice.model.PaymentRequest;
+
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @Service
 public class PCCService {
@@ -25,6 +34,12 @@ public class PCCService {
 
     private ValidationService validationService;
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+    @Autowired
+    private RestConfig configuration;
+
     Logger logger = LoggerFactory.getLogger(PCCService.class);
 
     public PCCService() {
@@ -32,7 +47,7 @@ public class PCCService {
     }
 
     public PaymentRequest cratePaymentRequest(PCCRequestDTO dto) throws InvalidDataException,
-            ExistingAcquirerOrder, BankException {
+            ExistingAcquirerOrder, BankException, URISyntaxException {
 
         validatePCCRequestDTO(dto);
 
@@ -50,7 +65,26 @@ public class PCCService {
         PaymentRequest newRequest = paymentRequestService.update(paymentRequest);
         logger.info("PCC Payment Request updated");
 
+        // zahtev se salje na Issuer Bank
+        HttpEntity<PCCRequestDTO> request = new HttpEntity<>(dto);
+        ResponseEntity<String> response = null;
+
+        try {
+            logger.info("Sending request to Issuer Bank service");
+            response = restTemplate.exchange(
+                    getEndpoint(), HttpMethod.POST, request, String.class);
+            System.out.println(response.getBody());
+            logger.info("Received response from Issuer Bank service");
+        } catch (RestClientException e) {
+            logger.error("RestTemplate error");
+            e.printStackTrace();
+        }
+
         return newRequest;
+    }
+
+    private URI getEndpoint() throws URISyntaxException {
+        return new URI(configuration.url() + EndpointConfig.ISSUER_BANK_BASE_URL + "/api/issuer/pcc-payment-request");
     }
 
     private Bank findBank(String pan, String bankName) throws BankException {
