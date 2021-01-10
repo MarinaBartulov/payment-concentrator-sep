@@ -123,7 +123,7 @@ const Login = () => {
             style={{ width: "90%", margin: "auto" }}
           >
             <div className="form-group">
-              <label htmlFor="username">Email:</label>
+              <label htmlFor="email">Email:</label>
               <input
                 className="form-control"
                 id="email"

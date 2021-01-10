@@ -1,7 +1,7 @@
-package team16.bitcoinservice.service;
+package team16.bankpaymentservice.service;
 
-import team16.bitcoinservice.dto.FormFieldDTO;
-import team16.bitcoinservice.model.Merchant;
+import team16.bankpaymentservice.dto.FormFieldDTO;
+import team16.bankpaymentservice.model.Merchant;
 
 import java.util.List;
 

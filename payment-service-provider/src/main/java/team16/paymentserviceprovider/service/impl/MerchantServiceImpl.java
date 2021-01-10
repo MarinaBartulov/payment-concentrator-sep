@@ -1,25 +1,35 @@
 package team16.paymentserviceprovider.service.impl;
 
+import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.client.RestTemplate;
+import team16.paymentserviceprovider.dto.FormFieldDTO;
+import team16.paymentserviceprovider.dto.MerchantActivationDTO;
 import team16.paymentserviceprovider.dto.MerchantInfoDTO;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
+import team16.paymentserviceprovider.model.PaymentMethod;
 import team16.paymentserviceprovider.model.Role;
 import team16.paymentserviceprovider.repository.MerchantRepository;
-import team16.paymentserviceprovider.service.AppService;
-import team16.paymentserviceprovider.service.EmailService;
-import team16.paymentserviceprovider.service.MerchantService;
-import team16.paymentserviceprovider.service.RoleService;
+import team16.paymentserviceprovider.service.*;
 
 import javax.mail.MessagingException;
 import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -35,7 +45,11 @@ public class MerchantServiceImpl implements MerchantService {
     @Autowired
     private RoleService roleService;
     @Autowired
+    private PaymentMethodService paymentMethodService;
+    @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private RestTemplate restTemplate;
 
     @Override
     public Merchant findOne(Long id) {
@@ -89,6 +103,58 @@ public class MerchantServiceImpl implements MerchantService {
     @Override
     public Merchant save(Merchant merchant) {
         return this.merchantRepository.save(merchant);
+    }
+
+    @Override
+    public String addPaymentMethodForCurrentMerchant(String authToken, String paymentMethodName, Map<String, Object> formValues) {
+
+        Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        String email = currentUser.getName();
+        Merchant merchant = this.findByMerchantEmail(email);
+
+        if(merchant == null){
+            return "Merchant does not exist.";
+        }
+
+        PaymentMethod pm = this.paymentMethodService.findByPaymentMethodNameAndApp(paymentMethodName, merchant.getApp().getId());
+
+        if(pm == null){
+            return "Merchant's application does not support this payment method.";
+        }
+
+        Gson gsonObj = new Gson();
+        String jsonString = gsonObj.toJson(formValues);
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", authToken);
+        HttpEntity<String> request = new HttpEntity<String>(jsonString, headers);
+
+        try {
+            restTemplate.postForEntity("https://localhost:8083/" + paymentMethodName.toLowerCase() + "-payment-service/api/merchant", request, ResponseEntity.class);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            return "Error occurred while adding merchant data on the payment service";
+        }
+
+        if(!merchant.isPmChosen()) {
+            merchant.setPmChosen(true);
+            try {
+                HttpEntity<MerchantActivationDTO> activationRequest = new HttpEntity<>(new MerchantActivationDTO(merchant.getEmail()));
+                restTemplate.exchange(merchant.getActivationUrl(), HttpMethod.PUT, activationRequest, ResponseEntity.class);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "Error occurred while activating merchant on his app.";
+            }
+        }
+        merchant.getPaymentMethods().add(pm);
+
+        //******* OVAJ DEO PROBLEMATICAN *******
+        if(paymentMethodName.equals("Bank")){
+            merchant.setMerchantId((String) formValues.get("merchantId"));
+            merchant.setMerchantPassword((String) formValues.get("merchantPassword"));
+        }
+        this.merchantRepository.save(merchant);
+        return null;
     }
 
     private String generateCommonLangPassword() {

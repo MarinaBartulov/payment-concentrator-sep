@@ -8,6 +8,7 @@ import team16.paymentserviceprovider.model.Merchant;
 
 import javax.mail.MessagingException;
 import java.util.List;
+import java.util.Map;
 
 public interface MerchantService {
 
@@ -18,4 +19,5 @@ public interface MerchantService {
     boolean registerNewMerchant(MerchantPCDTO merchantPCDTO) throws MessagingException, InterruptedException;
     MerchantInfoDTO getMyInfo(Authentication currentUser);
     Merchant save(Merchant merchant);
+    String addPaymentMethodForCurrentMerchant(String authorization, String paymentMethodName, Map<String, Object> formValues);
 }
