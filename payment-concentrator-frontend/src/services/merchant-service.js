@@ -8,6 +8,17 @@ class MerchantService extends HttpService {
     );
     return response.data;
   };
+
+  addPaymentMethodForMerchant = async (paymentMethodName, payload) => {
+    const response = await this.client.post(
+      SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+        PSP_ENDPOINTS.MERCHANT_ADD_PAYMENT_METHOD +
+        "/" +
+        paymentMethodName,
+      payload
+    );
+    return response.data;
+  };
 }
 
 export const merchantService = new MerchantService();

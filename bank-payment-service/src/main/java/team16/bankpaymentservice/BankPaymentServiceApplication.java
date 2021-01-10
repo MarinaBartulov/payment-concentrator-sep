@@ -11,7 +11,9 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
 public class BankPaymentServiceApplication {
@@ -19,6 +21,11 @@ public class BankPaymentServiceApplication {
     public static void main(String[] args) throws IOException {
 
         SpringApplication.run(BankPaymentServiceApplication.class, args);
+    }
+
+    @Bean
+    RestTemplate restTemplate(){
+        return new RestTemplate();
     }
 
 }

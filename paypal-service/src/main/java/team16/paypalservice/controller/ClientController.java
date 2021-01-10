@@ -1,30 +1,29 @@
-package team16.bitcoinservice.controller;
+package team16.paypalservice.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
-import team16.bitcoinservice.model.Merchant;
-import team16.bitcoinservice.service.MerchantService;
+import team16.paypalservice.model.Client;
+import team16.paypalservice.service.ClientService;
 
 @RestController
 @RequestMapping(value="/api/merchant")
-public class MerchantController {
+public class ClientController {
 
     @Autowired
-    private MerchantService merchantService;
+    private ClientService clientService;
     @Autowired
     private RestTemplate restTemplate;
-
 
     @GetMapping(value = "/formFields")
     public ResponseEntity getFormFields(){
 
-          return new ResponseEntity(this.merchantService.getFormFields(), HttpStatus.OK);
+        return new ResponseEntity(this.clientService.getFormFields(), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity addNewMerchant(@RequestHeader("Authorization") String authToken, @RequestBody String merchantData){
+    public ResponseEntity addNewClient(@RequestHeader("Authorization") String authToken, @RequestBody String clientData){
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", authToken);
@@ -38,18 +37,19 @@ public class MerchantController {
             return ResponseEntity.badRequest().body("Error occurred while authenticating merchant.");
         }
 
-        Merchant merchant = this.merchantService.findByEmail(email);
-        if(merchant != null){
-            return ResponseEntity.badRequest().body("This merchant has already chosen bitcoin payment method.");
+        Client client = this.clientService.findByEmail(email);
+        if(client != null){
+            return ResponseEntity.badRequest().body("This merchant has already chosen PayPal payment method.");
         }
 
-        Merchant newMerchant = this.merchantService.addNewMerchant(merchantData, email);
+        Client newClient = this.clientService.addNewClient(clientData, email);
 
-        if(newMerchant == null){
+        if(newClient == null){
             return ResponseEntity.badRequest().body("Invalid merchant data.");
         }
 
         return ResponseEntity.ok().build();
 
     }
+
 }
