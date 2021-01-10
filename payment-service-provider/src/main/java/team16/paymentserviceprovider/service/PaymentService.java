@@ -139,14 +139,14 @@ public class PaymentService {
 
     private void validateDTO(OrderDTO dto) throws InvalidDataException {
         System.out.println("------------------------DTO from LA validation-------------------------------");
-        if(!validationService.validateString(dto.getMerchantId()) ||
+        /*if(!validationService.validateString(dto.getMerchantId()) ||
                 !validationService.validateString(dto.getMerchantPassword()) ||
                 !validationService.validateString(dto.getMerchantEmail())) {
             System.out.println("Id, pass or email null or empty");
             logger.debug("Invalid merchantId, password or email");
             logger.error("Failed to create Order due to invalid received data");
             throw new InvalidDataException("Invalid merchant info.");
-        }
+        }*/
         if(merchantService.findByMerchantEmail(dto.getMerchantEmail()) == null) {
             System.out.println("nonexistent merchant");
             logger.debug("Nonexistent merchant");
@@ -165,13 +165,13 @@ public class PaymentService {
             logger.error("Failed to create Order due to invalid received data");
             throw new InvalidDataException("Amount cannot be negative.");
         }
-        Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
+        /*Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
         if(!merchant.getMerchantPassword().equals(dto.getMerchantPassword())) {
             System.out.println("passwords dont match");
             logger.debug("Invalid merchant password");
             logger.error("Failed to create Order due to invalid received data");
             throw new InvalidDataException("Invalid merchant info.");
-        }
+        }*/
         if(!validationService.validateString(dto.getMerchantSuccessUrl()) ||
                 !validationService.validateString(dto.getMerchantFailedUrl()) ||
                 !validationService.validateString(dto.getMerchantErrorUrl())) {
