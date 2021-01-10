@@ -6,5 +6,5 @@ public interface IPaymentService {
 
     Payment findById(Long id);
 
-    Payment create(Payment payment);
+    Payment update(Payment payment);
 }

@@ -1,4 +1,4 @@
-package team16.bankpaymentservice.service;
+package team16.bankpaymentservice.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -6,6 +6,7 @@ import team16.bankpaymentservice.model.CardOwner;
 import team16.bankpaymentservice.model.Client;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.repository.CardOwnerRepository;
+import team16.bankpaymentservice.service.CardOwnerService;
 
 @Service
 public class CardOwnerServiceImpl implements CardOwnerService {

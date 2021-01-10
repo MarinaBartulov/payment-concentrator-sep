@@ -20,32 +20,26 @@ import team16.bankpaymentservice.exceptions.InappropriateBankException;
 import team16.bankpaymentservice.exceptions.InvalidDataException;
 import team16.bankpaymentservice.exceptions.LackingFundsException;
 import team16.bankpaymentservice.model.*;
-import team16.bankpaymentservice.repository.CardRepository;
+import team16.bankpaymentservice.service.impl.CardServiceImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 
 @Service
-public class CardServiceImpl implements CardService {
+public class AcquirerService {
 
     @Autowired
-    private CardRepository cardRepository;
+    private IPaymentService paymentService;
 
     @Autowired
-    private BankServiceImpl bankService;
+    private TransactionService transactionService;
 
     @Autowired
-    private PaymentServiceImpl paymentService;
+    private CardOwnerService cardOwnerService;
 
     @Autowired
-    private TransactionServiceImpl transactionService;
-
-    @Autowired
-    private CardOwnerServiceImpl cardOwnerService;
-
-    @Autowired
-    private OrderServiceImpl orderService;
+    private CardService cardService;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -57,95 +51,58 @@ public class CardServiceImpl implements CardService {
 
     Logger logger = LoggerFactory.getLogger(CardServiceImpl.class);
 
-    public CardServiceImpl() {
-        validationService = new ValidationService();
-    }
-
-
-    @Override
-    public Card findByPan(String pan) {
-        return cardRepository.findByPan(pan);
-    }
-
-    @Override
-    public Card create(Card card) {
-        return cardRepository.save(card);
-    }
-
-    @Override
-    public Card update(Card card) {
-        return cardRepository.save(card);
-    }
+    public AcquirerService() { validationService = new ValidationService(); }
 
     // validirati DTO
-    // porveriti na osnovu sifre banke da li je to pan iz te banke
+    // porveriti na osnovu PAN-a Merchant-a vezanog za taj Payment/Transaction
+    // i PAN-a unetog na formi od strane Client-a,
+    // da li su oni u istoj banci
     // ako da
-    // proveriti da li se svi podaci poklapaju sa onima u bazi
+    // validirati podatke i izvrsiti placanje
     // ako ne
-    // onda ide na pcc
-    public OnlyAcquirerTransactionResponseDTO handleClientAuthentication(ClientAuthDTO dto, Long paymentId) throws Exception {
-        System.out.println("------------------------DTO from Bank Fron to Bank for Client authentication and Transaction-------------------------------");
+    // onda se salje zahtev za placanje na pcc
+    public OnlyAcquirerTransactionResponseDTO initialPayment(ClientAuthDTO dto, Long paymentId) throws Exception {
+
         if(paymentService.findById(paymentId) == null) {
-            System.out.println("Nonexistent payment");
             logger.error("Nonexistent payment");
             throw new Exception("Nonexistent payment.");
         }
 
         Payment payment = paymentService.findById(paymentId);
-        System.out.println("Payment: ");
-        System.out.println(payment.getPaymentId());
-        System.out.println(payment.getPaymentUrl());
-        System.out.println(payment.getTransaction().getId());
-
         Transaction transaction = payment.getTransaction();
-        System.out.println("Transaction: ");
-        System.out.println(transaction.getId());
-        System.out.println(transaction.getMerchant().getMerchantId());
-        System.out.println(transaction.getAmount());
-        System.out.println(transaction.getMerchantOrderId());
-        System.out.println(transaction.getMerchantTimestamp());
-        System.out.println(transaction.getStatus());
-
         Merchant merchant = transaction.getMerchant();
-        System.out.println("Merchant from transaction: ");
-        System.out.println(merchant.getId());
-        System.out.println(merchant.getMerchantId());
-        System.out.println(merchant.getMerchantEmail());
-        System.out.println(merchant.getPassword());
-
         Card merchantCard = merchant.getCard();
 
         OnlyAcquirerTransactionResponseDTO responseDTO = new OnlyAcquirerTransactionResponseDTO();
 
         // u zavisnosti od problema baciti odgovarajuci exception i odraditi odgovarajuce redirection
         try {
-            validateClientInput(dto);
+            validateClientInput(dto, merchantCard.getPAN());
         } catch (InvalidDataException ide) {
             responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
             responseDTO.setResponseMessage(ide.getMessage());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
-            logger.error("Invalid client data.");
             return responseDTO;
         } catch(InappropriateBankException ibe) {
-            responseDTO.setRedirectionURL("Ide na PCC.");
-            responseDTO.setTransactionStatus(transaction.getStatus().toString());
-            responseDTO.setResponseMessage(ibe.getMessage());
+
             logger.info("Redirection to PCC");
 
             // generise se ACQUIRER_ORDER_ID i ACQUIRER_TIMESTAMP
+            // ACQUIRER_ORDER_ID je id Transaction-a dobijenog na osnovu Payment-a
+            // ACQUIRER_TIMESTAMP je trenutno vreme
 
-            Order order = new Order();
-            order.setAmount(transaction.getAmount());
-            order.setAcquirerTimestamp(LocalDateTime.now());
-            Order newOrder = orderService.create(order);
+            transaction.setAcquirerOrderId(transaction.getId());
+            transaction.setAcquirerTimestamp(LocalDateTime.now());
+
+            Transaction t1 = transactionService.update(transaction);
 
             // zajedno sa podacima o kartici - podaci uneti sa fronta za autentifikaciju klijenta i kartice
             PCCRequestDTO pccRequestDTO = new PCCRequestDTO(dto.getPan(), dto.getSecurityNumber(),
-                    dto.getCardHolderName(), dto.getExpirationDate(), transaction.getMerchantOrderId(),
-                    transaction.getMerchantTimestamp(), payment.getPaymentId(), newOrder.getAcquirerOrderId(),
-                    newOrder.getAcquirerTimestamp(), merchantCard.getPAN());
+                    dto.getCardHolderName(), dto.getExpirationDate(), t1.getMerchantOrderId(),
+                    t1.getMerchantTimestamp(), payment.getPaymentId(), t1.getAcquirerOrderId(),
+                    t1.getAcquirerTimestamp(), merchantCard.getPAN());
 
             // zahtev se salje na PCC
             HttpEntity<PCCRequestDTO> request = new HttpEntity<>(pccRequestDTO);
@@ -155,48 +112,41 @@ public class CardServiceImpl implements CardService {
                 logger.info("Sending request to PCC service");
                 response = restTemplate.exchange(
                         getEndpoint(), HttpMethod.POST, request, PCCResponseDTO.class);
-                logger.info("Received response from corresponding payment service");
+                logger.info("Received response from PCC service");
             } catch (RestClientException e) {
                 logger.error("RestTemplate error");
                 e.printStackTrace();
             }
 
-            System.out.println("Response from pcc: ");
-            System.out.println(response.getBody());
-            System.out.println(response.getBody().getStatus());
+            if (response != null) {
+                responseDTO.setResponseMessage("Transaction completed with status " + response.getBody().getStatus().toString());
+                responseDTO.setTransactionStatus(response.getBody().getStatus().toString());
+                responseDTO.setRedirectionURL(""); // postavi odgovarajuci URL za redirekciju!!!
+                return responseDTO;
+            }
 
-            return responseDTO;
         } catch (Exception e) {
             responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
             responseDTO.setResponseMessage(e.getMessage());
-            logger.error("Error validating client input");
             return responseDTO;
         }
 
         // vezati transakciju sa klijentom
-        Card clientCard = cardRepository.findByPan(dto.getPan());
-        System.out.println("Klijentova kartica:");
-        System.out.println(clientCard.getId());
-        System.out.println(clientCard.getExpirationDate());
-        System.out.println(clientCard.getAvailableFunds());
-        System.out.println(clientCard.getPAN());
+        Card clientCard = cardService.findByPan(dto.getPan());
 
         // provera sredstava sa racuna klijenta
         try {
             checkClientFunds(clientCard, transaction);
-            System.out.println("Check funds proslo");
             logger.info("Enough available funds");
         } catch (LackingFundsException lfe) {
-            System.out.println("Check funds nije proslo");
             responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
             responseDTO.setResponseMessage(lfe.getMessage());
-            logger.error("Not enough available funds");
             return responseDTO;
         }
 
@@ -205,16 +155,12 @@ public class CardServiceImpl implements CardService {
         merchantCard.setAvailableFunds(merchantCard.getAvailableFunds() + transaction.getAmount());
         transaction.setStatus(TransactionStatus.COMPLETED);
 
-        update(clientCard);
-        //update(merchantCard);
-        transactionService.update(transaction);
-        System.out.println(" Updated Transaction: ");
-        System.out.println(transaction.getId());
-        System.out.println(transaction.getStatus());
+        cardService.update(clientCard);
+        cardService.update(merchantCard);
 
-        System.out.println("update client funds: ");
-        System.out.println(clientCard.getId());
-        System.out.println(clientCard.getAvailableFunds());
+        Client client = cardOwnerService.findClientByCardId(clientCard.getId());
+        transaction.setClient(client);
+        transactionService.update(transaction);
 
         responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
         responseDTO.setTransactionStatus(transaction.getStatus().toString());
@@ -225,61 +171,46 @@ public class CardServiceImpl implements CardService {
 
     private void checkClientFunds(Card clientCard, Transaction transaction) throws LackingFundsException {
         if(clientCard.getAvailableFunds() < transaction.getAmount()) {
-            System.out.println("Lacking funds.");
             logger.error("Not enough available funds");
             throw new LackingFundsException("Lacking funds.");
         } else {
             transaction.setStatus(TransactionStatus.CREATED);
             transactionService.update(transaction);
-            System.out.println("Not Lacking funds.");
         }
     }
 
-    private void validateClientInput(ClientAuthDTO dto) throws Exception {
+    private void validateClientInput(ClientAuthDTO dto, String merchantCardPAN) throws Exception {
         if(!validationService.validateString(dto.getPan()) ||
-            !validationService.validateString(dto.getSecurityNumber()) ||
-            !validationService.validateString(dto.getCardHolderName()) ||
-            !validationService.validateString(dto.getCardHolderName())) {
-            System.out.println("Invalid client information.");
-            logger.error("Invalid client information");
-            throw new InvalidDataException("Invalid client information.");
+                !validationService.validateString(dto.getSecurityNumber()) ||
+                !validationService.validateString(dto.getCardHolderName()) ||
+                !validationService.validateString(dto.getCardHolderName())) {
+            logger.error("ERROR | Client information empty");
+            throw new InvalidDataException("Client information empty");
         }
-        Bank bank = bankService.findById(1L);
-        String bankCode = bank.getCode();
-        System.out.println("Current bank");
-        System.out.println(bankCode);
-        if(!dto.getPan().substring(0, 3).equals(bankCode)) {
-            System.out.println("Client doesn't have an account in this bank.");
-            logger.error("Client doesn't have an account in this bank");
-            throw new InappropriateBankException("Client doesn't have an account in this bank.");
+        if(!dto.getPan().substring(0, 3).equals(merchantCardPAN.substring(0, 3))) {
+            logger.error("Client and Merchant don't have an account in the same bank");
+            throw new InappropriateBankException("Client and Merchant don't have an account in the same bank");
         }
-        if(cardRepository.findByPan(dto.getPan()) == null) {
-            System.out.println("Invalid client information.");
-            logger.error("Invalid client information - Non existent client account");
-            throw new InvalidDataException("Invalid client information.");
+        if(cardService.findByPan(dto.getPan()) == null) {
+            logger.error("Invalid client information - Non existent client card pan");
+            throw new InvalidDataException("Non existent client card pan");
         }
 
-        Card card = cardRepository.findByPan(dto.getPan());
-        System.out.println("Card:");
-        System.out.println(card.getId());
-        System.out.println(card.getPAN());
+        Card card = cardService.findByPan(dto.getPan());
 
         if(!card.getSecurityCode().equals(dto.getSecurityNumber())) {
-            System.out.println("Invalid client information. Security code doesnt match");
             logger.error("Invalid client information - security codes don't match");
-            throw new InvalidDataException("Invalid client information.");
+            throw new InvalidDataException("Security codes don't match");
         }
 
         Client client = cardOwnerService.findClientByCardId(card.getId());
-        if(!client.getName().equals(dto.getCardHolderName())) {
-            System.out.println("Invalid client information. CHD name doesnt match");
+        if(!client.getFirstName().equals(dto.getCardHolderName())) {
             logger.error("Invalid client information - Card Holder Name not valid");
-            throw new InvalidDataException("Invalid client information.");
+            throw new InvalidDataException("Card Holder Name not valid");
         }
         if(!validationService.convertToYearMonthFormat(dto.getExpirationDate()).equals(card.getExpirationDate())) {
-            System.out.println("Invalid client information. Not good year month");
             logger.error("Invalid client information - false expiration date");
-            throw new InvalidDataException("Invalid client information.");
+            throw new InvalidDataException("False expiration date");
         }
     }
 
