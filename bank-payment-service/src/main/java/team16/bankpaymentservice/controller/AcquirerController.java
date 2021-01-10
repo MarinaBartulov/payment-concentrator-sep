@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.bankpaymentservice.dto.ClientAuthDTO;
 import team16.bankpaymentservice.dto.OnlyAcquirerTransactionResponseDTO;
+import team16.bankpaymentservice.dto.PCCResponseDTO;
+import team16.bankpaymentservice.dto.TransactionDTO;
 import team16.bankpaymentservice.service.AcquirerService;
 
 @RestController
@@ -39,4 +41,19 @@ public class AcquirerController {
             return new ResponseEntity<>(response, HttpStatus.OK); // promeniti na bad_request
         }
     }
+
+    @PostMapping(value = "/finish-payment", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> finishPaymentFromIssuerBank(@RequestBody PCCResponseDTO dto) {
+        TransactionDTO transactionDTO = acquirerService.finishPayment(dto);
+        System.out.println("Response sa PCC-a");
+        System.out.println(transactionDTO.getPaymentId());
+        System.out.println(transactionDTO.getMerchantOrderId());
+        System.out.println(transactionDTO.getAcquirerOrderId());
+        System.out.println(transactionDTO.getAcquirerTimestamp());
+        System.out.println(transactionDTO.getIssuerOrderId());
+        System.out.println(transactionDTO.getIssuerTimestamp());
+        System.out.println(transactionDTO.getStatus());
+        return new ResponseEntity<>(transactionDTO, HttpStatus.OK);
+    }
+
 }

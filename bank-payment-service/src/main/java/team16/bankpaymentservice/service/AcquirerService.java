@@ -11,10 +11,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import team16.bankpaymentservice.config.EndpointConfig;
 import team16.bankpaymentservice.config.RestConfig;
-import team16.bankpaymentservice.dto.ClientAuthDTO;
-import team16.bankpaymentservice.dto.OnlyAcquirerTransactionResponseDTO;
-import team16.bankpaymentservice.dto.PCCRequestDTO;
-import team16.bankpaymentservice.dto.PCCResponseDTO;
+import team16.bankpaymentservice.dto.*;
 import team16.bankpaymentservice.enums.TransactionStatus;
 import team16.bankpaymentservice.exceptions.InappropriateBankException;
 import team16.bankpaymentservice.exceptions.InvalidDataException;
@@ -216,5 +213,17 @@ public class AcquirerService {
 
     private URI getEndpoint() throws URISyntaxException {
         return new URI(configuration.url() + EndpointConfig.PCC_SERVICE_BASE_URL + "/api/redirect");
+    }
+
+    public TransactionDTO finishPayment(PCCResponseDTO dto) {
+        TransactionDTO response = new TransactionDTO();
+        response.setPaymentId(dto.getPaymentId());
+        response.setMerchantOrderId(dto.getMerchantOrderId());
+        response.setAcquirerOrderId(dto.getAcquirerOrderId());
+        response.setAcquirerTimestamp(dto.getAcquirerTimestamp());
+        response.setIssuerOrderId(dto.getIssuerOrderId());
+        response.setIssuerTimestamp(dto.getIssuerTimestamp());
+        response.setStatus(dto.getStatus().toString());
+        return response;
     }
 }

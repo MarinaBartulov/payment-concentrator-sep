@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.pccservice.dto.PCCRequestDTO;
+import team16.pccservice.dto.PCCResponseDTO;
 import team16.pccservice.model.PaymentRequest;
 import team16.pccservice.service.PCCService;
 
@@ -23,10 +24,10 @@ public class PCCRedirectionController {
     @PostMapping(value = "/redirect", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> findBankAndRedirect(@RequestBody PCCRequestDTO dto) {
         try {
-            PaymentRequest paymentRequest = pccService.cratePaymentRequest(dto);
-            logger.info("Payment Request successfully completed. Sending redirection URL");
+            PCCResponseDTO response = pccService.cratePaymentRequest(dto);
+            logger.info("Transaction from Issuer Bank successfully completed. Sending redirection URL");
 
-            return new ResponseEntity<>(pccService.makeSuccessResponse(paymentRequest), HttpStatus.CREATED);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch(Exception e) {
 
             logger.error("Exception while completing Payment Request");

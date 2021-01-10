@@ -46,7 +46,7 @@ public class PCCService {
         validationService = new ValidationService();
     }
 
-    public PaymentRequest cratePaymentRequest(PCCRequestDTO dto) throws InvalidDataException,
+    public PCCResponseDTO cratePaymentRequest(PCCRequestDTO dto) throws InvalidDataException,
             ExistingAcquirerOrder, BankException, URISyntaxException {
 
         validatePCCRequestDTO(dto);
@@ -90,7 +90,28 @@ public class PCCService {
             e.printStackTrace();
         }
 
-        return newRequest;
+        PCCResponseDTO pccResponseDTO = response.getBody();
+
+        // zahtev se salje na Acquirer Bank
+        HttpEntity<PCCResponseDTO> requestAcquirer = new HttpEntity<>(pccResponseDTO);
+        ResponseEntity<String> responseAcquirer = null;
+
+        try {
+            logger.info("Sending request to Acquirer Bank service");
+            responseAcquirer = restTemplate.exchange(
+                    getEndpointForAcquirerBank(), HttpMethod.POST, requestAcquirer, String.class);
+            System.out.println(responseAcquirer.getBody());
+            logger.info("Received response from Acquirer Bank service");
+        } catch (RestClientException e) {
+            logger.error("RestTemplate error");
+            e.printStackTrace();
+        }
+
+        return pccResponseDTO;
+    }
+
+    private URI getEndpointForAcquirerBank() throws URISyntaxException {
+        return new URI(configuration.url() + EndpointConfig.ISSUER_BANK_BASE_URL + "/api/acquirer/finish-payment");
     }
 
     private URI getEndpoint() throws URISyntaxException {
