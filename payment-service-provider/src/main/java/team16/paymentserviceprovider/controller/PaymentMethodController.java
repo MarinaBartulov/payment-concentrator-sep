@@ -32,4 +32,10 @@ public class PaymentMethodController {
 
     }
 
+    @GetMapping
+    public ResponseEntity getAllPaymentMethods(){
+
+        return ResponseEntity.ok(this.paymentMethodService.getAllPaymentMethods());
+    }
+
 }

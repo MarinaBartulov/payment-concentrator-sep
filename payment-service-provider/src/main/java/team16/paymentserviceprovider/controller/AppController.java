@@ -25,6 +25,9 @@ public class AppController {
               return ResponseEntity.badRequest().body("Application with that email already exists.");
           }
           AppDTO appDTO = this.appService.addNewApp(appDto);
+          if(appDTO == null){
+              return ResponseEntity.badRequest().body("Payment method doesn't exist.");
+          }
           return ResponseEntity.ok(appDTO);
     }
 }
