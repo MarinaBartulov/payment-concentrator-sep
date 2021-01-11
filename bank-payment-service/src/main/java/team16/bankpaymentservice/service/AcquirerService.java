@@ -171,12 +171,15 @@ public class AcquirerService {
 
         Client client = cardOwnerService.findClientByCardId(clientCard.getId());
         transaction.setClient(client);
-        transactionService.update(transaction);
+        Transaction newT = transactionService.update(transaction);
 
         responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
         responseDTO.setTransactionStatus(transaction.getStatus().toString());
-        responseDTO.setResponseMessage("Transaction completed successfully.");
-        logger.info("Transaction completed successfully");
+
+        String PSPResponseMessage = finishPaymentOneBank(newT, payment.getPaymentId());
+        responseDTO.setResponseMessage(PSPResponseMessage);
+
+        logger.info("Transaction with only one Bank completed successfully");
         return responseDTO;
     }
 
@@ -227,6 +230,34 @@ public class AcquirerService {
 
     private URI getEndpoint() throws URISyntaxException {
         return new URI(configuration.url() + EndpointConfig.PCC_SERVICE_BASE_URL + "/api/redirect");
+    }
+
+    private String finishPaymentOneBank(Transaction t, Long paymentId) {
+        TransactionDTO responseDTO = new TransactionDTO();
+        responseDTO.setPaymentId(paymentId);
+        responseDTO.setMerchantOrderId(t.getMerchantOrderId());
+        responseDTO.setAcquirerOrderId(t.getAcquirerOrderId());
+        responseDTO.setAcquirerTimestamp(t.getAcquirerTimestamp());
+        responseDTO.setIssuerOrderId(t.getIssuerOrderId());
+        responseDTO.setIssuerTimestamp(t.getIssuerTimestamp());
+        responseDTO.setStatus(t.getStatus().toString());
+
+        // zahtev se salje na PSP
+        HttpEntity<TransactionDTO> request = new HttpEntity<>(responseDTO);
+        ResponseEntity<String> response = null;
+
+        try {
+            logger.info("Sending request to PSP service");
+            response = restTemplate.exchange(
+                    "https://localhost:8085/api/transactions/bank", HttpMethod.POST, request, String.class);
+            System.out.println(response.getBody());
+            logger.info("Received response from PSP service");
+        } catch (RestClientException e) {
+            logger.error("RestTemplate error");
+            e.printStackTrace();
+        }
+
+        return response.getBody();
     }
 
     public String finishPayment(PCCResponseDTO dto) throws Exception {

@@ -39,12 +39,21 @@ public class IssuerService {
 
     public PCCResponseDTO handlePCCPaymentRequest(PCCRequestDTO dto) {
 
+
+        Transaction transaction = null;
+
+        try {
+            // pronaci Transaction sa poslatim acquirer_order_is, ako je nema - greska
+            transaction = transactionService.findByAcquirerOrderId(dto.getAcquirerOrderId());
+        } catch (Exception e) {
+            Transaction t = new Transaction();
+            t.setStatus(TransactionStatus.NONEXISTENT);
+            return createResponse(transactionService.update(t));
+        }
+
         // validirati dto u smislu postojanja svih polja
         try {
             validateDTO(dto);
-
-            // pronaci Transaction sa poslatim acquirer_order_is, ako je nema - greska
-            Transaction transaction = transactionService.findByAcquirerOrderId(dto.getAcquirerOrderId());
 
             validateClientCardInfo(dto);
 
@@ -62,7 +71,7 @@ public class IssuerService {
 
             if(merchantCard == null) {
                 // nonexistant merchant card
-                return null;
+                return createResponse(updated1);
             }
 
             // update sredstava sa kartica
@@ -79,7 +88,8 @@ public class IssuerService {
         } catch (Exception e) {
             logger.error(e.getMessage());
             // failed transakcija
-            return null;
+            transaction.setStatus(TransactionStatus.FAILED);
+            return createResponse(transactionService.update(transaction));
         }
     }
 
