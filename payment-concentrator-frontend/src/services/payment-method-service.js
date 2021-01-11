@@ -9,6 +9,13 @@ class PaymentMethodService extends HttpService {
     );
     return response.data;
   };
+
+  getAllPaymentMethods = async () => {
+    const response = await this.client.get(
+      SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE + PSP_ENDPOINTS.PAYMENT_METHOD
+    );
+    return response.data;
+  };
 }
 
 export const paymentMethodService = new PaymentMethodService();

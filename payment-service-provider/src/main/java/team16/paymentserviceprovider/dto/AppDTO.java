@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,6 +22,7 @@ public class AppDTO {
     @NotNull
     @Email
     private String officialEmail;
+    private List<String> paymentMethods;
     private String appId;
 
 }

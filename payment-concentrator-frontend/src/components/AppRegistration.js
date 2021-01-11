@@ -1,15 +1,39 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { appService } from "../services/app-service";
+import { paymentMethodService } from "../services/payment-method-service";
 import { toast } from "react-toastify";
 
 const AppRegistration = () => {
+  const [newApp, setNewApp] = useState({});
+  const [showNewApp, setShowNewApp] = useState(false);
+  const [paymentMethods, setPaymentMethods] = useState([]);
+
+  const getAllPaymentMethods = async () => {
+    try {
+      const response = await paymentMethodService.getAllPaymentMethods();
+      setPaymentMethods(response);
+    } catch (error) {
+      if (error.response) {
+        console.log("Error: " + JSON.stringify(error.response));
+      }
+      toast.error(error.response ? error.response.data : error.message, {
+        hideProgressBar: true,
+      });
+    }
+  };
+
+  useEffect(() => {
+    getAllPaymentMethods();
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       appName: "",
       webAddress: "",
       officialEmail: "",
+      paymentMethods: [],
     },
     validationSchema: Yup.object({
       appName: Yup.string()
@@ -21,6 +45,10 @@ const AppRegistration = () => {
       officialEmail: Yup.string()
         .email("Invalid email address")
         .required("Required"),
+      paymentMethods: Yup.array().min(
+        1,
+        "At least one payment method required"
+      ),
     }),
     onSubmit: async (values, { resetForm }) => {
       console.log(values);
@@ -43,9 +71,6 @@ const AppRegistration = () => {
       }
     },
   });
-
-  const [newApp, setNewApp] = useState({});
-  const [showNewApp, setShowNewApp] = useState(false);
 
   return (
     <div>
@@ -107,6 +132,26 @@ const AppRegistration = () => {
             />
             {formik.touched.officialEmail && formik.errors.officialEmail ? (
               <p style={{ color: "red" }}>{formik.errors.officialEmail}</p>
+            ) : null}
+          </div>
+          <div className="form-group">
+            <label htmlFor="paymentMethods">Payment methods:</label>
+            <select
+              multiple
+              className="form-control"
+              id="paymentMethods"
+              name="paymentMethods"
+              placeholder="Select payment methods"
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              value={formik.values.paymentMethods}
+            >
+              {paymentMethods.map((pm, i) => {
+                return <option key={i}>{pm.name}</option>;
+              })}
+            </select>
+            {formik.touched.paymentMethods && formik.errors.paymentMethods ? (
+              <p style={{ color: "red" }}>{formik.errors.paymentMethods}</p>
             ) : null}
           </div>
           <button type="submit" className="btn btn-primary">

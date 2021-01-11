@@ -36,4 +36,5 @@ export const PSP_ENDPOINTS = {
   MERCHANT_INFO: "/merchant/info",
   MERCHANT_ADD_PAYMENT_METHOD: "/merchant/paymentMethod",
   PAYMENT_METHOD_FORMS_DATA: "/paymentMethod/formsData",
+  PAYMENT_METHOD: "/paymentMethod",
 };

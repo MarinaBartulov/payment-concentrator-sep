@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import team16.paymentserviceprovider.dto.FormDataDTO;
 import team16.paymentserviceprovider.dto.FormFieldDTO;
+import team16.paymentserviceprovider.dto.PaymentMethodDTO;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.PaymentMethod;
@@ -18,6 +19,7 @@ import team16.paymentserviceprovider.service.PaymentMethodService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentMethodServiceImpl implements PaymentMethodService {
@@ -57,5 +59,12 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     @Override
     public PaymentMethod findByPaymentMethodNameAndApp(String paymentMethodName, Long appId) {
         return this.paymentMethodRepository.findByPaymentMethodNameAndAppId(paymentMethodName, appId);
+    }
+
+    @Override
+    public List<PaymentMethodDTO> getAllPaymentMethods() {
+        List<PaymentMethod> paymentMethods = this.paymentMethodRepository.findAll();
+        List<PaymentMethodDTO> paymentMethodDTOs = paymentMethods.stream().map(pm -> new PaymentMethodDTO(pm.getId(), pm.getName())).collect(Collectors.toList());
+        return paymentMethodDTOs;
     }
 }
