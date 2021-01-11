@@ -27,7 +27,7 @@ public class PCCRedirectionController {
     public ResponseEntity<PCCResponseDTO> findBankAndRedirect(@RequestBody PCCRequestDTO dto) {
         try {
             PCCResponseDTO response = pccService.cratePaymentRequest(dto);
-            logger.info("Transaction from Issuer Bank successfully completed. Sending redirection URL");
+            logger.info("Transaction from Issuer Bank completed with status: " + response.getStatus().toString() + ". Sending redirection URL");
 
             return new ResponseEntity<>(response, HttpStatus.CREATED);
         } catch(Exception e) {
