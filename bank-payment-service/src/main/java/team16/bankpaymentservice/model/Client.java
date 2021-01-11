@@ -15,7 +15,13 @@ import javax.persistence.*;
 @Setter
 public class Client extends CardOwner {
 
+    private String firstName;
+
     private String lastName;
 
+    @Column(unique = true)
     private String email;
+
+    @Column(unique = true)
+    private String NIN;
 }

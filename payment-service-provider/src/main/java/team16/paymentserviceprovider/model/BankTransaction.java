@@ -20,21 +20,22 @@ public class BankTransaction {
     private Long id;
 
     @Column(nullable = false)
-    private Long payment_id; // pazi, ovo se kreira kod banke prodavca
-
-    private LocalDateTime payment_timestamp;
+    private Long paymentId; // pazi, ovo se kreira kod banke prodavca
 
     @Column(nullable = false)
-    private Long acquirer_order_id; // ovo se kreira u banci prodavca za prodavcevu transakciju
-
-    private LocalDateTime acquirer_timestamp;
+    private Long merchantOrderId; // pazi, ovo se kreira na PSP-u inicijalno kao Order
 
     @Column(nullable = false)
-    private Long issuer_order_id; // ovo se kreira u banci prodavca za prodavcevu transakciju
+    private Long acquirerOrderId; // ovo se kreira u banci prodavca za prodavcevu transakciju, ali samo kad nisu u istoj banci
 
-    private LocalDateTime issuer_timestamp;
+    private LocalDateTime acquirerTimestamp;
 
-    private BankTransactionStatus status;
+    @Column(nullable = false)
+    private Long issuerOrderId; // ovo se kreira u banci kupca za kupcevu transakciju
+
+    private LocalDateTime issuerTimestamp;
+
+    private String status;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Order order;

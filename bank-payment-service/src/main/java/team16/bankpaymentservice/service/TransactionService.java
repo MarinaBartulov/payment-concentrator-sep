@@ -6,6 +6,8 @@ public interface TransactionService {
 
     Transaction findById(Long id);
 
+    Transaction findByAcquirerOrderId(Long id);
+
     Transaction create(Transaction transaction);
 
     Transaction update(Transaction transaction);

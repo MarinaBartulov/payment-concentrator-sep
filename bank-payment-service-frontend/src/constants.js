@@ -1,4 +1,4 @@
 export const ROUTES = {
     TEST: "/test",
-    AUTH: "/card/client-auth"
+    AUTH: "/acquirer/initialize-payment"
   };

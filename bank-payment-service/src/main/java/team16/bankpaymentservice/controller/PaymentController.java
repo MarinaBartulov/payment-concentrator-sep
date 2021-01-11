@@ -23,16 +23,12 @@ public class PaymentController {
     Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
     @PostMapping(value = "/request")
-    public ResponseEntity<?> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) throws Exception {
+    public ResponseEntity<?> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) {
         try {
             PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
-            System.out.println("///////// Payment Response INFO ////////////////");
-            System.out.println(paymentResponseInfoDTO.getPaymentUrl());
-            System.out.println(paymentResponseInfoDTO.getPaymentId());
             logger.info("Payment successfully created. Sending payment URL");
             return new ResponseEntity<>(paymentResponseInfoDTO, HttpStatus.OK);
         } catch (Exception e) {
-            System.out.println("///////// exception ////////////////");
             logger.error("Exception while creating payment");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }

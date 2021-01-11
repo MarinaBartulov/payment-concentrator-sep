@@ -1,9 +1,10 @@
-package team16.bankpaymentservice.service;
+package team16.bankpaymentservice.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team16.bankpaymentservice.model.Payment;
 import team16.bankpaymentservice.repository.PaymentRepository;
+import team16.bankpaymentservice.service.IPaymentService;
 
 @Service
 public class PaymentServiceImpl implements IPaymentService {
@@ -17,7 +18,12 @@ public class PaymentServiceImpl implements IPaymentService {
     }
 
     @Override
-    public Payment create(Payment payment) {
+    public Payment findByTransactionId(Long transactionId) {
+        return paymentRepository.findPaymentByTransactionId(transactionId);
+    }
+
+    @Override
+    public Payment update(Payment payment) {
         return paymentRepository.save(payment);
     }
 }

@@ -21,9 +21,10 @@ public class CardOwner {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
     @OneToOne
     @JoinColumn(name = "card_id", referencedColumnName = "id")
     private Card card;
+
+    @ManyToOne(cascade = CascadeType.REFRESH, fetch = FetchType.EAGER)
+    private Bank bank;
 }
