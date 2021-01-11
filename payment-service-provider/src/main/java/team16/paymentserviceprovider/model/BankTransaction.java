@@ -35,7 +35,7 @@ public class BankTransaction {
 
     private LocalDateTime issuerTimestamp;
 
-    private BankTransactionStatus status;
+    private String status;
 
     @OneToOne(cascade = CascadeType.ALL)
     private Order order;

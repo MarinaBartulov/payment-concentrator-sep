@@ -58,7 +58,7 @@ public class AcquirerService {
     // validirati podatke i izvrsiti placanje
     // ako ne
     // onda se salje zahtev za placanje na pcc
-    public OnlyAcquirerTransactionResponseDTO initialPayment(ClientAuthDTO dto, Long paymentId) throws Exception {
+    public TransactionResponseDTO initialPayment(ClientAuthDTO dto, Long paymentId) throws Exception {
 
         if(paymentService.findById(paymentId) == null) {
             logger.error("Nonexistent payment");
@@ -70,7 +70,7 @@ public class AcquirerService {
         Merchant merchant = transaction.getMerchant();
         Card merchantCard = merchant.getCard();
 
-        OnlyAcquirerTransactionResponseDTO responseDTO = new OnlyAcquirerTransactionResponseDTO();
+        TransactionResponseDTO responseDTO = new TransactionResponseDTO();
 
         // u zavisnosti od problema baciti odgovarajuci exception i odraditi odgovarajuce redirection
         try {
@@ -110,15 +110,29 @@ public class AcquirerService {
                 response = restTemplate.exchange(
                         getEndpoint(), HttpMethod.POST, request, PCCResponseDTO.class);
                 logger.info("Received response from PCC service");
+
+                //responseDTO.setResponseMessage("Transaction completed with status " + response.getBody().getStatus().toString());
+                responseDTO.setTransactionStatus(response.getBody().getStatus().toString());
+
+                if(response.getBody().getStatus().toString().equals("COMPLETED")) {
+                    responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
+                } else if(response.getBody().getStatus().toString().equals("FAILED")) {
+                    responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
+                } else {
+                    responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                }
+
+                String PSPResponseMessage = finishPayment(response.getBody());
+                responseDTO.setResponseMessage(PSPResponseMessage);
+
+                return responseDTO;
             } catch (RestClientException e) {
                 logger.error("RestTemplate error");
-                e.printStackTrace();
-            }
-
-            if (response != null) {
-                responseDTO.setResponseMessage("Transaction completed with status " + response.getBody().getStatus().toString());
-                responseDTO.setTransactionStatus(response.getBody().getStatus().toString());
-                responseDTO.setRedirectionURL(""); // postavi odgovarajuci URL za redirekciju!!!
+                responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                responseDTO.setResponseMessage(e.getMessage());
+                transaction.setStatus(TransactionStatus.FAILED);
+                t1 = transactionService.update(transaction);
+                responseDTO.setTransactionStatus(t1.getStatus().toString());
                 return responseDTO;
             }
 
@@ -215,7 +229,7 @@ public class AcquirerService {
         return new URI(configuration.url() + EndpointConfig.PCC_SERVICE_BASE_URL + "/api/redirect");
     }
 
-    public TransactionDTO finishPayment(PCCResponseDTO dto) throws Exception {
+    public String finishPayment(PCCResponseDTO dto) throws Exception {
 
         Payment payment = paymentService.findById(dto.getPaymentId());
 
@@ -245,7 +259,7 @@ public class AcquirerService {
         try {
             logger.info("Sending request to PSP service");
             response = restTemplate.exchange(
-                    getEndpointPSP(), HttpMethod.POST, request, String.class);
+                    "https://localhost:8085/api/transactions/bank", HttpMethod.POST, request, String.class);
             System.out.println(response.getBody());
             logger.info("Received response from PSP service");
         } catch (RestClientException e) {
@@ -253,10 +267,10 @@ public class AcquirerService {
             e.printStackTrace();
         }
 
-        return responseDTO;
+        return response.getBody();
     }
 
     private URI getEndpointPSP() throws URISyntaxException {
-        return new URI(configuration.url() + EndpointConfig.PSP_SERVICE_BASE_URL + "/api/redirect");
+        return new URI(configuration.url() + EndpointConfig.PSP_SERVICE_BASE_URL + "/api/transactions/bank");
     }
 }

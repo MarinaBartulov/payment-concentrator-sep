@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class OnlyAcquirerTransactionResponseDTO {
+public class TransactionResponseDTO {
 
     private String transactionStatus;
     private String responseMessage;

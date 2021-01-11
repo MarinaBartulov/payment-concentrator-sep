@@ -86,26 +86,26 @@ public class PCCService {
         PCCResponseDTO pccResponseDTO = response.getBody();
 
         // zahtev se salje na Acquirer Bank
-        HttpEntity<PCCResponseDTO> requestAcquirer = new HttpEntity<>(pccResponseDTO);
-        ResponseEntity<String> responseAcquirer = null;
-
-        try {
-            logger.info("Sending request to Acquirer Bank service");
-            responseAcquirer = restTemplate.exchange(
-                    getEndpointForAcquirerBank(), HttpMethod.POST, requestAcquirer, String.class);
-            System.out.println(responseAcquirer.getBody());
-            logger.info("Received response from Acquirer Bank service");
-        } catch (RestClientException e) {
-            logger.error("RestTemplate error");
-            e.printStackTrace();
-        }
+//        HttpEntity<PCCResponseDTO> requestAcquirer = new HttpEntity<>(pccResponseDTO);
+//        ResponseEntity<String> responseAcquirer = null;
+//
+//        try {
+//            logger.info("Sending request to Acquirer Bank service");
+//            responseAcquirer = restTemplate.exchange(
+//                    getEndpointForAcquirerBank(), HttpMethod.POST, requestAcquirer, String.class);
+//            System.out.println(responseAcquirer.getBody());
+//            logger.info("Received response from Acquirer Bank service");
+//        } catch (RestClientException e) {
+//            logger.error("RestTemplate error");
+//            e.printStackTrace();
+//        }
 
         return pccResponseDTO;
     }
 
-    private URI getEndpointForAcquirerBank() throws URISyntaxException {
-        return new URI(configuration.url() + EndpointConfig.ISSUER_BANK_BASE_URL + "/api/acquirer/finish-payment");
-    }
+//    private URI getEndpointForAcquirerBank() throws URISyntaxException {
+//        return new URI(configuration.url() + EndpointConfig.ISSUER_BANK_BASE_URL + "/api/acquirer/finish-payment");
+//    }
 
     private URI getEndpoint() throws URISyntaxException {
         return new URI(configuration.url() + EndpointConfig.ISSUER_BANK_BASE_URL + "/api/issuer/pcc-payment-request");
@@ -145,12 +145,12 @@ public class PCCService {
         }
     }
 
-    public PCCResponseDTO makeFailureResponse() {
+    public PCCResponseDTO makeFailureResponse(Long merchantOrderId) {
 
         logger.info("Make failure response function is called");
 
         PCCResponseDTO responseDTO = new PCCResponseDTO();
-
+        responseDTO.setMerchantOrderId(merchantOrderId);
         responseDTO.setStatus(Status.FAILED);
 
         return responseDTO;

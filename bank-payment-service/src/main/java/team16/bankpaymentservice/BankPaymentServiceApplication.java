@@ -49,9 +49,9 @@ public class BankPaymentServiceApplication {
 //        }
     }
 
-    @Bean
-    RestTemplate restTemplate(){
-        return new RestTemplate();
-    }
+//    @Bean
+//    RestTemplate restTemplate(){
+//        return new RestTemplate();
+//    }
 
 }

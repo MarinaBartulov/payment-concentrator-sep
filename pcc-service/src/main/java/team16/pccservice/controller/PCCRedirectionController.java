@@ -22,7 +22,7 @@ public class PCCRedirectionController {
     Logger logger = LoggerFactory.getLogger(PCCRedirectionController.class);
 
     @PostMapping(value = "/redirect", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> findBankAndRedirect(@RequestBody PCCRequestDTO dto) {
+    public ResponseEntity<PCCResponseDTO> findBankAndRedirect(@RequestBody PCCRequestDTO dto) {
         try {
             PCCResponseDTO response = pccService.cratePaymentRequest(dto);
             logger.info("Transaction from Issuer Bank successfully completed. Sending redirection URL");
@@ -33,7 +33,7 @@ public class PCCRedirectionController {
             logger.error("Exception while completing Payment Request");
             logger.error(e.getMessage());
 
-            return new ResponseEntity<>(pccService.makeFailureResponse(), HttpStatus.OK);
+            return new ResponseEntity<>(pccService.makeFailureResponse(dto.getMerchantOrderId()), HttpStatus.OK);
         }
     }
 }
