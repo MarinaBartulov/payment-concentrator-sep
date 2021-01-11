@@ -41,18 +41,4 @@ public class AcquirerController {
         }
     }
 
-//    @PostMapping(value = "/finish-payment", consumes = MediaType.APPLICATION_JSON_VALUE)
-//    public ResponseEntity<?> finishPaymentFromIssuerBank(@RequestBody PCCResponseDTO dto) {
-//        String response = null;
-//        try {
-//            response = acquirerService.finishPayment(dto);
-//            System.out.println("Response sa PCC-a");
-//            System.out.println(response);
-//            return new ResponseEntity<>(response, HttpStatus.OK);
-//        } catch (Exception e) {
-//            logger.error(e.getMessage());
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-//        }
-//    }
-
 }

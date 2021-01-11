@@ -25,12 +25,10 @@ public class BankTransaction {
     @Column(nullable = false)
     private Long merchantOrderId; // pazi, ovo se kreira na PSP-u inicijalno kao Order
 
-    @Column(nullable = false)
     private Long acquirerOrderId; // ovo se kreira u banci prodavca za prodavcevu transakciju, ali samo kad nisu u istoj banci
 
     private LocalDateTime acquirerTimestamp;
 
-    @Column(nullable = false)
     private Long issuerOrderId; // ovo se kreira u banci kupca za kupcevu transakciju
 
     private LocalDateTime issuerTimestamp;
