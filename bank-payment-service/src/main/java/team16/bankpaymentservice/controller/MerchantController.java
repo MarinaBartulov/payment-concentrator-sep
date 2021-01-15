@@ -4,6 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import team16.bankpaymentservice.dto.ClientAuthDTO;
+import team16.bankpaymentservice.dto.MerchantCardInfoDTO;
+import team16.bankpaymentservice.dto.TransactionResponseDTO;
+import team16.bankpaymentservice.model.Card;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.service.MerchantService;
 
@@ -52,5 +56,16 @@ public class MerchantController {
 
         return ResponseEntity.ok().build();
 
+    }
+
+
+    @PostMapping(value = "/card-auth/{merchantId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> authenticateClient(@PathVariable Long merchantId, @RequestBody MerchantCardInfoDTO dto) {
+        try {
+            Card card = merchantService.merchantCardAuth(dto, merchantId);
+            return new ResponseEntity<>(card, HttpStatus.OK);
+        } catch(Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
 }

@@ -277,6 +277,7 @@ public class AcquirerService {
         TransactionDTO responseDTO = new TransactionDTO();
         responseDTO.setPaymentId(dto.getPaymentId());
         responseDTO.setMerchantOrderId(dto.getMerchantOrderId());
+
         responseDTO.setAcquirerOrderId(dto.getAcquirerOrderId());
         responseDTO.setAcquirerTimestamp(dto.getAcquirerTimestamp());
         responseDTO.setIssuerOrderId(dto.getIssuerOrderId());

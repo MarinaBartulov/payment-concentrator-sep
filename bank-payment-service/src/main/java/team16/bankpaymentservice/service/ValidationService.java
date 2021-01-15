@@ -1,7 +1,5 @@
 package team16.bankpaymentservice.service;
 
-import java.time.YearMonth;
-
 public class ValidationService {
 
     public boolean validateString(String data) {

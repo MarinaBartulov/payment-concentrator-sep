@@ -1,6 +1,7 @@
 import './App.css';
 import Home from './components/Home';
 import ClientForm from './components/ClientForm';
+import MerchantForm from './components/MerchantForm';
 import { Route, BrowserRouter as Router } from "react-router-dom";
 
 function App() {
@@ -13,6 +14,9 @@ function App() {
         </Route>
         <Route path="/issuer/:paymentId">
           <ClientForm />
+        </Route>
+        <Route path="/card-info/:metchantId">
+          <MerchantForm />
         </Route>
       </Router>
     </div>

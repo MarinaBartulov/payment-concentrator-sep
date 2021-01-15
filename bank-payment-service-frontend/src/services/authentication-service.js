@@ -19,6 +19,19 @@ class AuthenticationService extends HttpService {
       console.log("ovde");
     }
   };
+
+  authenticateMerchant = async (payload, metchantId) => {
+    try {
+      const response = await this.client.post(ROUTES.AUTH_MERCHANT + "/" + metchantId, payload);
+      console.log("Response: ")
+      console.log(response);
+      console.log("----------")
+      window.location.replace(response.data.redirectionURL);
+      return response;
+    } catch (e) {
+      console.log("ovde");
+    }
+  };
 }
 
 export const authService = new AuthenticationService();

@@ -1,0 +1,95 @@
+import React, {useState} from "react";
+import { useFormik } from 'formik';
+import * as Yup from "yup";
+import { authService } from "../services/authentication-service";
+import DatePicker from "react-datepicker";
+import { useParams } from "react-router-dom";
+
+const MerchantForm = () => {
+
+    const { metchantId } = useParams();
+
+    const formik = useFormik({
+        initialValues: {
+            pan: '',
+            securityNumber: ''
+        },
+        validationSchema: Yup.object().shape({
+            pan: Yup.string()
+              .length(16, "PAN should be 16 numbers long.")
+              .required("PAN is required."),
+            securityNumber: Yup.string()
+              .length(3, "Security number must be 3 numbers long.")
+              .required("Security number is required."),
+        }),
+        onSubmit: values => {
+            let expirationDate = new Intl.DateTimeFormat("en-GB", {
+                year: "numeric",
+                month: "numeric"
+              }).format(startDate);
+            let payload = {...values, expirationDate};
+            const promise = authService.authenticateMerchant(payload, metchantId);
+                promise.then((res) => {
+                    console.log(res);
+            });
+        },
+      });
+
+      const [startDate, setStartDate] = useState(new Date());
+
+
+  return (
+    <div className="formDiv">
+        <form onSubmit={formik.handleSubmit}>
+            <div className="formFieldDiv">
+            <label className="formDivLabel" htmlFor="pan">PAN:</label>
+            </div>
+            <div className="formInputField">
+            <input
+                id="pan"
+                name="pan"
+                type="text"
+                onChange={formik.handleChange}
+                value={formik.values.pan}
+            />
+            {formik.touched.pan && formik.errors.pan ? (
+                <div style={{color:"red"}}>{formik.errors.pan}</div>
+            ) : null}
+            </div>
+            <div className="formFieldDiv">
+            <label className="formDivLabel" htmlFor="securityNumber">Card Security Number:</label>
+            </div>
+            <div className="formInputField">
+            <input
+                id="securityNumber"
+                name="securityNumber"
+                type="password"
+                onChange={formik.handleChange}
+                value={formik.values.securityNumber}
+            />
+            {formik.touched.securityNumber && formik.errors.securityNumber ? (
+                <div style={{color:"red"}}>{formik.errors.securityNumber}</div>
+            ) : null}
+            </div>
+            <div className="formFieldDiv">
+            <label className="formDivLabel" htmlFor="expirationDate">Expiration Date:</label>
+            </div>
+            <div className="formInputFieldDatePicker">
+            <DatePicker
+                className="datePicker"
+                selected={startDate}
+                onChange={date => setStartDate(date)}
+                dateFormat="MM/yyyy"
+                minDate={new Date()}
+                showMonthYearPicker
+            />
+            </div>
+            <div className="formFieldDiv">
+                <button type="submit">Submit</button>
+            </div>
+     </form>
+    </div>
+  );
+};
+
+export default MerchantForm;
