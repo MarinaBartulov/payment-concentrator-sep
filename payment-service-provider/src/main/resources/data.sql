@@ -1,5 +1,5 @@
--- insert into app (app_id, app_name, official_email, web_address)
--- values ('43d86eb5-b5e9-46db-ae03-af4a84350770', 'Literary Association', 'literaryassociation7@gmail.com', 'https://literaryassociation.com');
+insert into app (app_id, app_name, official_email, web_address)
+values ('43d86eb5-b5e9-46db-ae03-af4a84350770', 'Literary Association', 'literaryassociation7@gmail.com', 'https://literaryassociation.com');
 
 -- insert into merchant (merchant_id, merchant_email, password, error_url, failed_url, success_url, app_id)
 -- values ('DsTbyWuTlNWR6ziyOnleu9TcMvngn3SKlOvTltzDXxw=|QxwKnPj+Mn96YbCzSSouOg==', 'sb-nsr1z4072854@business.example.com', '4M8HB0qUUuJ6bgQZvzzPAA==|Ue9pvnZiKYCURTXnbLmPnQ==', 'https://localhost:3000/error', 'https://localhost:3000/failed', 'https://localhost:3000/success', 1);

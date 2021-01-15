@@ -5,6 +5,7 @@ import { authService } from "../services/authentication-service";
 import DatePicker from "react-datepicker";
 import { useParams } from "react-router-dom";
 import {Button} from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const MerchantForm = () => {
 
@@ -23,16 +24,27 @@ const MerchantForm = () => {
               .length(3, "Security number must be 3 numbers long.")
               .required("Security number is required."),
         }),
-        onSubmit: values => {
+        onSubmit: async (values, { resetForm }) => {
             let expirationDate = new Intl.DateTimeFormat("en-GB", {
                 year: "numeric",
                 month: "numeric"
               }).format(startDate);
             let payload = {...values, expirationDate};
-            const promise = authService.authenticateMerchant(payload, metchantId);
-                promise.then((res) => {
-                    console.log(res);
-            });
+            try {
+                const response = await authService.authenticateMerchant(payload, metchantId);
+                console.log(response);
+                resetForm();
+                toast.success("New merchant successfully registered for e-banking.", {
+                    hideProgressBar: true,
+                });
+            } catch(error) {
+                if (error.response) {
+                    console.log("Error: " + JSON.stringify(error.response));
+                  }
+                  toast.error(error.response ? error.response.data : error.message, {
+                    hideProgressBar: true,
+                  });
+            }
         },
       });
 
