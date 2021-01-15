@@ -45,13 +45,13 @@ const MerchantForm = () => {
             height: "100%",
             margin: "auto",
             paddingTop: "10%",
-            backgroundColor: "#ccccb3",
+            backgroundColor: "#999999",
         }}>
         <div 
             style={{
                 margin: "auto",
                 width: "60%",
-                border: "3px solid #ff9933",
+                border: "5px solid #ff9933",
                 paddingBottom: "2%",
             }}>
         <h3>E-banking registration</h3>
