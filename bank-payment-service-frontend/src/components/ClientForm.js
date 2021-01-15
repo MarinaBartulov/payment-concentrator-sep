@@ -3,7 +3,9 @@ import { useFormik } from 'formik';
 import * as Yup from "yup";
 import { authService } from "../services/authentication-service";
 import DatePicker from "react-datepicker";
+import 'react-datepicker/dist/react-datepicker.css';
 import { useParams } from "react-router-dom";
+import {Button} from "react-bootstrap";
 
 const ClientForm = () => {
 
@@ -42,70 +44,90 @@ const ClientForm = () => {
 
 
   return (
-    <div className="formDiv">
+    <div 
+        style={{
+            height: "100%",
+            margin: "auto",
+            paddingTop: "10%",
+            backgroundColor: "#ccccb3",
+          }}>
+        <div 
+            style={{
+                margin: "auto",
+                width: "60%",
+                border: "3px solid #ff9933",
+                paddingBottom: "2%",
+            }}>
+        <h3> Card authentication for online payment</h3>
         <form onSubmit={formik.handleSubmit}>
-            <div className="formFieldDiv">
-            <label className="formDivLabel" htmlFor="pan">PAN:</label>
+            <div className="form-group">
+                <label htmlFor="pan">PAN:</label>
+                <input
+                    id="pan"
+                    className="form-control"
+                    name="pan"
+                    type="text"
+                    onChange={formik.handleChange}
+                    value={formik.values.pan}
+                    style={{margin:"auto", width:"200px"}}
+                />
+                {formik.touched.pan && formik.errors.pan ? (
+                    <div style={{color:"red"}}>{formik.errors.pan}</div>
+                ) : null}
             </div>
-            <div className="formInputField">
-            <input
-                id="pan"
-                name="pan"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.pan}
-            />
-            {formik.touched.pan && formik.errors.pan ? (
-                <div style={{color:"red"}}>{formik.errors.pan}</div>
-            ) : null}
+            <div className="form-group">
+                <label htmlFor="securityNumber">Card Security Number:</label>
+                <input
+                    id="securityNumber"
+                    className="form-control"
+                    name="securityNumber"
+                    type="password"
+                    onChange={formik.handleChange}
+                    value={formik.values.securityNumber}
+                    style={{margin:"auto", width:"200px"}}
+                />
+                {formik.touched.securityNumber && formik.errors.securityNumber ? (
+                    <div style={{color:"red"}}>{formik.errors.securityNumber}</div>
+                ) : null}
             </div>
-            <div className="formFieldDiv">
-            <label className="formDivLabel" htmlFor="securityNumber">Card Security Number:</label>
+            <div className="form-group">
+                <label htmlFor="cardHolderName">Card Holder Name:</label>
+                <input
+                    id="cardHolderName"
+                    className="form-control"
+                    name="cardHolderName"
+                    type="text"
+                    onChange={formik.handleChange}
+                    value={formik.values.cardHolderName}
+                    style={{margin:"auto", width:"200px"}}
+                />
+                {formik.touched.cardHolderName && formik.errors.cardHolderName ? (
+                    <div style={{color:"red"}}>{formik.errors.cardHolderName}</div>
+                ) : null}
             </div>
-            <div className="formInputField">
-            <input
-                id="securityNumber"
-                name="securityNumber"
-                type="password"
-                onChange={formik.handleChange}
-                value={formik.values.securityNumber}
-            />
-            {formik.touched.securityNumber && formik.errors.securityNumber ? (
-                <div style={{color:"red"}}>{formik.errors.securityNumber}</div>
-            ) : null}
+            <div className="form-group">
+                <label htmlFor="expirationDate">Expiration Date:</label>
+                <div>
+                    <DatePicker
+                        className="form-control"
+                        type="input"
+                        selected={startDate}
+                        onChange={date => setStartDate(date)}
+                        dateFormat="MM/yyyy"
+                        minDate={new Date()}
+                        showMonthYearPicker
+                    />
+                </div>
             </div>
-            <div className="formFieldDiv">
-            <label className="formDivLabel" htmlFor="cardHolderName">Card Holder Name:</label>
-            </div>
-            <div className="formInputField">
-            <input
-                id="cardHolderName"
-                name="cardHolderName"
-                type="text"
-                onChange={formik.handleChange}
-                value={formik.values.cardHolderName}
-            />
-            {formik.touched.cardHolderName && formik.errors.cardHolderName ? (
-                <div style={{color:"red"}}>{formik.errors.cardHolderName}</div>
-            ) : null}
-            </div>
-            <div className="formFieldDiv">
-            <label className="formDivLabel" htmlFor="expirationDate">Expiration Date:</label>
-            </div>
-            <div className="formInputFieldDatePicker">
-            <DatePicker
-                className="datePicker"
-                selected={startDate}
-                onChange={date => setStartDate(date)}
-                dateFormat="MM/yyyy"
-                minDate={new Date()}
-                showMonthYearPicker
-            />
-            </div>
-            <div className="formFieldDiv">
-                <button type="submit">Submit</button>
+            <div>
+                <Button 
+                    variant="success" 
+                    type="submit"
+                    style={{width:"100px"}}
+                >Submit</Button>{' '}
             </div>
      </form>
+     </div>
     </div>
   );
 };

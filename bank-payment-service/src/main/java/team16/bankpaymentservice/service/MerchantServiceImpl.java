@@ -65,10 +65,10 @@ public class MerchantServiceImpl implements MerchantService {
 
             // sending email to this merchant - to get card information
             String gettingCardInfoUrl = "https://localhost:3002/card-info/" + newMerchant.getId();
-            String text = "Hello " + merchant.getName() + ",\n\nPlease, fill in your bank card information by visiting this link: " + gettingCardInfoUrl
+            String text = "Dear Sir or Madam,  " + ",\n\nPlease, fill in your bank card information by visiting this link: " + gettingCardInfoUrl
                     + "\n\nBest regards,\nYour Bank";
 
-            String subject = "Banca Intesa - card authentication";
+            String subject = "Bank - card authentication";
             emailService.sendEmail(merchant.getMerchantEmail(), subject, text);
 
             return newMerchant;
