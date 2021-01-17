@@ -39,7 +39,7 @@ public class BankPaymentServiceApplication {
 //            System.out.println("Reading key failed.");
 //        }
 //
-//        String data = "46QfIZh9KGe62AMDAStgnRbsK1fcX4";
+//        String data = "111111111111111111111111111111";
 //        try {
 //            Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
 //            c.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(ivParameterVector));

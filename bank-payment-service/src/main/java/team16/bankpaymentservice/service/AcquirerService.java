@@ -249,15 +249,19 @@ public class AcquirerService {
         try {
             logger.info("Sending request to PSP service");
             response = restTemplate.exchange(
-                    "https://localhost:8085/api/transactions/bank", HttpMethod.POST, request, String.class);
+                    getEndpointPSP(), HttpMethod.POST, request, String.class);
             System.out.println(response.getBody());
             logger.info("Received response from PSP service");
-        } catch (RestClientException e) {
+        } catch (RestClientException | URISyntaxException e) {
             logger.error("RestTemplate error");
             e.printStackTrace();
         }
 
         return response.getBody();
+    }
+
+    private URI getEndpointPSP() throws URISyntaxException {
+        return new URI(configuration.url() + EndpointConfig.PSP_SERVICE_BASE_URL + "/api/transactions/bank");
     }
 
     public String finishPayment(PCCResponseDTO dto) throws Exception {
@@ -277,6 +281,7 @@ public class AcquirerService {
         TransactionDTO responseDTO = new TransactionDTO();
         responseDTO.setPaymentId(dto.getPaymentId());
         responseDTO.setMerchantOrderId(dto.getMerchantOrderId());
+
         responseDTO.setAcquirerOrderId(dto.getAcquirerOrderId());
         responseDTO.setAcquirerTimestamp(dto.getAcquirerTimestamp());
         responseDTO.setIssuerOrderId(dto.getIssuerOrderId());
@@ -299,9 +304,5 @@ public class AcquirerService {
         }
 
         return response.getBody();
-    }
-
-    private URI getEndpointPSP() throws URISyntaxException {
-        return new URI(configuration.url() + EndpointConfig.PSP_SERVICE_BASE_URL + "/api/transactions/bank");
     }
 }

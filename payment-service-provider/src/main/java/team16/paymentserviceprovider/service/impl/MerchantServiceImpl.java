@@ -151,7 +151,7 @@ public class MerchantServiceImpl implements MerchantService {
         //******* OVAJ DEO PROBLEMATICAN *******
         if(paymentMethodName.equals("Bank")){
             merchant.setMerchantId((String) formValues.get("merchantId"));
-            merchant.setMerchantPassword((String) formValues.get("merchantPassword"));
+            merchant.setMerchantPassword((String) formValues.get("password"));
         }
         this.merchantRepository.save(merchant);
         return null;
