@@ -1,6 +1,10 @@
 package team16.paymentserviceprovider.service.impl;
 
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -30,6 +34,9 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
     private MerchantService merchantService;
     @Autowired
     private RestTemplate restTemplate;
+    @Qualifier("eurekaClient")
+    @Autowired
+    private EurekaClient discoveryClient;
 
 
     @Override
@@ -66,5 +73,25 @@ public class PaymentMethodServiceImpl implements PaymentMethodService {
         List<PaymentMethod> paymentMethods = this.paymentMethodRepository.findAll();
         List<PaymentMethodDTO> paymentMethodDTOs = paymentMethods.stream().map(pm -> new PaymentMethodDTO(pm.getId(), pm.getName())).collect(Collectors.toList());
         return paymentMethodDTOs;
+    }
+
+    @Override
+    public void getAvailablePaymentMethods() {
+
+        List<Application> applications = discoveryClient.getApplications().getRegisteredApplications();
+        List<String> appsNames = new ArrayList<String>();
+        for (Application application : applications) {
+            List<InstanceInfo> applicationsInstances = application.getInstances();
+            for (InstanceInfo applicationsInstance : applicationsInstances) {
+
+                String name = applicationsInstance.getAppName();
+                appsNames.add(name);
+                String url = applicationsInstance.getHomePageUrl();
+            }
+        }
+        List<String> apps = appsNames.stream().filter(a -> a.contains("PAYMENT")).collect(Collectors.toList());
+        for(String app: apps){
+            System.out.println(app);
+        }
     }
 }

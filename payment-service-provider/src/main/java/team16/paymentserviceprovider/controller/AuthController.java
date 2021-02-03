@@ -7,7 +7,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,11 +16,10 @@ import team16.paymentserviceprovider.dto.JwtAuthenticationRequestDTO;
 import team16.paymentserviceprovider.dto.UserTokenStateDTO;
 import team16.paymentserviceprovider.model.User;
 import team16.paymentserviceprovider.security.TokenUtils;
-import team16.paymentserviceprovider.service.CustomUserDetailsService;
+import team16.paymentserviceprovider.service.impl.CustomUserDetailsService;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 
 @RestController
 @RequestMapping(value = "/api/auth")

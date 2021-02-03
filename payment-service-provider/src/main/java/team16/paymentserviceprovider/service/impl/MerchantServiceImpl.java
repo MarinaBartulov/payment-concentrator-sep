@@ -3,7 +3,6 @@ package team16.paymentserviceprovider.service.impl;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -12,9 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.client.RestTemplate;
-import team16.paymentserviceprovider.dto.FormFieldDTO;
 import team16.paymentserviceprovider.dto.MerchantActivationDTO;
 import team16.paymentserviceprovider.dto.MerchantInfoDTO;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
@@ -26,11 +23,9 @@ import team16.paymentserviceprovider.repository.MerchantRepository;
 import team16.paymentserviceprovider.service.*;
 
 import javax.mail.MessagingException;
-import java.security.Principal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service

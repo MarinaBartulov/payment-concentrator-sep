@@ -14,4 +14,5 @@ public interface PaymentMethodService {
     List<FormDataDTO> getFormsDataForAvailablePaymentMethodsForCurrentMerchant(Authentication currentUser);
     PaymentMethod findByPaymentMethodNameAndApp(String paymentMethodName, Long appId);
     List<PaymentMethodDTO> getAllPaymentMethods();
+    void getAvailablePaymentMethods();
 }
