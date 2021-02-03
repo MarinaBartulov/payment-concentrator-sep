@@ -1,4 +1,4 @@
-package team16.paymentserviceprovider.service;
+package team16.paymentserviceprovider.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

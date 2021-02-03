@@ -12,9 +12,7 @@ import lombok.Setter;
 public class OrderDTO {
 
     private Long orderId;
-    private String merchantId;
     private String merchantEmail;
-    private String merchantPassword;
     private String currency;
     private double amount;
     private String merchantSuccessUrl;

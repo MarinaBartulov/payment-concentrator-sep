@@ -1,4 +1,4 @@
-package team16.paymentserviceprovider.service;
+package team16.paymentserviceprovider.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.User;
 import team16.paymentserviceprovider.repository.UserRepository;
+import team16.paymentserviceprovider.service.MerchantService;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

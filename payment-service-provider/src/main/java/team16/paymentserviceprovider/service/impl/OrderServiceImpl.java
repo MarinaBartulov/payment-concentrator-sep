@@ -1,4 +1,4 @@
-package team16.paymentserviceprovider.service;
+package team16.paymentserviceprovider.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,36 +9,67 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import team16.paymentserviceprovider.dto.OrderInfoDTO;
-import team16.paymentserviceprovider.dto.PaymentMethodDTO;
-import team16.paymentserviceprovider.dto.PaymentRequestDTO;
-import team16.paymentserviceprovider.dto.PaymentResponseInfoDTO;
+import team16.paymentserviceprovider.dto.*;
+import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
-import team16.paymentserviceprovider.model.PaymentMethod;
 import team16.paymentserviceprovider.repository.OrderRepository;
+import team16.paymentserviceprovider.service.MerchantService;
+import team16.paymentserviceprovider.service.OrderService;
+import team16.paymentserviceprovider.service.ValidationService;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private MerchantService merchantService;
 
     @Autowired
     private RestTemplate restTemplate;
 
     Logger logger = LoggerFactory.getLogger(OrderServiceImpl.class);
+    private ValidationService validationService;
+    public OrderServiceImpl() {
+        validationService = new ValidationService();
+    }
 
 
     @Override
-    public Order create(Order order) {
+    public OrderResponseDTO createOrderFromClientApp(OrderDTO dto) throws InvalidDataException {
+        System.out.println("------------------------DTO from LA-------------------------------");
+        System.out.println(dto.getAmount());
+        System.out.println(dto.getCurrency());
+        System.out.println(dto.getMerchantEmail());
+        System.out.println(dto.getMerchantSuccessUrl());
+        System.out.println(dto.getMerchantFailedUrl());
+        System.out.println(dto.getMerchantErrorUrl());
+
+        validateDTO(dto);
+
+        Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
+        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
+        System.out.println("Found merchant: " + merchant.getEmail() + "|" + merchant.getMerchantId());
+
+        Order order = new Order();
+        order.setMerchant(merchant);
+        order.setAmount(dto.getAmount());
+        order.setCurrency(dto.getCurrency());
         order.setMerchantOrderTimestamp(LocalDateTime.now());
-        return orderRepository.save(order);
+        Order newOrder = orderRepository.save(order);
+        System.out.println("Create Order: " + newOrder.getMerchantOrderId());
+
+        logger.info("New Order created: " + newOrder.getMerchantOrderId());
+
+        return new OrderResponseDTO(newOrder.getMerchantOrderId(),
+                "https://localhost:3001/order/" + newOrder.getMerchantOrderId(), merchant.getMerchantId());
     }
+
 
     @Override
     public Order getOne(Long id) {
@@ -118,6 +149,45 @@ public class OrderServiceImpl implements OrderService{
             }
 
             return response.getBody();
+        }
+    }
+
+
+
+    private void validateDTO(OrderDTO dto) throws InvalidDataException {
+        System.out.println("------------------------DTO from LA validation-------------------------------");
+        if(!validationService.validateString(dto.getMerchantEmail())) {
+            System.out.println("Email null or empty");
+            logger.debug("Invalid email");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid merchant info.");
+        }
+        if(merchantService.findByMerchantEmail(dto.getMerchantEmail()) == null) {
+            System.out.println("nonexistent merchant");
+            logger.debug("Nonexistent merchant");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Nonexistent merchant.");
+        }
+        if(!validationService.validateString(dto.getCurrency())) {
+            System.out.println("currency null or empty");
+            logger.debug("Invalid currency");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid currency.");
+        }
+        if(dto.getAmount() < 0) {
+            System.out.println("negative amount");
+            logger.debug("Invalid amount");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Amount cannot be negative.");
+        }
+
+        if(!validationService.validateString(dto.getMerchantSuccessUrl()) ||
+                !validationService.validateString(dto.getMerchantFailedUrl()) ||
+                !validationService.validateString(dto.getMerchantErrorUrl())) {
+            System.out.println("invalid urls - null or empty");
+            logger.debug("Invalid redirection URLs");
+            logger.error("Failed to create Order due to invalid received data");
+            throw new InvalidDataException("Invalid URLs.");
         }
     }
 }

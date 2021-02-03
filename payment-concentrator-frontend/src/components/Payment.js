@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import Button from "react-bootstrap/Button";
-import { paymentService } from "../services/payment-service";
+import { orderService } from "../services/order-service";
 import { useParams, useHistory } from "react-router-dom";
 import Select from "react-dropdown-select";
 import { toast } from "react-toastify";
@@ -13,7 +13,7 @@ const Payment = () => {
 
   const getAvailablePaymentMethods = async () => {
     try {
-      const response = await paymentService.getAvailablePaymentMethods(orderId);
+      const response = await orderService.getAvailablePaymentMethods(orderId);
       setPaymentMethods(response);
     } catch (error) {
       if (error.response) {
@@ -32,7 +32,7 @@ const Payment = () => {
   const submitForm = async (event) => {
     event.preventDefault();
     try {
-      const response = await paymentService.choosePaymentMethodForOrder(
+      const response = await orderService.choosePaymentMethodForOrder(
         orderId,
         chosenPaymentMethod
       );
@@ -46,26 +46,6 @@ const Payment = () => {
       });
     }
   };
-
-  // const onClickBank = () => {
-  //   paymentService.testBank(orderId);
-  // };
-  // const onClickPaypal = () => {
-  //   payPalService.pay(orderId, "paypal");
-  // };
-
-  // const onClickBitcoin = async () => {
-  //   const response = await bitcoinService.pay(orderId, "bitcoin");
-  //   if ((response !== null) & (response !== undefined)) {
-  //     window.location.replace(response.data); // redirection to CoinGate site
-  //   } else {
-  //     history.push("/bitcoin/error");
-  //   }
-  // };
-
-  // const onClickAvailableServices = () => {
-  //   paymentService.getAvailableServices();
-  // };
 
   return (
     <div>
@@ -90,20 +70,6 @@ const Payment = () => {
           </Button>
         </form>
       </div>
-      {/* <Button variant="dark" className="myBtn" onClick={onClickBank}>
-        Bank
-      </Button>
-      <Button variant="dark" className="myBtn" onClick={onClickPaypal}>
-        Paypal
-      </Button>
-      <Button variant="dark" className="myBtn" onClick={onClickBitcoin}>
-        Bitcoin
-      </Button>
-      <div>
-        <Button className="btnAvailable" onClick={onClickAvailableServices}>
-          Available Payment Services
-        </Button>
-      </div> */}
     </div>
   );
 };
