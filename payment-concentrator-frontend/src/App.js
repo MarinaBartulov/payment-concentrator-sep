@@ -19,6 +19,7 @@ import Login from "./components/Login";
 import AdminPanel from "./components/AdminPanel";
 import MerchantChoosePM from "./components/MerchantChoosePM";
 import MerchantChangePM from "./components/MerchantChangePM";
+import BillingPlan from "./components/BillingPlan";
 
 function App() {
   return (
@@ -88,6 +89,9 @@ function App() {
         </Route>
         <Route exact path="/merchantChangePM">
           <MerchantChangePM />
+        </Route>
+        <Route exact path="/billingPlan">
+          <BillingPlan />
         </Route>
       </div>
     </Router>

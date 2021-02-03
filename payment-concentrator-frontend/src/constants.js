@@ -30,11 +30,12 @@ export const PSP_ENDPOINTS = {
   PAYMENTS: "/payments",
   ORDER: "/order",
   APP: "/app",
-  SUBSCRIPTION: "/payments/subscription",
+  SUBSCRIPTION: "/subscriptions/subscription",
   AUTH_LOGIN: "/auth/login",
   AUTH_CHANGE_PASSWORD: "/auth/changePassword",
   MERCHANT_INFO: "/merchant/info",
   MERCHANT_ADD_PAYMENT_METHOD: "/merchant/paymentMethod",
   PAYMENT_METHOD_FORMS_DATA: "/paymentMethod/formsData",
   PAYMENT_METHOD: "/paymentMethod",
+  CREATE_BILLING_PLAN: "/billing-plans/create",
 };

@@ -4,8 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import team16.paymentserviceprovider.dto.SubscriptionRequestDTO;
+import team16.paymentserviceprovider.enums.SubscriptionFrequency;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 @Entity
 @NoArgsConstructor
@@ -17,18 +19,8 @@ public class Subscription {
     @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
-    /*@Column
-    private Long subscriptionId;
-
     @Column
-    private Date expirationDate;
-
-    @Column
-    @Enumerated(EnumType.STRING)
-    private SubscriptionStatus subscriptionStatus;*/
-
-    @Column
-    private Double price;
+    private LocalDate expirationDate;
 
     @Column
     private String currency;
@@ -36,10 +28,28 @@ public class Subscription {
     @ManyToOne
     private Merchant merchant;
 
-    public Subscription(SubscriptionRequestDTO dto, Merchant merchant)
+    @ManyToOne
+    private BillingPlan billingPlan;
+
+    public Subscription(SubscriptionRequestDTO dto, Merchant merchant, BillingPlan billingPlan)
     {
-        this.price = dto.getPrice();
         this.currency = dto.getCurrency();
         this.merchant = merchant;
+        this.billingPlan = billingPlan;
+        this.expirationDate = getExpirationDate(billingPlan.getCyclesNumber(), billingPlan.getFrequency());
+    }
+
+    private LocalDate getExpirationDate(Integer cycles, SubscriptionFrequency frequency){
+
+        LocalDate expirationDate = LocalDate.now();
+        if(frequency.equals(SubscriptionFrequency.MONTH))
+        {
+            expirationDate = expirationDate.plusMonths(cycles);
+        }
+        else if (frequency.equals(SubscriptionFrequency.YEAR))
+        {
+            expirationDate = expirationDate.plusYears(cycles);
+        }
+        return expirationDate;
     }
 }
