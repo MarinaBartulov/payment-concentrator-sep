@@ -19,13 +19,7 @@ public class BillingPlan {
     private Long id;
 
     @Column
-    private String billingPlanId;
-
-    @Column
-    private Integer cyclesNumber;
-
-    @ManyToOne
-    private Merchant merchant;
+    private Double price;
 
     @Column
     @Enumerated(EnumType.STRING)
@@ -34,4 +28,15 @@ public class BillingPlan {
     @Column
     @Enumerated(EnumType.STRING)
     private SubscriptionFrequency frequency;
+
+    @Column
+    private Integer cyclesNumber;
+
+    @ManyToOne
+    private Merchant merchant;
+
+    @Column
+    private Boolean isDefault;
+
+
 }

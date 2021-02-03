@@ -8,17 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.*;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
-import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.model.PaymentMethod;
-import team16.paymentserviceprovider.model.Subscription;
-import team16.paymentserviceprovider.service.MerchantService;
 import team16.paymentserviceprovider.service.OrderService;
 import team16.paymentserviceprovider.service.PaymentMethodService;
 import team16.paymentserviceprovider.service.PaymentService;
-import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
-
-import java.net.URISyntaxException;
 
 // TREBA RAZDVOJITI OVAJ KONTROLER NA DVA KONTROLERA, ZA ORDERE I SUBSCRIPTION JER OVAJ PAYMENT NEMA SMISLA
 @RestController
@@ -32,13 +26,7 @@ public class PaymentController {
     private OrderService orderService;
 
     @Autowired
-    private SubscriptionServiceImpl subscriptionService;
-
-    @Autowired
     private PaymentMethodService paymentMethodService;
-
-    @Autowired
-    private MerchantService merchantService;
 
     Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
@@ -60,29 +48,6 @@ public class PaymentController {
         } catch (Exception e) {
             logger.error("Exception while creating order");
             System.out.println("Exception");
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-
-    }
-
-    @PostMapping(value="/subscribe")
-    public ResponseEntity<?> saveSubscriptionFromLA(@RequestBody SubscriptionRequestDTO dto) {
-        System.out.println("Usao u save subscription from LA");
-
-        Merchant merchant = merchantService.findByMerchantEmail(dto.getMerchantEmail());
-        if(merchant == null)
-        {
-            logger.error("Merchant not found | Email: " + dto.getMerchantEmail());
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
-        try {
-            String redirectURL = paymentService.saveSubscriptionFromLA(dto, merchant);
-            logger.info("Subscription successfully created. Sending redirection URL to LA");
-            System.out.println(redirectURL);
-            return new ResponseEntity<>(redirectURL, HttpStatus.OK);
-        }catch (Exception e) {
-            logger.error("Exception while creating subscription");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
 
@@ -129,27 +94,6 @@ public class PaymentController {
 //        System.out.println("Redirect url = " + redirectUrl);
 //        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
 //    }
-
-    @PutMapping(value="/subscription/{subscriptionId}")
-    public ResponseEntity<?> createSubscription(@PathVariable Long subscriptionId) throws URISyntaxException {
-        Subscription subscription = subscriptionService.getOne(subscriptionId);
-        logger.info("Found subscription | ID: " + subscription.getId());
-        if(subscription == null)
-        {
-            logger.error("Subscription not found | ID: " + subscriptionId);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-
-        String redirectUrl = paymentService.createSubscription(subscription);
-        if(redirectUrl == null)
-        {
-            logger.error("Failed to get URL");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
-        logger.info("Sending redirection URL");
-        System.out.println("Redirect url = " + redirectUrl);
-        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
-    }
 
     @GetMapping(value="/order/{id}/paymentMethods")
     public ResponseEntity getAvailablePaymentMethodsForOrder(@PathVariable("id") Long id){

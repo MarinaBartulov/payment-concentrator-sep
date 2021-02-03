@@ -37,5 +37,12 @@ insert into merchants_payment_methods (merchant_id, payment_method_id) values (2
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (2,2);
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (2,3);
 
-insert into billing_plan ( billing_plan_id, cycles_number, merchant_id, type, frequency )
-values ( 'P-1A648881X5345862WL7ZRIDY', 2, 2, 'FIXED', 'MONTH');
+insert into billing_plan ( cycles_number, price, is_default, type, frequency )
+values ( 6, 3, true, 'FIXED', 'MONTH');
+insert into billing_plan ( cycles_number, price, is_default, type, frequency )
+values ( 12, 2,true, 'FIXED', 'MONTH');
+insert into billing_plan ( cycles_number, price, is_default, type, frequency )
+values ( 1, 15, true, 'FIXED', 'YEAR');
+
+insert into billing_plan ( cycles_number, price, is_default, merchant_id, type, frequency )
+values ( 2, 25, false, 2 ,'FIXED', 'YEAR');

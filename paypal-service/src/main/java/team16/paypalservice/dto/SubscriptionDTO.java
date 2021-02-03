@@ -23,9 +23,6 @@ public class SubscriptionDTO {
     private Long subscriptionId;
 
     @NotNull
-    private String billingPlanId;
-
-    @NotNull
     @Positive
     private Double price;
 

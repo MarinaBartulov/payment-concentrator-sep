@@ -30,7 +30,7 @@ export const PSP_ENDPOINTS = {
   PAYMENTS: "/payments",
   PAYMENTS_ORDER: "/payments/order",
   APP: "/app",
-  SUBSCRIPTION: "/payments/subscription",
+  SUBSCRIPTION: "/subscriptions/subscription",
   AUTH_LOGIN: "/auth/login",
   AUTH_CHANGE_PASSWORD: "/auth/changePassword",
   MERCHANT_INFO: "/merchant/info",

@@ -33,9 +33,6 @@ public class SubscriptionInfoDTO {
     private String email;
 
     @NotNull
-    private String billingPlanId;
-
-    @NotNull
     private SubscriptionFrequency frequency;
 
     @NotNull
@@ -48,10 +45,9 @@ public class SubscriptionInfoDTO {
     public SubscriptionInfoDTO(Subscription subscription, Merchant merchant, BillingPlan  billingPlan)
     {
         this.subscriptionId = subscription.getId();
-        this.price = subscription.getPrice();
+        this.price = billingPlan.getPrice();
         this.currency = subscription.getCurrency();
         this.email = merchant.getEmail();
-        this.billingPlanId = billingPlan.getBillingPlanId();
         this.cyclesNumber = billingPlan.getCyclesNumber();
         this.type = billingPlan.getType();
         this.frequency = billingPlan.getFrequency();

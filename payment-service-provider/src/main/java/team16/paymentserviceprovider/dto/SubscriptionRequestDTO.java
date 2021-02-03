@@ -15,15 +15,14 @@ public class SubscriptionRequestDTO {
 
     @NotNull
     @Positive
-    private Double price;
+    private Long billingPlanId;
 
     @NotNull
     private String currency;
 
     @NotNull
-    @Email
-    private String merchantEmail;
+    private Long merchantId;
 
     @NotNull
-    private String merchantId;
+    private String merchantEmail;
 }

@@ -3,23 +3,14 @@ package team16.paymentserviceprovider.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
-import org.springframework.web.client.RestTemplate;
 import team16.paymentserviceprovider.config.EndpointConfig;
 import team16.paymentserviceprovider.config.RestConfig;
 import team16.paymentserviceprovider.dto.*;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
-import team16.paymentserviceprovider.model.BillingPlan;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Order;
-import team16.paymentserviceprovider.model.Subscription;
-import team16.paymentserviceprovider.service.impl.BillingPlanServiceImpl;
 import team16.paymentserviceprovider.service.impl.MerchantServiceImpl;
-import team16.paymentserviceprovider.service.impl.SubscriptionServiceImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -29,9 +20,6 @@ import java.time.LocalDateTime;
 public class PaymentService {
 
     @Autowired
-    private RestTemplate restTemplate;
-
-    @Autowired
     private RestConfig configuration;
 
     @Autowired
@@ -39,12 +27,6 @@ public class PaymentService {
 
     @Autowired
     private OrderServiceImpl orderService;
-
-    @Autowired
-    private SubscriptionServiceImpl subscriptionService;
-
-    @Autowired
-    private BillingPlanServiceImpl billingPlanService;
 
     private ValidationService validationService;
 
@@ -84,17 +66,6 @@ public class PaymentService {
         return new OrderResponseDTO(newOrder.getMerchantOrderId(),
                 "https://localhost:3001/order/" + newOrder.getMerchantOrderId(), merchant.getMerchantId());
     }
-
-    public String saveSubscriptionFromLA(SubscriptionRequestDTO dto, Merchant merchant) {
-
-        Subscription subscription = new Subscription(dto, merchant);
-        Subscription savedSubscription = subscriptionService.save(subscription);
-        logger.info("Saved subscription | ID " + savedSubscription.getId());
-        String redirectionURL = "https://localhost:3001/subscription/id/" + savedSubscription.getId();
-
-        return redirectionURL;
-    }
-
 
 //    public PaymentResponseInfoDTO createPaymentRequest(Long orderId) throws Exception {
 //        System.out.println("------------------------Order from PC front-------------------------------");
@@ -213,38 +184,5 @@ public class PaymentService {
         return new URI(configuration.url() + "/" + paymentMethodName + "-payment-service/api/pay");
     }
 
-    public String createSubscription(Subscription subscription) throws URISyntaxException {
-        Merchant merchant = subscription.getMerchant();
-        logger.info("Found Merchant | ID: " + merchant.getId());
-        if(merchant == null){
-            logger.error("Failed to find Merchant | ID: " + subscription.getMerchant().getMerchantId());
-            return null;
-        }
 
-        // pronaci odgovarajuci plan
-        BillingPlan billingPlan = billingPlanService.getOne(1L);
-        logger.info("Found Billing plan | ID: 1");
-        if(billingPlan == null)
-        {
-            logger.error("Failed to find Billing plan | ID: 1");
-            return null;
-        }
-
-        SubscriptionInfoDTO subscriptionInfoDTO = new SubscriptionInfoDTO(subscription, merchant, billingPlan);
-
-        HttpEntity<SubscriptionInfoDTO> request = new HttpEntity<>(subscriptionInfoDTO);
-        ResponseEntity<String> response = null;
-
-        try {
-            logger.info("Sending request to paypal payment service");
-            response = restTemplate.exchange( configuration.url() + EndpointConfig.PAYPAL_PAYMENT_SERVICE_BASE_URL + "/api/subscription/create"
-                    ,HttpMethod.POST, request, String.class);
-            logger.info("Received response from paypal payment service");
-        } catch (RestClientException e) {
-            logger.error("RestTemplate error");
-            e.printStackTrace();
-        }
-
-        return response.getBody();
-    }
 }

@@ -68,6 +68,5 @@ public class PayPalSubscription {
         this.frequency = subscriptionDTO.getFrequency();
         this.type = subscriptionDTO.getType();
         this.cyclesNumber = subscriptionDTO.getCyclesNumber();
-        this.billingPlanId = subscriptionDTO.getBillingPlanId();
     }
 }
