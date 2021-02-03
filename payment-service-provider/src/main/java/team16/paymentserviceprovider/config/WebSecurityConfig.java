@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 import team16.paymentserviceprovider.security.TokenUtils;
 import team16.paymentserviceprovider.security.auth.JwtAuthenticationFilter;
 import team16.paymentserviceprovider.security.auth.RestAuthenticationEntryPoint;
-import team16.paymentserviceprovider.service.CustomUserDetailsService;
+import team16.paymentserviceprovider.service.impl.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
