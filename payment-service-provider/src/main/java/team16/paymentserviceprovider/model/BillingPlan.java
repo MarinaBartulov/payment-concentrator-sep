@@ -3,6 +3,7 @@ package team16.paymentserviceprovider.model;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import team16.paymentserviceprovider.dto.BillingPlanDTO;
 import team16.paymentserviceprovider.enums.SubscriptionFrequency;
 import team16.paymentserviceprovider.enums.SubscriptionType;
 
@@ -22,6 +23,9 @@ public class BillingPlan {
     private Double price;
 
     @Column
+    private Double discount;
+
+    @Column
     @Enumerated(EnumType.STRING)
     private SubscriptionType type;
 
@@ -37,6 +41,16 @@ public class BillingPlan {
 
     @Column
     private Boolean isDefault;
+
+    public BillingPlan(BillingPlanDTO billingPlanDTO, Merchant merchant){
+        this.price = billingPlanDTO.getPrice();
+        this.discount = billingPlanDTO.getDiscount();
+        this.cyclesNumber = billingPlanDTO.getCyclesNumber();
+        this.isDefault = false;
+        this.merchant = merchant;
+        this.frequency = SubscriptionFrequency.valueOf(billingPlanDTO.getFrequency());
+        this.type = SubscriptionType.valueOf(billingPlanDTO.getType());
+    }
 
 
 }

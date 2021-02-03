@@ -19,6 +19,15 @@ class MerchantService extends HttpService {
     );
     return response.data;
   };
+
+  createBillingPlan = async (payload) => {
+    const response = await this.client.post(
+      SERVICES_ENDPOINTS.PAYMENT_PROVIDER_SERVICE +
+        PSP_ENDPOINTS.CREATE_BILLING_PLAN,
+      payload
+    );
+    return response.data;
+  };
 }
 
 export const merchantService = new MerchantService();

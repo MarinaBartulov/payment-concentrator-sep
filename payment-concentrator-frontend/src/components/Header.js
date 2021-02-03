@@ -19,10 +19,49 @@ const Header = () => {
     history.push("/login");
   };
 
+  const goToBillingPlan = () => {
+    history.push("/billingPlan");
+  };
+
+  const goToChangePM = () => {
+    history.push("/merchantChangePM");
+  };
+
   return (
     <div>
       <Navbar bg="primary" variant="dark">
         <Navbar.Brand href="/">Payment Concentrator</Navbar.Brand>
+        <Nav className="mr-auto" style={{ width: "100%" }}>
+          {loggedIn && role === "ROLE_MERCHANT" && (
+            <Nav.Item
+              className="ml-2"
+              style={{ backgroundColor: "black", borderRadius: "10px" }}
+            >
+              <Button
+                style={{ color: "white" }}
+                variant="link"
+                onClick={goToBillingPlan}
+              >
+                Billing Plan
+              </Button>
+            </Nav.Item>
+          )}
+          {loggedIn && role === "ROLE_MERCHANT" && (
+            <Nav.Item
+              className="ml-2"
+              style={{ backgroundColor: "black", borderRadius: "10px" }}
+            >
+              <Button
+                style={{ color: "white" }}
+                variant="link"
+                onClick={goToChangePM}
+              >
+                Payment Methods
+              </Button>
+            </Nav.Item>
+          )}
+        </Nav>
+
         <Nav className="justify-content-end" style={{ width: "100%" }}>
           {role === "ROLE_ADMIN" && loggedIn && (
             <Nav.Item
@@ -38,6 +77,7 @@ const Header = () => {
               </Button>
             </Nav.Item>
           )}
+
           {!loggedIn && (
             <Nav.Item
               className="ml-2"

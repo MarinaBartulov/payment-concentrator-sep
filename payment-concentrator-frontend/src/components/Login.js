@@ -45,7 +45,7 @@ const Login = () => {
             if (!response.pmChosen) {
               history.push("/merchantChoosePM");
             } else {
-              history.push("/merchantChangePM");
+              history.push("/");
             }
           }
         }
