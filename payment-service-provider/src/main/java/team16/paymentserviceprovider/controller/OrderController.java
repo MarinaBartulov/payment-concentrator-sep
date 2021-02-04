@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.OrderDTO;
 import team16.paymentserviceprovider.dto.OrderResponseDTO;
+import team16.paymentserviceprovider.dto.OrderStatusDTO;
+import team16.paymentserviceprovider.enums.OrderStatus;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.model.PaymentMethod;
@@ -67,6 +69,10 @@ public class OrderController {
             return ResponseEntity.badRequest().body("Order with that id does not exist.");
         }
 
+        if(order.getOrderStatus() != OrderStatus.INITIATED){
+            return ResponseEntity.badRequest().body("Order with that id has been aready created.");
+        }
+
         PaymentMethod paymentMethod = this.paymentMethodService.findByName(paymentMethodName);
         if(paymentMethod == null){
             return ResponseEntity.badRequest().body("Payment method with that name does not exist.");
@@ -79,6 +85,18 @@ public class OrderController {
             return ResponseEntity.ok().body(redirectUrl);
         }
 
+    }
+
+    @GetMapping(value = "/status")
+    public ResponseEntity checkOrderStatus(@RequestParam("orderId") Long orderId, @RequestParam("merchantEmail") String merchantEmail){
+
+        System.out.println("Checking order status - id: " + orderId + ", merchantEmail: " + merchantEmail);
+        OrderStatus status = this.orderService.findOrderStatus(merchantEmail, orderId);
+        if(status == null){
+            return ResponseEntity.badRequest().body("Order with orderId " + orderId + " doesn't exits on Payment Concentrator.");
+        }
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO(status.toString());
+        return new ResponseEntity(orderStatusDTO, HttpStatus.OK);
     }
 
 

@@ -15,7 +15,7 @@ import team16.bitcoinservice.dto.PaymentRequestDTO;
 import team16.bitcoinservice.dto.PaymentResponseDTO;
 import team16.bitcoinservice.model.Merchant;
 import team16.bitcoinservice.model.Transaction;
-import team16.bitcoinservice.model.TransactionStatus;
+import team16.bitcoinservice.enums.TransactionStatus;
 import team16.bitcoinservice.repository.TransactionRepository;
 import team16.bitcoinservice.service.TransactionService;
 
@@ -143,6 +143,12 @@ public class TransactionServiceImpl implements TransactionService {
         if(transactions.size() > 0){
             logger.info("Updating unfinished transaction from CoinGate finished.");
         }
+    }
+
+    @Override
+    public Transaction findTransactionByOrderId(Long orderId) {
+
+        return this.transactionRepository.findByOrderId(orderId);
     }
 
 

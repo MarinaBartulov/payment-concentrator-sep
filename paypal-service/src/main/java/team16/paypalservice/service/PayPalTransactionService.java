@@ -11,4 +11,5 @@ public interface PayPalTransactionService {
     PayPalTransaction findById(Long transactionId);
     void findUnfinishedTransactions();
     List<PayPalTransaction> findAllUnfinished();
+    PayPalTransaction findTransactionByOrderId(Long orderId);
 }

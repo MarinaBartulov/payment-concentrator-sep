@@ -48,6 +48,11 @@ public class PayPalTransactionServiceImpl implements PayPalTransactionService {
     }
 
     @Override
+    public PayPalTransaction findTransactionByOrderId(Long orderId) {
+        return this.transactionRepository.findByOrderId(orderId);
+    }
+
+    @Override
     @Scheduled(cron = "0 0/15 * * * *")
     public void findUnfinishedTransactions() {
         logger.info("INITIATED FINDING UNFINISHED TRANSACTIONS");

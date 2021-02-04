@@ -1,4 +1,4 @@
-package team16.bitcoinservice.model;
+package team16.bitcoinservice.enums;
 
 public enum TransactionStatus {
     NEW, //Newly created invoice. The shopper has not yet selected payment currency
