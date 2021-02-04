@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import team16.bitcoinservice.enums.TransactionStatus;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -22,7 +23,7 @@ public class Transaction {
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
-    private Long orderId; //nas id od ordera
+    private Long orderId; //nas id od ordera sa psp
     private Date createdAt;
     private String priceCurrency;
     private Double priceAmount;

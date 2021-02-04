@@ -3,6 +3,7 @@ package team16.paymentserviceprovider.service;
 import team16.paymentserviceprovider.dto.OrderDTO;
 import team16.paymentserviceprovider.dto.OrderResponseDTO;
 import team16.paymentserviceprovider.dto.PaymentMethodDTO;
+import team16.paymentserviceprovider.enums.OrderStatus;
 import team16.paymentserviceprovider.exceptions.InvalidDataException;
 import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.model.PaymentMethod;
@@ -17,4 +18,5 @@ public interface OrderService {
     Order findById(Long id);
     List<PaymentMethodDTO> getAvailablePaymentMethodsForOrder(Order order);
     String choosePaymentMethodForOrderAndSend(Order order, String paymentMethodName);
+    OrderStatus findOrderStatus(String merchantEmail, Long orderId);
 }

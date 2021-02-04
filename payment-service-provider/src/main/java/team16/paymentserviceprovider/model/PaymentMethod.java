@@ -26,4 +26,7 @@ public class PaymentMethod {
 
     @ManyToMany(mappedBy = "paymentMethods")
     private Set<App> apps = new HashSet<>();
+
+    @OneToMany(mappedBy = "paymentMethod")
+    private Set<Order> orders;
 }

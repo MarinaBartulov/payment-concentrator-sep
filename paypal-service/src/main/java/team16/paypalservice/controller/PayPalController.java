@@ -9,7 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paypalservice.dto.OrderInfoDTO;
+import team16.paypalservice.dto.OrderStatusDTO;
 import team16.paypalservice.dto.SubscriptionDTO;
+import team16.paypalservice.enums.PayPalTransactionStatus;
 import team16.paypalservice.model.Client;
 import team16.paypalservice.model.PayPalSubscription;
 import team16.paypalservice.model.PayPalTransaction;
@@ -195,5 +197,24 @@ public class PayPalController {
         }
         else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity checkTransactionStatus(@RequestParam("orderId") Long orderId){
+
+        PayPalTransaction tr = this.transactionService.findTransactionByOrderId(orderId);
+        if(tr == null){
+            return ResponseEntity.badRequest().body("Transaction with orderId " + orderId + " doesn't exist.");
+        }
+
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+        if(tr.getStatus() == PayPalTransactionStatus.INITIATED || tr.getStatus() == PayPalTransactionStatus.CREATED){
+            orderStatusDTO.setStatus("CREATED");
+        }else if(tr.getStatus() == PayPalTransactionStatus.FAILED){
+            orderStatusDTO.setStatus("INVALID");
+        }else{
+            orderStatusDTO.setStatus(tr.getStatus().toString());
+        }
+        return new ResponseEntity(orderStatusDTO, HttpStatus.OK);
     }
 }

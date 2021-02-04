@@ -12,6 +12,7 @@ public interface TransactionService {
     Transaction updateTransaction(Transaction transaction, PaymentResponseDTO paymentResponseDTO);
     Transaction findTransactionById(Long id);
     boolean updateTransactionFromCoinGate(Transaction transaction);
-    public void updateUnfinishedTransactionsFromCoinGate();
+    void updateUnfinishedTransactionsFromCoinGate();
+    Transaction findTransactionByOrderId(Long orderId);
 
 }

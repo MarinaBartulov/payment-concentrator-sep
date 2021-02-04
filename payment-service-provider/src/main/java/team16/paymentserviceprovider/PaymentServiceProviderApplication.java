@@ -3,6 +3,7 @@ package team16.paymentserviceprovider;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -14,6 +15,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 
 @SpringBootApplication
+@EnableScheduling
 public class PaymentServiceProviderApplication {
 
     public static void main(String[] args) throws IOException {

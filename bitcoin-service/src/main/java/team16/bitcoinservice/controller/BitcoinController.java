@@ -4,15 +4,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import team16.bitcoinservice.dto.BitcoinPaymentDTO;
+import team16.bitcoinservice.dto.OrderStatusDTO;
 import team16.bitcoinservice.dto.PaymentRequestDTO;
 import team16.bitcoinservice.dto.PaymentResponseDTO;
+import team16.bitcoinservice.enums.TransactionStatus;
 import team16.bitcoinservice.model.Merchant;
 import team16.bitcoinservice.model.Transaction;
 import team16.bitcoinservice.service.MerchantService;
@@ -23,7 +22,7 @@ import java.text.MessageFormat;
 
 @RestController
 @RequestMapping("/api")
-public class BitcoinPaymentController {
+public class BitcoinController {
 
     @Value("${success_url}")
     private String successUrl;
@@ -47,10 +46,9 @@ public class BitcoinPaymentController {
     @Autowired
     private TransactionService transactionService;
 
-    Logger logger = LoggerFactory.getLogger(BitcoinPaymentController.class);
+    Logger logger = LoggerFactory.getLogger(BitcoinController.class);
 
 
-    //@PostMapping("/create")
     @PostMapping("/pay")
     public ResponseEntity createPayment(@RequestBody @Valid BitcoinPaymentDTO bitcoinPaymentDTO){
 
@@ -146,6 +144,28 @@ public class BitcoinPaymentController {
         }else{
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity checkTransactionStatus(@RequestParam("orderId") Long orderId){
+
+         Transaction tr = this.transactionService.findTransactionByOrderId(orderId);
+         if(tr == null){
+             return ResponseEntity.badRequest().body("Transaction with orderId " + orderId + " doesn't exist.");
+         }
+
+        OrderStatusDTO orderStatusDTO = new OrderStatusDTO();
+          if(tr.getStatus() == TransactionStatus.NEW || tr.getStatus() == TransactionStatus.PENDING
+              || tr.getStatus() == TransactionStatus.CONFIRMING){
+              orderStatusDTO.setStatus("CREATED");
+          }else if(tr.getStatus() == TransactionStatus.PAID){
+              orderStatusDTO.setStatus("COMPLETED");
+          }else if(tr.getStatus() == TransactionStatus.CANCELED || tr.getStatus() == TransactionStatus.REFUNDED){
+              orderStatusDTO.setStatus("CANCELED");
+          }else{
+              orderStatusDTO.setStatus(tr.getStatus().toString());
+          }
+          return new ResponseEntity(orderStatusDTO, HttpStatus.OK);
     }
 
 

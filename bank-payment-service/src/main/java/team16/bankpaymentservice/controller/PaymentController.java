@@ -5,16 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import team16.bankpaymentservice.dto.PaymentRequestDTO;
 import team16.bankpaymentservice.dto.PaymentResponseInfoDTO;
 import team16.bankpaymentservice.service.PaymentService;
 
 @RestController
-@RequestMapping(value = "/api/payments")
+@RequestMapping(value = "/api")
 public class PaymentController {
 
     @Autowired
@@ -22,7 +19,7 @@ public class PaymentController {
 
     Logger logger = LoggerFactory.getLogger(PaymentController.class);
 
-    @PostMapping(value = "/request")
+    @PostMapping(value = "/payments/request")
     public ResponseEntity<?> createPaymentRequest(@RequestBody PaymentRequestDTO paymentRequestDTO) {
         try {
             PaymentResponseInfoDTO paymentResponseInfoDTO = paymentService.generatePaymentInfo(paymentRequestDTO);
@@ -32,6 +29,13 @@ public class PaymentController {
             logger.error("Exception while creating payment");
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity checkTransactionStatus(@RequestParam("orderId") Long orderId){
+
+
+        return new ResponseEntity(null, HttpStatus.OK);
     }
 
 }
