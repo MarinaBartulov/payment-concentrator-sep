@@ -116,13 +116,13 @@ public class BitcoinController {
         if(transaction == null){
 
             logger.warn("Transaction not found | TransactionId: " + id);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(transaction.getErrorUrl());
         }
 
         if(this.transactionService.updateTransactionFromCoinGate(transaction)){
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(transaction.getSuccessUrl());
         }else{
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(transaction.getErrorUrl());
         }
 
     }
@@ -136,13 +136,13 @@ public class BitcoinController {
         if(transaction == null){
 
             logger.warn("Transaction not found | TransactionId: " + id);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(transaction.getErrorUrl());
         }
 
         if(this.transactionService.updateTransactionFromCoinGate(transaction)){
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(transaction.getFailedUrl());
         }else{
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(transaction.getErrorUrl());
         }
     }
 

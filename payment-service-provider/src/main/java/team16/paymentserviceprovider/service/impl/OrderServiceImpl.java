@@ -189,7 +189,17 @@ public class OrderServiceImpl implements OrderService {
     public void updateOrdersStatus(){
 
         System.out.println("Updating orders status started...");
-        List<Order> unfinishedOrders = this.orderRepository.findAllUnfinishedOrders(); // traze se CREATED
+        List<Order> expiredOrders = this.orderRepository.findInitiatedOrders();
+
+        for(Order o : expiredOrders){
+            if(o.getMerchantOrderTimestamp().plusMinutes(30).isBefore(LocalDateTime.now())){
+                System.out.println("Promenjen status sa " + o.getOrderStatus().toString() + " na EXPIRED");
+                o.setOrderStatus(OrderStatus.EXPIRED);
+                this.orderRepository.save(o);
+            }
+        }
+
+        List<Order> unfinishedOrders = this.orderRepository.findCreatedOrders(); // traze se CREATED
 
         for(Order o : unfinishedOrders){
 
@@ -212,8 +222,6 @@ public class OrderServiceImpl implements OrderService {
             }
         }
         System.out.println("Updating orders status finished...");
-
-
     }
 
 

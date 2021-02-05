@@ -4,21 +4,24 @@ import { bitcoinService } from "../services/bitcoin-service";
 import Spinner from "react-bootstrap/Spinner";
 import bitcoinLogo from "../assets/bitcoin.png";
 import Button from "react-bootstrap/Button";
+import Header from "./Header";
 
 const BitcoinSuccess = () => {
   const { id } = useParams();
   const [successShow, setSuccessShow] = useState(0);
+  const [redirectUrl, setRedirectUrl] = useState("");
 
   const success = async (id) => {
-    const response = await bitcoinService.success(id);
-    if (response !== null && response !== undefined) {
+    try {
+      const response = await bitcoinService.success(id);
       setSuccessShow(1);
-    } else {
+      setRedirectUrl(response);
+    } catch (error) {
       setSuccessShow(2);
+      setRedirectUrl(error.response.data);
     }
   };
   useEffect(() => {
-    console.log(id);
     success(id);
   }, []);
 
@@ -49,9 +52,7 @@ const BitcoinSuccess = () => {
           <br></br>
           <Button
             style={{ marginTop: "1em" }}
-            onClick={() =>
-              window.location.replace("https://localhost:3000/success")
-            }
+            onClick={() => window.location.replace(redirectUrl)}
           >
             Return
           </Button>
@@ -59,7 +60,18 @@ const BitcoinSuccess = () => {
       </>
     );
   } else {
-    return <div style={{ color: "Red" }}>Something went wrong</div>;
+    return (
+      <div>
+        <Header />
+        <h2 style={{ color: "Red" }}>Something went wrong</h2>
+        <Button
+          style={{ marginTop: "1em" }}
+          onClick={() => window.location.replace(redirectUrl)}
+        >
+          Return
+        </Button>
+      </div>
+    );
   }
 };
 

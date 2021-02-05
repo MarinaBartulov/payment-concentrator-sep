@@ -4,17 +4,21 @@ import { bitcoinService } from "../services/bitcoin-service";
 import Spinner from "react-bootstrap/Spinner";
 import bitcoinLogo from "../assets/bitcoin.png";
 import Button from "react-bootstrap/Button";
+import Header from "./Header";
 
 const BitcoinCancel = () => {
   const { id } = useParams();
   const [cancelShow, setCancelShow] = useState(0);
+  const [redirectUrl, setRedirectUrl] = useState("");
 
   const cancel = async (id) => {
-    const response = await bitcoinService.cancel(id);
-    if (response !== null && response !== undefined) {
+    try {
+      const response = await bitcoinService.cancel(id);
       setCancelShow(1);
-    } else {
+      setRedirectUrl(response);
+    } catch (error) {
       setCancelShow(2);
+      setRedirectUrl(error.response.data);
     }
   };
   useEffect(() => {
@@ -25,12 +29,14 @@ const BitcoinCancel = () => {
   if (cancelShow === 0) {
     return (
       <div>
+        <Header />
         <Spinner animation="border" variant="dark" />
       </div>
     );
   } else if (cancelShow === 1) {
     return (
       <>
+        <Header />
         <div
           style={{
             backgroundColor: "rgb(248, 0, 12)",
@@ -50,9 +56,7 @@ const BitcoinCancel = () => {
           <br></br>
           <Button
             style={{ marginTop: "1em" }}
-            onClick={() =>
-              window.location.replace("https://localhost:3000/failed")
-            }
+            onClick={() => window.location.replace(redirectUrl)}
           >
             Return
           </Button>
@@ -60,7 +64,18 @@ const BitcoinCancel = () => {
       </>
     );
   } else {
-    return <div style={{ color: "Red" }}>Something went wrong</div>;
+    return (
+      <div>
+        <Header />
+        <h2 style={{ color: "Red" }}>Something went wrong</h2>
+        <Button
+          style={{ marginTop: "1em" }}
+          onClick={() => window.location.replace(redirectUrl)}
+        >
+          Return
+        </Button>
+      </div>
+    );
   }
 };
 

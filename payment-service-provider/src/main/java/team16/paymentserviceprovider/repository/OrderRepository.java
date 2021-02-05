@@ -13,6 +13,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "from Order o join o.merchant m where m.email = ?1 and o.merchantOrderId = ?2")
     Order findOrderForMerchant(String merchantEmail, Long orderId);
 
+    @Query(value = "from Order o where o.orderStatus = 'INITIATED'")
+    List<Order> findInitiatedOrders();
+
     @Query(value = "from Order o where o.orderStatus = 'CREATED'")
-    List<Order> findAllUnfinishedOrders();
+    List<Order> findCreatedOrders();
 }
