@@ -50,8 +50,9 @@ public class MerchantServiceImpl implements MerchantService {
     public List<FormFieldDTO> getFormFields() {
 
         List<FormFieldDTO> formFields = new ArrayList<>();
-        formFields.add(new FormFieldDTO("merchantId", "Merchant Id", FormFieldType.text, true));
-        formFields.add(new FormFieldDTO("password", "Merchant Password", FormFieldType.password, true));
+        formFields.add(new FormFieldDTO("pan", "PAN", FormFieldType.text, true));
+//        formFields.add(new FormFieldDTO("merchantId", "Merchant Id", FormFieldType.text, true));
+//        formFields.add(new FormFieldDTO("password", "Merchant Password", FormFieldType.password, true));
         return formFields;
     }
 
@@ -103,6 +104,11 @@ public class MerchantServiceImpl implements MerchantService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    @Override
+    public Merchant save(Merchant merchant) {
+        return merchantRepository.save(merchant);
     }
 
     private void validateMerchantCardInput(MerchantCardInfoDTO dto) throws Exception {

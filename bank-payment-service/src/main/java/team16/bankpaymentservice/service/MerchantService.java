@@ -14,4 +14,5 @@ public interface MerchantService {
     List<FormFieldDTO> getFormFields();
     Merchant addNewMerchant(String merchantData, String email);
     Card merchantCardAuth(MerchantCardInfoDTO dto, Long merchantId) throws Exception;
+    Merchant save(Merchant merchant);
 }
