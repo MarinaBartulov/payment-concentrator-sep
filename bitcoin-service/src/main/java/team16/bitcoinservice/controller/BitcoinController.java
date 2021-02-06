@@ -151,6 +151,7 @@ public class BitcoinController {
 
          Transaction tr = this.transactionService.findTransactionByOrderId(orderId);
          if(tr == null){
+             logger.warn("Transaction with orderId " + orderId + " doesn't exist.");
              return ResponseEntity.badRequest().body("Transaction with orderId " + orderId + " doesn't exist.");
          }
 
