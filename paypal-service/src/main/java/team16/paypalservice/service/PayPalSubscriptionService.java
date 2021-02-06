@@ -10,4 +10,5 @@ public interface PayPalSubscriptionService {
     PayPalSubscription getOne(Long id);
     void findUnfinishedSubscriptions();
     List<PayPalSubscription> findAllUnfinished();
+    PayPalSubscription findBySubscriptionId(Long id);
 }

@@ -12,4 +12,6 @@ public interface PayPalSubscriptionRepository extends JpaRepository<PayPalSubscr
 
     @Query(value = "SELECT * FROM pay_pal_subscription pps WHERE pps.status = 'INITIATED' or pps.status = 'CREATED'", nativeQuery = true)
     List<PayPalSubscription> findAllUnfinished();
+
+    PayPalSubscription findBySubscriptionId(Long id);
 }

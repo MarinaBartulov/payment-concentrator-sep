@@ -9,6 +9,7 @@ import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.Subscription;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -17,9 +18,13 @@ public class SubscriptionResponseDTO {
 
     private Long subscriptionId;
 
+    private LocalDateTime createdAd;
+
     private LocalDate expirationDate;
 
     private Double price;
+
+    private Double discount;
 
     private Integer cycles;
 
@@ -40,6 +45,8 @@ public class SubscriptionResponseDTO {
         this.merchantEmail = merchant.getEmail();
         this.redirectURL = redirectURL;
         this.expirationDate = subscription.getExpirationDate();
+        this.createdAd = LocalDateTime.now();
+        this.discount = billingPlan.getDiscount();
     }
 
 
