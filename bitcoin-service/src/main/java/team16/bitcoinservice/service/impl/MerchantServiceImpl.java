@@ -1,6 +1,8 @@
 package team16.bitcoinservice.service.impl;
 
 import com.google.gson.Gson;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team16.bitcoinservice.dto.FormFieldDTO;
@@ -17,6 +19,8 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Autowired
     private MerchantRepository merchantRepository;
+
+    Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
     @Override
     public Merchant findByEmail(String email) {
@@ -40,6 +44,7 @@ public class MerchantServiceImpl implements MerchantService {
             merchant.setEmail(email);
             return this.merchantRepository.save(merchant);
         }catch(Exception e){
+            logger.error("Invalid merchant data");
             return null;
         }
     }

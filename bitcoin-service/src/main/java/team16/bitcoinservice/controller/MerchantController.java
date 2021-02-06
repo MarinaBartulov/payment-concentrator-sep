@@ -1,5 +1,7 @@
 package team16.bitcoinservice.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,9 @@ public class MerchantController {
     private MerchantService merchantService;
     @Autowired
     private RestTemplate restTemplate;
+
+    Logger logger = LoggerFactory.getLogger(MerchantController.class);
+
 
 
     @GetMapping(value = "/formFields")
@@ -35,11 +40,13 @@ public class MerchantController {
             ResponseEntity<String> response = restTemplate.exchange("https://localhost:8083/psp-service/api/merchant/current", HttpMethod.GET, httpEntity, String.class);
             email = response.getBody();
         }catch(Exception e){
+            logger.error("Error occurred while authenticating merchant.");
             return ResponseEntity.badRequest().body("Error occurred while authenticating merchant.");
         }
 
         Merchant merchant = this.merchantService.findByEmail(email);
         if(merchant != null){
+            logger.warn("Merchant with email " + merchant.getEmail() + " has already chosen bitcoin payment method.");
             return ResponseEntity.badRequest().body("This merchant has already chosen bitcoin payment method.");
         }
 
