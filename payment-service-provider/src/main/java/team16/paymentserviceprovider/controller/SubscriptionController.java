@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.SubscriptionRequestDTO;
 import team16.paymentserviceprovider.dto.SubscriptionResponseDTO;
+import team16.paymentserviceprovider.dto.SubscriptionStatusDTO;
+import team16.paymentserviceprovider.enums.SubscriptionStatus;
 import team16.paymentserviceprovider.model.BillingPlan;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.PaymentMethod;
@@ -45,6 +47,7 @@ public class SubscriptionController {
         }
         logger.info("Found merchant: " + merchant.getEmail() + " | " + merchant.getMerchantId());
 
+        //samo zato sto nisu dozvoljeni drugi nacini placanja
         Boolean hasPayPal = false;
         for(PaymentMethod paymentMethod : merchant.getPaymentMethods())
         {
@@ -80,13 +83,13 @@ public class SubscriptionController {
 
     @PutMapping(value="/subscription/{subscriptionId}")
     public ResponseEntity<?> createSubscription(@PathVariable Long subscriptionId) throws URISyntaxException {
-        Subscription subscription = subscriptionService.getOne(subscriptionId);
-        logger.info("Found subscription | ID: " + subscription.getId());
+        Subscription subscription = subscriptionService.findById(subscriptionId);
         if(subscription == null)
         {
             logger.error("Subscription not found | ID: " + subscriptionId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        logger.info("Found subscription | ID: " + subscription.getId());
 
         String redirectUrl = subscriptionService.createSubscription(subscription);
         if(redirectUrl == null)
@@ -97,6 +100,19 @@ public class SubscriptionController {
         logger.info("Sending redirection URL");
         System.out.println("Redirect url = " + redirectUrl);
         return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/status")
+    public ResponseEntity<?> checkSubscriptionStatus(@RequestParam("subscriptionId") Long subscriptionId, @RequestParam("merchantEmail") String merchantEmail){
+
+        logger.info("Checking subscription status - id: " + subscriptionId + ", merchantEmail: " + merchantEmail);
+        SubscriptionStatus status = this.subscriptionService.findSubscriptionStatus(merchantEmail, subscriptionId);
+        if(status == null){
+            logger.error("Order with subscriptionId \" + subscriptionId + \" doesn't exits on Payment Concentrator.");
+            return ResponseEntity.badRequest().body("Order with subscriptionId " + subscriptionId + " doesn't exits on Payment Concentrator.");
+        }
+        SubscriptionStatusDTO subscriptionStatusDTO = new SubscriptionStatusDTO(status.toString());
+        return new ResponseEntity<>(subscriptionStatusDTO, HttpStatus.OK);
     }
 
 

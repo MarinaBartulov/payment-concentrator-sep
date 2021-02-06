@@ -37,14 +37,19 @@ public class PayPalSubscriptionServiceImpl implements PayPalSubscriptionService 
     }
 
     @Override
-    @Scheduled(cron = "0 0/15 * * * *")
+    public PayPalSubscription findBySubscriptionId(Long id) {
+        return payPalSubscriptionRepository.findBySubscriptionId(id);
+    }
+
+    @Override
+    @Scheduled(cron = "0 0/5 * * * *")
     public void findUnfinishedSubscriptions() {
         logger.info("INITIATED FINDING UNFINISHED SUBSCRIPTIONS");
         List<PayPalSubscription> subscriptionList = this.findAllUnfinished();
 
         for(PayPalSubscription subscription : subscriptionList)
         {
-            if(subscription.getCreatedAt().plusMinutes(15).isBefore(LocalDateTime.now())) {
+            if(subscription.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now())) {
                 logger.info("Subscription ID | " + subscription.getId() + " - status changed | EXPIRED");
                 subscription.setStatus(SubscriptionStatus.EXPIRED);
                 save(subscription);

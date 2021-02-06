@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import team16.paypalservice.dto.OrderInfoDTO;
 import team16.paypalservice.dto.OrderStatusDTO;
 import team16.paypalservice.dto.SubscriptionDTO;
+import team16.paypalservice.dto.SubscriptionStatusDTO;
 import team16.paypalservice.enums.PayPalTransactionStatus;
 import team16.paypalservice.model.Client;
 import team16.paypalservice.model.PayPalSubscription;
@@ -78,15 +79,16 @@ public class PayPalController {
     public ResponseEntity<?> cancelPayment(@RequestParam("id") Long transactionId) {
 
         PayPalTransaction transaction = transactionService.findById(transactionId);
-        logger.error("Transaction found | ID: " + transactionId);
         if(transaction == null)
         {
             logger.error("Transaction not found | ID: " + transactionId);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+        logger.info("Transaction found | ID: " + transactionId);
 
         if(payPalService.cancelPayment(transaction))
         {
+            logger.info("Transaction canceled | ID: " + transactionId);
             return new ResponseEntity<>(HttpStatus.OK);
         }
         else return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -96,12 +98,12 @@ public class PayPalController {
     public ResponseEntity<?> executePayment(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId) {
 
         PayPalTransaction transaction = transactionService.findByPaymentId(paymentId);
-
         if(transaction == null)
         {
             logger.error("Transaction not found | PaymentId: " + paymentId);
             return new ResponseEntity<>(FAIL_URL, HttpStatus.OK);
         }
+        logger.info("Transaction  found | PaymentId: " + paymentId);
 
         try {
             logger.info("Executing payment | PaymentId: " + paymentId);
@@ -123,15 +125,11 @@ public class PayPalController {
     public ResponseEntity<?> createSubscription(@RequestBody @Valid SubscriptionDTO subscriptionDTO) {
 
         Client client = clientService.findByEmail(subscriptionDTO.getEmail());
-        logger.info("Merchant found | Email: " + subscriptionDTO.getEmail());
         if(client == null) {
             logger.error("Merchant not found | Email: " + subscriptionDTO.getEmail());
             return new ResponseEntity<>(SUBSCRIPTION_FAIL_URL, HttpStatus.OK);
         }
-
-        /*PayPalSubscription subscription = new PayPalSubscription(subscriptionDTO, client);
-        PayPalSubscription savedSubscription = payPalSubscriptionService.save(subscription);
-        Long subscriptionId = savedSubscription.getId();*/
+        logger.info("Merchant found | Email: " + subscriptionDTO.getEmail());
 
         Long subscriptionId;
         try {
@@ -204,6 +202,7 @@ public class PayPalController {
 
         PayPalTransaction tr = this.transactionService.findTransactionByOrderId(orderId);
         if(tr == null){
+            logger.error("Transaction with orderId " + orderId + " doesn't exist.");
             return ResponseEntity.badRequest().body("Transaction with orderId " + orderId + " doesn't exist.");
         }
 
@@ -216,5 +215,19 @@ public class PayPalController {
             orderStatusDTO.setStatus(tr.getStatus().toString());
         }
         return new ResponseEntity(orderStatusDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/subscriptionStatus")
+    public ResponseEntity<?> checkSubscriptionStatus(@RequestParam("subscriptionId") Long subscriptionId){
+
+        PayPalSubscription s = this.payPalSubscriptionService.findBySubscriptionId(subscriptionId);
+        if(s == null){
+            logger.error("Subscription with SubscriptionId " + subscriptionId + " doesn't exist.");
+            return ResponseEntity.badRequest().body("Subscription with SubscriptionId " + subscriptionId + " doesn't exist.");
+        }
+        logger.info("Checking for subscription status | ID: " + subscriptionId);
+        SubscriptionStatusDTO subscriptionStatusDTO = new SubscriptionStatusDTO();
+        subscriptionStatusDTO.setStatus(s.getStatus().toString());
+        return new ResponseEntity<>(subscriptionStatusDTO, HttpStatus.OK);
     }
 }

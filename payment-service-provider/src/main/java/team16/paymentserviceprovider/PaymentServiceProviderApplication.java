@@ -39,15 +39,17 @@ public class PaymentServiceProviderApplication {
 //            System.out.println("Reading key failed.");
 //        }
 //
-//        String data = "Merchant123!";
+//        String data = "Laguna";
+//        String data2 = "Laguna123";
 //        try {
 //            Cipher c = Cipher.getInstance("AES/CBC/PKCS5Padding");
 //            c.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(ivParameterVector));
 //            System.out.println(Base64.getEncoder().encodeToString(c.doFinal(data.getBytes())) + "|" + ivString);
+//            System.out.println(Base64.getEncoder().encodeToString(c.doFinal(data2.getBytes())) + "|" + ivString);
 //        } catch (Exception e) {
 //            throw new RuntimeException(e);
 //        }
-
+//
     }
 
 }
