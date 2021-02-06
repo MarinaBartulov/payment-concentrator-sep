@@ -56,6 +56,7 @@ public class OrderController {
 
         Order order = this.orderService.findById(id);
         if(order == null){
+            logger.warn("Order with id " + id + " doesn't exist.");
             return ResponseEntity.badRequest().body("Order with that id does not exist.");
         }
         return new ResponseEntity(this.orderService.getAvailablePaymentMethodsForOrder(order), HttpStatus.OK);
@@ -66,22 +67,27 @@ public class OrderController {
 
         Order order = this.orderService.findById(id);
         if(order == null){
+            logger.warn("Order with id " + id + " doesn't exist.");
             return ResponseEntity.badRequest().body("Order with that id does not exist.");
         }
 
         if(order.getOrderStatus() != OrderStatus.INITIATED){
-            return ResponseEntity.badRequest().body("Order with that id has been aready created.");
+            logger.warn("Order with id " + id + " has already been created.");
+            return ResponseEntity.badRequest().body("Order with that id has been already created.");
         }
 
         PaymentMethod paymentMethod = this.paymentMethodService.findByName(paymentMethodName);
         if(paymentMethod == null){
+            logger.warn("Payment method with name " + paymentMethodName + " doesn't exist.");
             return ResponseEntity.badRequest().body("Payment method with that name does not exist.");
         }
 
         String redirectUrl = this.orderService.choosePaymentMethodForOrderAndSend(order, paymentMethodName);
         if(redirectUrl == null){
+            logger.error("Error occurred while sending order to the payment service. Payment method: " + paymentMethodName);
             return ResponseEntity.badRequest().body("Something went wrong while sending order to the payment service.");
         }else{
+            logger.info("Order with id " + id + " successfully created on the payment service. Payment method: " + paymentMethodName);
             return ResponseEntity.ok().body(redirectUrl);
         }
 
@@ -90,9 +96,11 @@ public class OrderController {
     @GetMapping(value = "/status")
     public ResponseEntity checkOrderStatus(@RequestParam("orderId") Long orderId, @RequestParam("merchantEmail") String merchantEmail){
 
+        logger.info("Checking order status - id: " + orderId + ", merchantEmail: " + merchantEmail);
         System.out.println("Checking order status - id: " + orderId + ", merchantEmail: " + merchantEmail);
         OrderStatus status = this.orderService.findOrderStatus(merchantEmail, orderId);
         if(status == null){
+            logger.warn("Order with orderId " + orderId + " doesn't exits on Payment Concentrator.");
             return ResponseEntity.badRequest().body("Order with orderId " + orderId + " doesn't exits on Payment Concentrator.");
         }
         OrderStatusDTO orderStatusDTO = new OrderStatusDTO(status.toString());

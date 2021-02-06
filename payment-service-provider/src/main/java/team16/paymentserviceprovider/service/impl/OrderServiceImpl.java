@@ -138,6 +138,7 @@ public class OrderServiceImpl implements OrderService {
                 this.orderRepository.save(order);
                 logger.error("RestTemplate error");
                 e.printStackTrace();
+                return null;
             }
 
             logger.info("Received response from bank service");
@@ -154,19 +155,19 @@ public class OrderServiceImpl implements OrderService {
             OrderInfoDTO orderDTO = new OrderInfoDTO(order.getId(), merchant.getEmail(), order.getAmount(), order.getCurrency(),
                     merchant.getMerchantSuccessUrl(), merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
 
-
             HttpEntity<OrderInfoDTO> request = new HttpEntity<>(orderDTO);
             ResponseEntity<String> response = null;
 
             try {
-                logger.info("Sending request to corresponding payment service");
+                logger.info("Sending request to corresponding payment service. Payment method: " + paymentMethodName);
                 response = restTemplate.exchange("https://localhost:8083/" + paymentMethodName.toLowerCase() + "-payment-service/api/pay", HttpMethod.POST, request, String.class);
-                logger.info("Received response from corresponding payment service");
+                logger.info("Received response from corresponding payment service. Payment method: " + paymentMethodName);
             } catch (RestClientException e) {
                 order.setOrderStatus(OrderStatus.INVALID);
                 this.orderRepository.save(order);
-                logger.error("RestTemplate error");
+                logger.error("Error occurred while sending request to the payment service. Payment method: " + paymentMethodName);
                 e.printStackTrace();
+                return null;
             }
             order.setPaymentMethod(pm);
             order.setOrderStatus(OrderStatus.CREATED);
@@ -188,11 +189,13 @@ public class OrderServiceImpl implements OrderService {
     @Scheduled(initialDelay = 10000, fixedRate = 300000) //na svakih 5 minuta
     public void updateOrdersStatus(){
 
+        logger.info("Updating orders status started...");
         System.out.println("Updating orders status started...");
         List<Order> expiredOrders = this.orderRepository.findInitiatedOrders();
 
         for(Order o : expiredOrders){
             if(o.getMerchantOrderTimestamp().plusMinutes(30).isBefore(LocalDateTime.now())){
+                logger.info("Status changed from " + o.getOrderStatus().toString() + " to EXPIRED. Order id: " + o.getId());
                 System.out.println("Promenjen status sa " + o.getOrderStatus().toString() + " na EXPIRED");
                 o.setOrderStatus(OrderStatus.EXPIRED);
                 this.orderRepository.save(o);
@@ -208,6 +211,7 @@ public class OrderServiceImpl implements OrderService {
                 response = restTemplate.getForEntity("https://localhost:8083/" + o.getPaymentMethod().getName().toLowerCase() + "-payment-service/api/status?orderId=" + o.getId(), OrderStatusDTO.class);
 
             }catch(Exception e){
+                logger.error("Error occurred while sending request to the payment service. Payment method: " + o.getPaymentMethod().getName());
                 e.printStackTrace();
                 return;
             }
@@ -215,12 +219,14 @@ public class OrderServiceImpl implements OrderService {
             if(response.getBody().getStatus() != null) {
                 OrderStatus status = OrderStatus.valueOf(response.getBody().getStatus());
                 if (!status.equals(o.getOrderStatus())) {
+                    logger.info("Status changed from " + o.getOrderStatus().toString() + " to " + status.toString() + ". Order id: " + o.getId());
                     System.out.println("Promenjen status sa " + o.getOrderStatus().toString() + " na " + status.toString());
                     o.setOrderStatus(status);
                     this.orderRepository.save(o);
                 }
             }
         }
+        logger.info("Updating orders status finished...");
         System.out.println("Updating orders status finished...");
     }
 

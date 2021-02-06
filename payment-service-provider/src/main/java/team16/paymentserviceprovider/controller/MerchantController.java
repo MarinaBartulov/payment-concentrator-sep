@@ -1,5 +1,7 @@
 package team16.paymentserviceprovider.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,20 +31,27 @@ public class MerchantController {
     @Autowired
     private PaymentMethodService paymentMethodService;
 
+    Logger logger = LoggerFactory.getLogger(MerchantController.class);
+
+
 
     @PostMapping
     public ResponseEntity registerNewMerchant(@RequestBody @Valid MerchantPCDTO merchantPCDTO) throws MessagingException, InterruptedException {
-        System.out.println("Uslo ovde");
+
+        logger.info("Merchant registration initiated.");
         App app = this.appService.findByAppId(merchantPCDTO.getAppId());
         if(app == null){
+            logger.warn("App with id " + merchantPCDTO.getAppId() + " doesn't exist.");
             return ResponseEntity.notFound().build();
         }
         Merchant m = this.merchantService.findByMerchantEmail(merchantPCDTO.getMerchantEmail());
         if(m != null){
+            logger.warn("Merchant with email " + merchantPCDTO.getMerchantEmail() + " already exist.");
             return ResponseEntity.badRequest().body("Merchant with this email already exists.");
         }
 
         if(merchantService.registerNewMerchant(merchantPCDTO)){
+            logger.info("Merchant registration successful. Merchant's email: " + merchantPCDTO.getMerchantEmail());
             return new ResponseEntity(merchantPCDTO, HttpStatus.OK);
         }else{
             return ResponseEntity.badRequest().build();
@@ -54,6 +63,7 @@ public class MerchantController {
     public ResponseEntity<?> getMyInfo(){
 
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        logger.info("Getting merchant's info. Merchant's email: " + currentUser.getName());
         return new ResponseEntity(this.merchantService.getMyInfo(currentUser), HttpStatus.OK);
     }
 
@@ -61,6 +71,7 @@ public class MerchantController {
     public ResponseEntity<?> getCurrentMerchant(){
 
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+        logger.info("Getting current merchant. Merchant's email: " + currentUser.getName());
         return new ResponseEntity(currentUser.getName(), HttpStatus.OK);
     }
 
@@ -70,11 +81,13 @@ public class MerchantController {
 
         PaymentMethod paymentMethod = this.paymentMethodService.findByName(paymentMethodName);
         if(paymentMethod == null){
+            logger.warn("Payment method with name " + paymentMethodName + " doesn't exist.");
             return ResponseEntity.badRequest().body("Payment method with that name does not exist.");
         }
 
         String errorMsg = this.merchantService.addPaymentMethodForCurrentMerchant(authToken, paymentMethodName, formValues);
         if(errorMsg == null){
+            logger.info("Payment method successfully added for the merchant.");
             return ResponseEntity.ok().build();
         }else{
             return ResponseEntity.badRequest().body(errorMsg);

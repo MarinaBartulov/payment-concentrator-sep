@@ -2,6 +2,8 @@ package team16.paymentserviceprovider.service.impl;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -45,6 +47,8 @@ public class MerchantServiceImpl implements MerchantService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RestTemplate restTemplate;
+
+    Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
     @Override
     public Merchant findOne(Long id) {
@@ -108,12 +112,14 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant merchant = this.findByMerchantEmail(email);
 
         if(merchant == null){
+            logger.warn("Merchant with email " + email + " doesn't exist.");
             return "Merchant does not exist.";
         }
 
         PaymentMethod pm = this.paymentMethodService.findByPaymentMethodNameAndApp(paymentMethodName, merchant.getApp().getId());
 
         if(pm == null){
+            logger.warn("Payment method not supported. Merchant's email: " + email + ", payment method: " + paymentMethodName);
             return "Merchant's application does not support this payment method.";
         }
 
@@ -128,6 +134,7 @@ public class MerchantServiceImpl implements MerchantService {
         }
         catch(Exception e) {
             e.printStackTrace();
+            logger.error("Error while adding merchant data on the payment service. Merchant: " + email + ", payment method: " + paymentMethodName);
             return "Error occurred while adding merchant data on the payment service";
         }
 
@@ -138,6 +145,7 @@ public class MerchantServiceImpl implements MerchantService {
                 restTemplate.exchange(merchant.getActivationUrl(), HttpMethod.PUT, activationRequest, ResponseEntity.class);
             } catch (Exception e) {
                 e.printStackTrace();
+                logger.error("Error occurred while activating merchant on his app. Merchant: " + merchant.getEmail());
                 return "Error occurred while activating merchant on his app.";
             }
         }

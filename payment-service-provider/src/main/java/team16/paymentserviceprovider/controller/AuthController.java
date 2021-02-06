@@ -1,5 +1,7 @@
 package team16.paymentserviceprovider.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -34,6 +36,9 @@ public class AuthController {
     @Autowired
     private CustomUserDetailsService userDetailsService;
 
+    Logger logger = LoggerFactory.getLogger(AuthController.class);
+
+
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(@RequestBody @Valid JwtAuthenticationRequestDTO authenticationRequest,
                                                        HttpServletResponse response) throws AuthenticationException {
@@ -44,6 +49,7 @@ public class AuthController {
                     .authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
                             authenticationRequest.getPassword()));
         }catch(Exception e){
+            logger.error("Login failed. Invalid email or password.");
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Invalid email or password.");
         }
@@ -54,11 +60,14 @@ public class AuthController {
         String jwt = tokenUtils.generateToken(user.getUsername());
         int expiresIn = tokenUtils.getExpiredIn();
         String role = user.getRoles().iterator().next().getName();
+
+        logger.info("Login successful. User's email " + user.getEmail() + ".");
         return ResponseEntity.ok(new UserTokenStateDTO(jwt, expiresIn, role));
     }
 
     @RequestMapping(value = "/changePassword", method = RequestMethod.POST)
     public ResponseEntity<?> changePassword(@RequestBody @Valid ChangePasswordDTO changePasswordDTO){
+
         this.userDetailsService.changePassword(changePasswordDTO.getOldPassword(), changePasswordDTO.getNewPassword());
         return ResponseEntity.ok().build();
     }

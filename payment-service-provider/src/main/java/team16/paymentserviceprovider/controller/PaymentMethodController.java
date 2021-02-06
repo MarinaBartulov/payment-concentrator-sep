@@ -1,5 +1,7 @@
 package team16.paymentserviceprovider.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +22,16 @@ public class PaymentMethodController {
     @Autowired
     private PaymentMethodService paymentMethodService;
 
+    Logger logger = LoggerFactory.getLogger(PaymentMethodController.class);
+
+
     @GetMapping(value="/formsData")
     public ResponseEntity getFormsDataForAvailablePaymentMethodsForCurrentMerchant(){
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
 
         List<FormDataDTO> formsDataDTO = this.paymentMethodService.getFormsDataForAvailablePaymentMethodsForCurrentMerchant(currentUser);
         if(formsDataDTO == null){
+            logger.error("Error occurred while retrieving form data from payment services");
             return ResponseEntity.badRequest().body("Error occurred while retrieving form data from payment services");
         }
         return new ResponseEntity(formsDataDTO, HttpStatus.OK);
@@ -35,6 +41,7 @@ public class PaymentMethodController {
     @GetMapping
     public ResponseEntity getAllPaymentMethods(){
 
+        logger.info("Getting all payment methods.");
         return ResponseEntity.ok(this.paymentMethodService.getAllPaymentMethods());
     }
 

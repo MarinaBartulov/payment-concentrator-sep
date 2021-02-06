@@ -1,5 +1,7 @@
 package team16.paymentserviceprovider.service.impl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team16.paymentserviceprovider.dto.AppDTO;
@@ -18,6 +20,8 @@ public class AppServiceImpl implements AppService {
     @Autowired
     private PaymentMethodServiceImpl paymentMethodService;
 
+    Logger logger = LoggerFactory.getLogger(AppServiceImpl.class);
+
     @Override
     public AppDTO addNewApp(AppDTO appDTO) {
 
@@ -30,12 +34,14 @@ public class AppServiceImpl implements AppService {
         for(String pmName: appDTO.getPaymentMethods()){
             PaymentMethod pm = this.paymentMethodService.findByName(pmName);
             if(pm == null){
+                logger.warn("Payment method with name " + pmName + " doesn't exist.");
                 return null;
             }
             newApp.getPaymentMethods().add(pm);
         }
         this.appRepository.save(newApp);
         appDTO.setAppId(appId);
+        logger.info("New app successfully added. App id " + appId);
         return appDTO;
     }
 
