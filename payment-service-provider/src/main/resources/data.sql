@@ -53,7 +53,7 @@ insert into merchants_payment_methods (merchant_id, payment_method_id) values (2
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (2,3);
 
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (3,1);
-insert into merchants_payment_methods (merchant_id, payment_method_id) values (3,2);
+--insert into merchants_payment_methods (merchant_id, payment_method_id) values (3,2);
 insert into merchants_payment_methods (merchant_id, payment_method_id) values (3,3);
 
 insert into billing_plan ( cycles_number, price, discount, is_default, type, frequency )
