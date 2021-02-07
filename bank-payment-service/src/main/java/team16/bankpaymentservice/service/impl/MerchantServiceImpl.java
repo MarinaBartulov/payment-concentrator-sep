@@ -1,7 +1,9 @@
-package team16.bankpaymentservice.service;
+package team16.bankpaymentservice.service.impl;
 
 import com.google.gson.Gson;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import team16.bankpaymentservice.dto.FormFieldDTO;
@@ -9,8 +11,13 @@ import team16.bankpaymentservice.dto.FormFieldType;
 import team16.bankpaymentservice.dto.PanDTO;
 import team16.bankpaymentservice.model.Bank;
 import team16.bankpaymentservice.model.Card;
+import team16.bankpaymentservice.model.CardOwner;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.repository.MerchantRepository;
+import team16.bankpaymentservice.service.BankService;
+import team16.bankpaymentservice.service.CardOwnerService;
+import team16.bankpaymentservice.service.CardService;
+import team16.bankpaymentservice.service.MerchantService;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,9 +36,10 @@ public class MerchantServiceImpl implements MerchantService {
     @Autowired
     private BankService bankService;
 
-    private ValidationService validationService;
+    @Autowired
+    private CardOwnerService cardOwnerService;
 
-    public MerchantServiceImpl() { validationService = new ValidationService(); }
+    Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
     @Override
     public Merchant findById(Long id) {
@@ -60,17 +68,29 @@ public class MerchantServiceImpl implements MerchantService {
         try {
             pan = gson.fromJson(merchantData, PanDTO.class);
         } catch(Exception e){
+            logger.error("Cannot register merchant - invalid PAN.");
             throw new Exception("Invalid PAN.");
         }
 
         Card card = cardService.findByPan(pan.getPan());
         if(card == null) {
+            logger.error("Cannot register merchant - Card with given PAN doesn't exist.");
             throw new Exception("Card with this PAN doesn't exist.");
         }
 
         Bank bank = bankService.findByBankCode(card.getPAN().substring(0, 3));
         if(bank == null) {
+            logger.error("Cannot register merchant - Bank requested code doesn't exist.");
             throw new Exception("Bank with this code doesn't exist.");
+        }
+
+        List<CardOwner> cardOwners = this.cardOwnerService.findAll();
+        for (CardOwner co: cardOwners) {
+            if(co.getCard().getId() == card.getId()) {
+                // znaci da pokusava da tudju karticu predstavi kao svoju, ali mu ne smemo to reci kao info jer onda ima tudji pan
+                logger.error("Cannot register merchant - invalid PAN.");
+                throw new Exception("Cannot register merchant - invalid PAN.");
+            }
         }
 
         Merchant newMerchant = new Merchant();
@@ -83,7 +103,9 @@ public class MerchantServiceImpl implements MerchantService {
         Merchant saved = null;
         try {
             saved = save(newMerchant);
+            logger.info("New merchant registered - merchant id: " + saved.getId());
         } catch (Exception e) {
+            logger.error("Cannot register merchant - Saving merchant failed.");
             throw new Exception("Saving merchant failed.");
         }
 

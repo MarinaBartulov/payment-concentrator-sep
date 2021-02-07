@@ -11,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import team16.paymentserviceprovider.dto.MerchantBankDTO;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
+import team16.paymentserviceprovider.dto.MerchantURLsDTO;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.PaymentMethod;
@@ -98,12 +99,22 @@ public class MerchantController {
         }
     }
 
-    @PutMapping(value = "/save-info-from-bank")
+    @PostMapping(value = "/save-info-from-bank")
     public ResponseEntity<?> saveMerchantInfoFromBank(@RequestBody MerchantBankDTO dto) {
         try {
             Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
             System.out.println("Auth sa Banke: " + currentUser.getName());
             return new ResponseEntity(merchantService.updateMerchant(currentUser.getName(), dto), HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @PostMapping(value = "/url-info")
+    public ResponseEntity<?> getMerchantURLs(@RequestBody String email) {
+        try {
+            MerchantURLsDTO merchantURLsDTO = merchantService.getMerchantURLs(email);
+            return new ResponseEntity(merchantURLsDTO, HttpStatus.OK);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e);
         }

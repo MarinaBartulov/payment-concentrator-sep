@@ -8,6 +8,8 @@ import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.repository.CardOwnerRepository;
 import team16.bankpaymentservice.service.CardOwnerService;
 
+import java.util.List;
+
 @Service
 public class CardOwnerServiceImpl implements CardOwnerService {
 
@@ -17,6 +19,11 @@ public class CardOwnerServiceImpl implements CardOwnerService {
     @Override
     public CardOwner findOne(Long id) {
         return cardOwnerRepository.getOne(id);
+    }
+
+    @Override
+    public List<CardOwner> findAll() {
+        return this.cardOwnerRepository.findAll();
     }
 
     @Override

@@ -70,13 +70,16 @@ public class AcquirerService {
         Merchant merchant = transaction.getMerchant();
         Card merchantCard = merchant.getCard();
 
+        // dobavi Merchant URL-ove sa PSP
+        MerchantURLsDTO merchantURLsDTO = this.getMerchantURLs(merchant);
+
         TransactionResponseDTO responseDTO = new TransactionResponseDTO();
 
         // u zavisnosti od problema baciti odgovarajuci exception i odraditi odgovarajuce redirection
         try {
             validateClientInput(dto, merchantCard.getPAN());
         } catch (InvalidDataException ide) {
-            //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+            responseDTO.setRedirectionURL(merchantURLsDTO.getFailed());
             responseDTO.setResponseMessage(ide.getMessage());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
@@ -115,11 +118,9 @@ public class AcquirerService {
                 responseDTO.setTransactionStatus(response.getBody().getStatus().toString());
 
                 if(response.getBody().getStatus().toString().equals("COMPLETED")) {
-                    //responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
+                    responseDTO.setRedirectionURL(merchantURLsDTO.getSuccess());
                 } else if(response.getBody().getStatus().toString().equals("FAILED")) {
-                    //responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
-                } else {
-                    //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                    responseDTO.setRedirectionURL(merchantURLsDTO.getFailed());
                 }
 
                 String PSPResponseMessage = finishPayment(response.getBody());
@@ -128,7 +129,7 @@ public class AcquirerService {
                 return responseDTO;
             } catch (RestClientException e) {
                 logger.error("RestTemplate error");
-                //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                responseDTO.setRedirectionURL(merchantURLsDTO.getError());
                 responseDTO.setResponseMessage(e.getMessage());
                 transaction.setStatus(TransactionStatus.FAILED);
                 t1 = transactionService.update(transaction);
@@ -137,7 +138,7 @@ public class AcquirerService {
             }
 
         } catch (Exception e) {
-            //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+            responseDTO.setRedirectionURL(merchantURLsDTO.getError());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
@@ -153,7 +154,7 @@ public class AcquirerService {
             checkClientFunds(clientCard, transaction);
             logger.info("Enough available funds");
         } catch (LackingFundsException lfe) {
-            //responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
+            responseDTO.setRedirectionURL(merchantURLsDTO.getFailed());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
@@ -173,7 +174,7 @@ public class AcquirerService {
         transaction.setClient(client);
         Transaction newT = transactionService.update(transaction);
 
-        //responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
+        responseDTO.setRedirectionURL(merchantURLsDTO.getSuccess());
         responseDTO.setTransactionStatus(transaction.getStatus().toString());
 
         String PSPResponseMessage = finishPaymentOneBank(newT, payment.getPaymentId());
@@ -269,12 +270,14 @@ public class AcquirerService {
         Payment payment = paymentService.findById(dto.getPaymentId());
 
         if(payment == null) {
+            logger.error("Finish payment - Nonexistent payment");
             throw new Exception("Nonexistent payment");
         }
 
         Transaction transaction = payment.getTransaction();
 
         if(transaction == null) {
+            logger.error("Finish payment - Nonexistent transaction");
             throw new Exception("Nonexistent transaction");
         }
 
@@ -293,16 +296,41 @@ public class AcquirerService {
         ResponseEntity<String> response = null;
 
         try {
-            logger.info("Sending request to PSP service");
+            logger.info("Finish payment - Sending request to PSP service");
             response = restTemplate.exchange(
                     "https://localhost:8085/api/transactions/bank", HttpMethod.POST, request, String.class);
             System.out.println(response.getBody());
-            logger.info("Received response from PSP service");
+            logger.info("Finish payment - Received response from PSP service");
         } catch (RestClientException e) {
-            logger.error("RestTemplate error");
+            logger.error("Finish payment - RestTemplate error");
             e.printStackTrace();
         }
 
         return response.getBody();
+    }
+
+    private MerchantURLsDTO getMerchantURLs(Merchant merchant) {
+
+        // zahtev se salje na PSP
+        String merchantEmail = merchant.getMerchantEmail();
+        HttpEntity<String> request = new HttpEntity<String>(merchantEmail);
+        ResponseEntity<MerchantURLsDTO> response = null;
+
+        try {
+            logger.info("Get Merchant URLs - Sending request to PSP service");
+            response = restTemplate.exchange(
+                    "https://localhost:8085/api/merchant/url-info", HttpMethod.POST, request, MerchantURLsDTO.class);
+            System.out.println("Response from PSP: ");
+            System.out.println(response.getBody().getSuccess());
+            System.out.println(response.getBody().getFailed());
+            System.out.println(response.getBody().getError());
+            logger.info("Get Merchant URLs - Received response from PSP service");
+            return response.getBody();
+        } catch (RestClientException e) {
+            logger.error("Get Merchant URLs - RestTemplate error");
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

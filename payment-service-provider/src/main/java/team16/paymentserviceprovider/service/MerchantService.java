@@ -4,6 +4,7 @@ import org.springframework.security.core.Authentication;
 import team16.paymentserviceprovider.dto.MerchantBankDTO;
 import team16.paymentserviceprovider.dto.MerchantInfoDTO;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
+import team16.paymentserviceprovider.dto.MerchantURLsDTO;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
 
@@ -21,5 +22,6 @@ public interface MerchantService {
     MerchantInfoDTO getMyInfo(Authentication currentUser);
     Merchant save(Merchant merchant);
     String addPaymentMethodForCurrentMerchant(String authorization, String paymentMethodName, Map<String, Object> formValues);
-    String updateMerchant(String email, MerchantBankDTO dto) throws Exception;
+    MerchantBankDTO updateMerchant(String email, MerchantBankDTO dto) throws Exception;
+    MerchantURLsDTO getMerchantURLs(String email);
 }

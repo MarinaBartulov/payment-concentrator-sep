@@ -13,17 +13,19 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.test.annotation.Rollback;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import team16.paymentserviceprovider.dto.MerchantActivationDTO;
-import team16.paymentserviceprovider.dto.MerchantBankDTO;
-import team16.paymentserviceprovider.dto.MerchantInfoDTO;
-import team16.paymentserviceprovider.dto.MerchantPCDTO;
+import team16.paymentserviceprovider.dto.*;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
 import team16.paymentserviceprovider.model.PaymentMethod;
 import team16.paymentserviceprovider.model.Role;
 import team16.paymentserviceprovider.repository.MerchantRepository;
-import team16.paymentserviceprovider.service.*;
+import team16.paymentserviceprovider.service.AppService;
+import team16.paymentserviceprovider.service.MerchantService;
+import team16.paymentserviceprovider.service.PaymentMethodService;
+import team16.paymentserviceprovider.service.RoleService;
 
 import javax.mail.MessagingException;
 import java.util.Collections;
@@ -182,20 +184,28 @@ public class MerchantServiceImpl implements MerchantService {
     }
 
     @Override
-    public String updateMerchant(String email, MerchantBankDTO dto) throws Exception {
+    @Transactional
+    @Rollback(false)
+    public MerchantBankDTO updateMerchant(String email, MerchantBankDTO dto) throws Exception {
         Merchant merchant = findByMerchantEmail(email);
-        System.out.println("Info form Bank - merchant id: " + dto.getMerchantId());
-        System.out.println("Info form Bank - merchant pass: " + dto.getMerchantPassword());
         if(merchant == null) {
             throw new Exception("Merchant with given email doesn't exist.");
         }
 
         merchant.setMerchantId(dto.getMerchantId());
         merchant.setMerchantPassword(dto.getMerchantPassword());
-        Merchant saved = this.merchantRepository.save(merchant);
-        System.out.println("Saved merchant id:" + saved.getMerchantId());
-        System.out.println("Saved merchant password:" + saved.getMerchantPassword());
+        Merchant saved = save(merchant);
 
-        return "Merchant successfully updated";
+        MerchantBankDTO newDTO = new MerchantBankDTO(saved.getEmail(), saved.getMerchantId(), saved.getMerchantPassword());
+
+        return newDTO;
+    }
+
+    @Override
+    public MerchantURLsDTO getMerchantURLs(String email) {
+        Merchant merchant = findByMerchantEmail(email);
+        MerchantURLsDTO merchantURLsDTO = new MerchantURLsDTO(merchant.getMerchantSuccessUrl(),
+                merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
+        return merchantURLsDTO;
     }
 }

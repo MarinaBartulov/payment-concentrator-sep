@@ -6,6 +6,8 @@ import team16.bankpaymentservice.model.Card;
 import team16.bankpaymentservice.repository.CardRepository;
 import team16.bankpaymentservice.service.CardService;
 
+import java.util.List;
+
 @Service
 public class CardServiceImpl implements CardService {
 
@@ -14,7 +16,13 @@ public class CardServiceImpl implements CardService {
 
     @Override
     public Card findByPan(String pan) {
-        return cardRepository.findByPan(pan);
+        List<Card> allCards = this.cardRepository.findAll();
+        for(Card c: allCards) {
+            if(c.getPAN().equals(pan)) {
+                return c;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -4,14 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
 import team16.paymentserviceprovider.converter.SensitiveDataConverter;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
 
 import javax.persistence.*;
-import javax.validation.constraints.Size;
 import java.util.HashSet;
 import java.util.Set;
 @Entity
+@DynamicUpdate
 @DiscriminatorValue("Merchant")
 @NoArgsConstructor
 @AllArgsConstructor
@@ -20,11 +21,14 @@ import java.util.Set;
 public class Merchant extends User {
 
     private String merchantName;
-    @Convert(converter = SensitiveDataConverter.class)
+
     @Column(unique = true)
+    @Convert(converter = SensitiveDataConverter.class)
     private String merchantId;
+
     @Convert(converter = SensitiveDataConverter.class)
     private String merchantPassword;
+
     private boolean passwordChanged;
     private boolean pmChosen; //tek kada izabere paymentMethods postaje aktivan na LA
     private String activationUrl;
