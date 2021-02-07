@@ -33,11 +33,11 @@ public class AcquirerController {
             }
 
             logger.info("Transaction IS NOT completed. Sending redirection URL");
-            return new ResponseEntity<>(response, HttpStatus.OK); // promeniti na bad_request
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch(Exception e) {
             response.setResponseMessage(e.getMessage());
             logger.error("ERROR | while completing transaction: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.OK); // promeniti na bad_request
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
     }
 

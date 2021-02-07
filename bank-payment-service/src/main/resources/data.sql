@@ -1,19 +1,25 @@
 insert into bank (name, code) values ('Banca Intesa', '170'); -- 1
 insert into bank (name, code) values ('UniCredit', '171'); -- 2
 
-insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
-values ('1703456879237581', '345', '2025-10', 20, 0); -- 1
-insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
-values ('1703456879666668', '325', '2022-01', 0, 0); -- 2
-insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
-values ('1713456879231111', '333', '2023-04', 50, 0); -- 3
-insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
-values ('1701111879231111', '111', '2024-01', 10, 0); -- 4
-
-insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
-values ('1701111111111111', '111', '2025-02', 0, 0); -- 4
-insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
-values ('1701111222221111', '111', '2023-12', 0, 0); -- 4
+-- svima je security_code 345
+-- pan: 1703456879237581
+insert into card (pan, security_code, expiration_date, available_funds)
+values ('kUBnwJSg6d2isRCRvYzYE61vKUe2z+4O22FBixsF7cg=|/UlpTO7y7cxpB7NXKGhW+A==', '3jiq7E30G9ouTkPdt5Zcww==|D5B9oxxyyktAJAQRB0aqew==', '2025-10', 20); -- 1 zauzeta
+-- pan: 1703456879666668
+insert into card (pan, security_code, expiration_date, available_funds)
+values ('vddiiFL8b1YJmmbcQC9FaRTSnvmLmVuiqkqIYhNjl68=|BJdJtARL7K/W4sOW/kr+iA==', '3jiq7E30G9ouTkPdt5Zcww==|D5B9oxxyyktAJAQRB0aqew==', '2022-01', 0); -- 2 zauzeta
+-- pan: 1713456879231111
+insert into card (pan, security_code, expiration_date, available_funds)
+values ('k41fHKkINTIZ5VJ03lBFH7Dk6UJ1E5b8i1uIOm09kHc=|inEmHty9x7jocsNk5xFPgQ==', '3jiq7E30G9ouTkPdt5Zcww==|D5B9oxxyyktAJAQRB0aqew==', '2023-04', 50); -- 3 zauzeta
+-- pan: 1701111879231111
+insert into card (pan, security_code, expiration_date, available_funds)
+values ('Jf+4YGPjQFgxzpK88/nH+cNXDeK7IZHBJaY0hBUMGB4=|CEJEVgd89QJe+1mhZeM6oQ==', '3jiq7E30G9ouTkPdt5Zcww==|D5B9oxxyyktAJAQRB0aqew==', '2024-01', 10); -- 4
+-- pan: 1701111111111111
+insert into card (pan, security_code, expiration_date, available_funds)
+values ('NtUx6LpBHxWRvIaHzoctcAU/oNR80zbW5zMUQm6Ld2Q=|aGVYs8gy+GJQIEa/r3DOJA==', '3jiq7E30G9ouTkPdt5Zcww==|D5B9oxxyyktAJAQRB0aqew==', '2025-02', 0); -- 5
+-- pan: 1701111222221111
+insert into card (pan, security_code, expiration_date, available_funds)
+values ('+e4BYpd5nd6AoapN7fOKUcPS+gcADe1UPXKxx/s29n4=|FipDfoiO+ZET2crzGGjwxw==', '3jiq7E30G9ouTkPdt5Zcww==|D5B9oxxyyktAJAQRB0aqew==', '2023-12', 0); -- 6
 
 insert into card_owner (type, merchant_id, merchant_email, password, bank_id, card_id)
 values ('Merchant', 'jlSuwpyB4v62M7KBc4dXiXuwSg53AsnKtWV/zP9E0cA=|zj3rWlhdDkkqWcfAf9hMfw==', 'sb-nsr1z4072854@business.example.com', '4bgphCgirDKF3SYl4LvFRQ==|YA7u//HlmBJoA2EevRphGw==', 1, 2);
