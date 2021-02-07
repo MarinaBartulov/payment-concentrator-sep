@@ -94,11 +94,5 @@ public class PaymentService {
             logger.error("Invalid merchant timestamp");
             throw new InvalidDataException("Invalid merchant timestamp."); // validacione poruke genericke, da ne iskazuju sta tacno ne valja
         }
-        if(!validationService.validateString(dto.getSuccessUrl()) ||
-                !validationService.validateString(dto.getFailedUrl()) ||
-                !validationService.validateString(dto.getErrorUrl())) {
-            logger.error("Invalid URLs");
-            throw new InvalidDataException("Invalid URLs.");
-        }
     }
 }

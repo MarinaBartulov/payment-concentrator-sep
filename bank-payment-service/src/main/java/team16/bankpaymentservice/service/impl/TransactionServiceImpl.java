@@ -31,4 +31,9 @@ public class TransactionServiceImpl implements TransactionService {
     public Transaction update(Transaction transaction) {
         return transactionRepository.save(transaction);
     }
+
+    @Override
+    public Transaction findByMerchantOrderId(Long id) {
+        return this.transactionRepository.findTransactionByMerchantOrderId(id);
+    }
 }

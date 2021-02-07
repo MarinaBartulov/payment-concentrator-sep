@@ -77,6 +77,7 @@ public class AcquirerService {
             validateClientInput(dto, merchantCard.getPAN());
         } catch (InvalidDataException ide) {
             //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+            // POZOVI FINISH PAYMENT
             responseDTO.setResponseMessage(ide.getMessage());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
@@ -116,10 +117,13 @@ public class AcquirerService {
 
                 if(response.getBody().getStatus().toString().equals("COMPLETED")) {
                     //responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
+                    // POZOVI FINISH PAYMENT
                 } else if(response.getBody().getStatus().toString().equals("FAILED")) {
                     //responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
+                    // POZOVI FINISH PAYMENT
                 } else {
                     //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                    // POZOVI FINISH PAYMENT
                 }
 
                 String PSPResponseMessage = finishPayment(response.getBody());
@@ -129,6 +133,7 @@ public class AcquirerService {
             } catch (RestClientException e) {
                 logger.error("RestTemplate error");
                 //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                // POZOVI FINISH PAYMENT
                 responseDTO.setResponseMessage(e.getMessage());
                 transaction.setStatus(TransactionStatus.FAILED);
                 t1 = transactionService.update(transaction);
@@ -138,6 +143,7 @@ public class AcquirerService {
 
         } catch (Exception e) {
             //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+            // POZOVI FINISH PAYMENT
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
@@ -154,6 +160,7 @@ public class AcquirerService {
             logger.info("Enough available funds");
         } catch (LackingFundsException lfe) {
             //responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
+            // POZOVI FINISH PAYMENT
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
@@ -269,12 +276,14 @@ public class AcquirerService {
         Payment payment = paymentService.findById(dto.getPaymentId());
 
         if(payment == null) {
+            logger.error("Finish payment - Nonexistent payment");
             throw new Exception("Nonexistent payment");
         }
 
         Transaction transaction = payment.getTransaction();
 
         if(transaction == null) {
+            logger.error("Finish payment - Nonexistent transaction");
             throw new Exception("Nonexistent transaction");
         }
 
@@ -293,13 +302,13 @@ public class AcquirerService {
         ResponseEntity<String> response = null;
 
         try {
-            logger.info("Sending request to PSP service");
+            logger.info("Finish payment - Sending request to PSP service");
             response = restTemplate.exchange(
                     "https://localhost:8085/api/transactions/bank", HttpMethod.POST, request, String.class);
             System.out.println(response.getBody());
-            logger.info("Received response from PSP service");
+            logger.info("Finish payment - Received response from PSP service");
         } catch (RestClientException e) {
-            logger.error("RestTemplate error");
+            logger.error("Finish payment - RestTemplate error");
             e.printStackTrace();
         }
 

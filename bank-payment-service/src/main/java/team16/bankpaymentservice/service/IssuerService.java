@@ -54,7 +54,6 @@ public class IssuerService {
         // validirati dto u smislu postojanja svih polja
         try {
             validateDTO(dto);
-
             validateClientCardInfo(dto);
 
             Card card = cardService.findByPan(dto.getClientPan());
@@ -120,21 +119,27 @@ public class IssuerService {
                 !validationService.validateString(dto.getSecurityNumber()) ||
                 !validationService.validateString(dto.getCardHolderName()) ||
                 !validationService.validateString(dto.getExpirationDate())) {
+            logger.error("HandlePCCPaymentRequestInvalid  - Empty client card information");
             throw new InvalidDataException("Empty client card information");
         }
         if(!validationService.validateString(dto.getMerchantPan())) {
+            logger.error("HandlePCCPaymentRequestInvalid  - Empty merchant card information");
             throw new InvalidDataException("Empty merchant card information");
         }
         if(dto.getAcquirerOrderId() == null) {
+            logger.error("HandlePCCPaymentRequestInvalid  - Empty acquirer order id");
             throw new InvalidDataException("Empty acquirer order id");
         }
         if(dto.getAcquirerTimestamp() == null) {
+            logger.error("HandlePCCPaymentRequestInvalid  - Empty acquirer timestamp");
             throw new InvalidDataException("Empty acquirer timestamp");
         }
         if(dto.getPaymentRequestId() == null) {
+            logger.error("HandlePCCPaymentRequestInvalid  - Empty payment request id");
             throw new InvalidDataException("Empty payment request id");
         }
         if(transactionService.findByAcquirerOrderId(dto.getAcquirerOrderId()) == null) {
+            logger.error("HandlePCCPaymentRequestInvalid  - Payment request with existing acquirer order id doesn't exist");
             throw new InvalidDataException("Payment request with existing acquirer order id doesn't exist");
         }
     }

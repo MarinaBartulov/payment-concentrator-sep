@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import team16.paymentserviceprovider.dto.TransactionDTO;
 import team16.paymentserviceprovider.model.BankTransaction;
+import team16.paymentserviceprovider.model.Merchant;
+import team16.paymentserviceprovider.model.Order;
 import team16.paymentserviceprovider.service.TransactionService;
 
 @RestController
@@ -28,8 +30,16 @@ public class TransactionController {
         String response = "";
         try {
             BankTransaction transaction = transactionService.create(dto);
-            response = "Transaction created successfully with status: " + transaction.getStatus().toString();
+            response = "Transaction created successfully with status: " + transaction.getStatus();
             logger.info("Transaction successfully created on PSP service.");
+
+            Merchant merchant = transaction.getOrder().getMerchant();
+            if(transaction.getStatus().equals("NONEXISTENT") || transaction.getStatus().equals("FAILED")) {
+                response = merchant.getMerchantFailedUrl();
+            } else {
+                response = merchant.getMerchantSuccessUrl();
+            }
+
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             logger.error("Exception while creating transaction");

@@ -8,4 +8,5 @@ import team16.bankpaymentservice.model.Transaction;
 public interface TransactionRepository extends JpaRepository<Transaction, Long> {
 
     Transaction findTransactionByAcquirerOrderId(Long acquirerOrderId);
+    Transaction findTransactionByMerchantOrderId(Long merchnetOrderId);
 }
