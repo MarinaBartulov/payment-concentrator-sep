@@ -11,9 +11,11 @@ import team16.bankpaymentservice.dto.FormFieldType;
 import team16.bankpaymentservice.dto.PanDTO;
 import team16.bankpaymentservice.model.Bank;
 import team16.bankpaymentservice.model.Card;
+import team16.bankpaymentservice.model.CardOwner;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.repository.MerchantRepository;
 import team16.bankpaymentservice.service.BankService;
+import team16.bankpaymentservice.service.CardOwnerService;
 import team16.bankpaymentservice.service.CardService;
 import team16.bankpaymentservice.service.MerchantService;
 
@@ -33,6 +35,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Autowired
     private BankService bankService;
+
+    @Autowired
+    private CardOwnerService cardOwnerService;
 
     Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
@@ -77,6 +82,15 @@ public class MerchantServiceImpl implements MerchantService {
         if(bank == null) {
             logger.error("Cannot register merchant - Bank requested code doesn't exist.");
             throw new Exception("Bank with this code doesn't exist.");
+        }
+
+        List<CardOwner> cardOwners = this.cardOwnerService.findAll();
+        for (CardOwner co: cardOwners) {
+            if(co.getCard().getId() == card.getId()) {
+                // znaci da pokusava da tudju karticu predstavi kao svoju, ali mu ne smemo to reci kao info jer onda ima tudji pan
+                logger.error("Cannot register merchant - invalid PAN.");
+                throw new Exception("Cannot register merchant - invalid PAN.");
+            }
         }
 
         Merchant newMerchant = new Merchant();
