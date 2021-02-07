@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +27,7 @@ public class PaymentMethodController {
 
 
     @GetMapping(value="/formsData")
+    @PreAuthorize("hasAuthority('pm_data_read')")
     public ResponseEntity getFormsDataForAvailablePaymentMethodsForCurrentMerchant(){
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
 
@@ -39,6 +41,7 @@ public class PaymentMethodController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('pm_all_read')")
     public ResponseEntity getAllPaymentMethods(){
 
         logger.info("Getting all payment methods.");
