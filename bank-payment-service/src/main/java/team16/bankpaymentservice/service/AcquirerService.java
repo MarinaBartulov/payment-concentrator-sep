@@ -76,7 +76,7 @@ public class AcquirerService {
         try {
             validateClientInput(dto, merchantCard.getPAN());
         } catch (InvalidDataException ide) {
-            responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+            //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
             responseDTO.setResponseMessage(ide.getMessage());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
@@ -115,11 +115,11 @@ public class AcquirerService {
                 responseDTO.setTransactionStatus(response.getBody().getStatus().toString());
 
                 if(response.getBody().getStatus().toString().equals("COMPLETED")) {
-                    responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
+                    //responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
                 } else if(response.getBody().getStatus().toString().equals("FAILED")) {
-                    responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
+                    //responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
                 } else {
-                    responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                    //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
                 }
 
                 String PSPResponseMessage = finishPayment(response.getBody());
@@ -128,7 +128,7 @@ public class AcquirerService {
                 return responseDTO;
             } catch (RestClientException e) {
                 logger.error("RestTemplate error");
-                responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+                //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
                 responseDTO.setResponseMessage(e.getMessage());
                 transaction.setStatus(TransactionStatus.FAILED);
                 t1 = transactionService.update(transaction);
@@ -137,7 +137,7 @@ public class AcquirerService {
             }
 
         } catch (Exception e) {
-            responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
+            //responseDTO.setRedirectionURL(merchant.getMerchantErrorUrl());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
@@ -153,7 +153,7 @@ public class AcquirerService {
             checkClientFunds(clientCard, transaction);
             logger.info("Enough available funds");
         } catch (LackingFundsException lfe) {
-            responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
+            //responseDTO.setRedirectionURL(merchant.getMerchantFailedUrl());
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
@@ -173,7 +173,7 @@ public class AcquirerService {
         transaction.setClient(client);
         Transaction newT = transactionService.update(transaction);
 
-        responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
+        //responseDTO.setRedirectionURL(merchant.getMerchantSuccessUrl());
         responseDTO.setTransactionStatus(transaction.getStatus().toString());
 
         String PSPResponseMessage = finishPaymentOneBank(newT, payment.getPaymentId());

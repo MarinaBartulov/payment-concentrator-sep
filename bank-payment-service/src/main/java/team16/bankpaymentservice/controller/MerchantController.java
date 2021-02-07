@@ -3,13 +3,14 @@ package team16.bankpaymentservice.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import team16.bankpaymentservice.dto.ClientAuthDTO;
-import team16.bankpaymentservice.dto.MerchantCardInfoDTO;
-import team16.bankpaymentservice.dto.TransactionResponseDTO;
-import team16.bankpaymentservice.model.Card;
+import team16.bankpaymentservice.dto.MerchantDTO;
+import team16.bankpaymentservice.dto.TransactionDTO;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.service.MerchantService;
+
+import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(value="/api/merchant")
@@ -19,7 +20,6 @@ public class MerchantController {
     private MerchantService merchantService;
     @Autowired
     private RestTemplate restTemplate;
-
 
     @GetMapping(value = "/formFields")
     public ResponseEntity getFormFields(){
@@ -48,24 +48,31 @@ public class MerchantController {
             return ResponseEntity.badRequest().body("This merchant has already chosen bank payment method.");
         }
 
-        Merchant newMerchant = this.merchantService.addNewMerchant(merchantData, email);
+        Merchant saved = null;
+        try {
+            saved = merchantService.addNewMerchant(merchantData, email);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
 
-        if(newMerchant == null){
-            return ResponseEntity.badRequest().body("Invalid merchant data.");
+        // vratiti informacije o merchant id i merchant password koji su se sad generisali na psp
+        System.out.println("New merchant: " + saved.getId());
+        // zahtev se salje na PSP
+        MerchantDTO merchantDTO = new MerchantDTO(saved.getMerchantEmail(), saved.getMerchantId(), saved.getPassword());
+        HttpEntity<MerchantDTO> request = new HttpEntity<>(merchantDTO, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange("https://localhost:8083/psp-service/api/merchant/save-info-from-bank", HttpMethod.PUT, request, String.class);
+            System.out.println(response.getBody());
+            if(!response.getBody().equals("Merchant successfully updated")) {
+                return ResponseEntity.badRequest().body("Error occurred while saving merchant on Payment Concentrator.");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().body("Error occurred while saving merchant on Payment Concentrator.");
         }
 
         return ResponseEntity.ok().build();
 
-    }
-
-
-    @PostMapping(value = "/card-auth/{merchantId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> authenticateClient(@PathVariable Long merchantId, @RequestBody MerchantCardInfoDTO dto) {
-        try {
-            Card card = merchantService.merchantCardAuth(dto, merchantId);
-            return new ResponseEntity<>(card, HttpStatus.OK);
-        } catch(Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
     }
 }
