@@ -95,7 +95,7 @@ public class MerchantController {
         }
     }
 
-    @PutMapping(value = "/save-info-from-bank")
+    @PostMapping(value = "/save-info-from-bank")
     public ResponseEntity<?> saveMerchantInfoFromBank(@RequestBody MerchantBankDTO dto) {
         try {
             Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();

@@ -62,11 +62,11 @@ public class MerchantController {
         HttpEntity<MerchantDTO> request = new HttpEntity<>(merchantDTO, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange("https://localhost:8083/psp-service/api/merchant/save-info-from-bank", HttpMethod.PUT, request, String.class);
-            System.out.println(response.getBody());
-            if(!response.getBody().equals("Merchant successfully updated")) {
+            ResponseEntity<MerchantDTO> response = restTemplate.exchange("https://localhost:8083/psp-service/api/merchant/save-info-from-bank", HttpMethod.POST, request, MerchantDTO.class);
+            if(response.getBody() == null) {
                 return ResponseEntity.badRequest().body("Error occurred while saving merchant on Payment Concentrator.");
             }
+            System.out.println("Response: " + response.getBody().getMerchantId() + " | " + response.getBody().getMerchantPassword());
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error occurred while saving merchant on Payment Concentrator.");
