@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import team16.paymentserviceprovider.dto.MerchantBankDTO;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
 import team16.paymentserviceprovider.model.App;
 import team16.paymentserviceprovider.model.Merchant;
@@ -78,6 +79,17 @@ public class MerchantController {
             return ResponseEntity.ok().build();
         }else{
             return ResponseEntity.badRequest().body(errorMsg);
+        }
+    }
+
+    @PutMapping(value = "/save-info-from-bank")
+    public ResponseEntity<?> saveMerchantInfoFromBank(@RequestBody MerchantBankDTO dto) {
+        try {
+            Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Auth sa Banke: " + currentUser.getName());
+            return new ResponseEntity(merchantService.updateMerchant(currentUser.getName(), dto), HttpStatus.OK);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e);
         }
     }
 }

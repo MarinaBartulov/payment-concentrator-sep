@@ -30,15 +30,4 @@ public class Merchant extends CardOwner {
     //@Size(min = 10, max = 100)
     private String password;
 
-    private String name;
-
-    @Column(name = "success_url")
-    private String merchantSuccessUrl;
-
-    @Column(name = "failed_url")
-    private String merchantFailedUrl;
-
-    @Column(name = "error_url")
-    private String merchantErrorUrl;
-
 }

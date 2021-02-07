@@ -15,8 +15,8 @@ values ('1701111111111111', '111', '2025-02', 0, 0); -- 4
 insert into card (pan, security_code, expiration_date, available_funds, reserved_funds)
 values ('1701111222221111', '111', '2023-12', 0, 0); -- 4
 
-insert into card_owner (type, name, merchant_id, merchant_email, password, success_url, failed_url, error_url, bank_id, card_id)
-values ('Merchant', 'Laguna', 'jlSuwpyB4v62M7KBc4dXiXuwSg53AsnKtWV/zP9E0cA=|zj3rWlhdDkkqWcfAf9hMfw==', 'sb-nsr1z4072854@business.example.com', '4bgphCgirDKF3SYl4LvFRQ==|YA7u//HlmBJoA2EevRphGw==', 'https://localhost:3000/success', 'https://localhost:3000/failed', 'https://localhost:3000/error', 1, 2);
+insert into card_owner (type, merchant_id, merchant_email, password, bank_id, card_id)
+values ('Merchant', 'jlSuwpyB4v62M7KBc4dXiXuwSg53AsnKtWV/zP9E0cA=|zj3rWlhdDkkqWcfAf9hMfw==', 'sb-nsr1z4072854@business.example.com', '4bgphCgirDKF3SYl4LvFRQ==|YA7u//HlmBJoA2EevRphGw==', 1, 2);
 -- 111111111111111111111111111111
 -- Merchant123!
 -- insert into card_owner (type, name, merchant_id, merchant_email, password, success_url, failed_url, error_url, bank_id, card_id)

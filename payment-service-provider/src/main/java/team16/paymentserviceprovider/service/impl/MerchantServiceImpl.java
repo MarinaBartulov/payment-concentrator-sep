@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import team16.paymentserviceprovider.dto.MerchantActivationDTO;
+import team16.paymentserviceprovider.dto.MerchantBankDTO;
 import team16.paymentserviceprovider.dto.MerchantInfoDTO;
 import team16.paymentserviceprovider.dto.MerchantPCDTO;
 import team16.paymentserviceprovider.model.App;
@@ -170,5 +171,20 @@ public class MerchantServiceImpl implements MerchantService {
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
         return password;
+    }
+
+    @Override
+    public String updateMerchant(String email, MerchantBankDTO dto) throws Exception {
+
+        Merchant merchant = findByMerchantEmail(email);
+        if(merchant == null) {
+            throw new Exception("Merchant with given email doesn't exist.");
+        }
+
+        merchant.setMerchantId(dto.getMerchantId());
+        merchant.setMerchantPassword(dto.getMerchantPassword());
+        Merchant saved = this.merchantRepository.save(merchant);
+
+        return "Merchant successfully updated";
     }
 }

@@ -1,30 +1,27 @@
 package team16.bankpaymentservice.service;
 
 import com.google.gson.Gson;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import team16.bankpaymentservice.dto.ClientAuthDTO;
 import team16.bankpaymentservice.dto.FormFieldDTO;
 import team16.bankpaymentservice.dto.FormFieldType;
-import team16.bankpaymentservice.dto.MerchantCardInfoDTO;
-import team16.bankpaymentservice.exceptions.InvalidDataException;
+import team16.bankpaymentservice.dto.PanDTO;
 import team16.bankpaymentservice.model.Bank;
 import team16.bankpaymentservice.model.Card;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.repository.MerchantRepository;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MerchantServiceImpl implements MerchantService {
 
     @Autowired
     private MerchantRepository merchantRepository;
-
-    @Autowired
-    private EmailService emailService;
 
     @Autowired
     private CardService cardService;
@@ -51,59 +48,66 @@ public class MerchantServiceImpl implements MerchantService {
 
         List<FormFieldDTO> formFields = new ArrayList<>();
         formFields.add(new FormFieldDTO("pan", "PAN", FormFieldType.text, true));
-//        formFields.add(new FormFieldDTO("merchantId", "Merchant Id", FormFieldType.text, true));
-//        formFields.add(new FormFieldDTO("password", "Merchant Password", FormFieldType.password, true));
         return formFields;
     }
 
     @Override
-    public Merchant addNewMerchant(String merchantData, String email) {
+    public Merchant addNewMerchant(String merchantData, String email) throws Exception {
+
+        // kao merchant data stize pan
         Gson gson = new Gson();
+        PanDTO pan = null;
         try {
-            Merchant merchant = gson.fromJson(merchantData, Merchant.class);
-            merchant.setMerchantEmail(email);
-            Merchant newMerchant = this.merchantRepository.save(merchant);
-
-            // sending email to this merchant - to get card information
-            String gettingCardInfoUrl = "https://localhost:3002/card-info/" + newMerchant.getId();
-            String text = "Dear Sir or Madam,  " + ",\n\nPlease, fill in your bank card information by visiting this link: " + gettingCardInfoUrl
-                    + "\n\nBest regards,\nYour Bank";
-
-            String subject = "Bank - card authentication";
-            emailService.sendEmail(merchant.getMerchantEmail(), subject, text);
-
-            return newMerchant;
-        }catch(Exception e){
-            return null;
+            pan = gson.fromJson(merchantData, PanDTO.class);
+        } catch(Exception e){
+            throw new Exception("Invalid PAN.");
         }
+
+        Card card = cardService.findByPan(pan.getPan());
+        if(card == null) {
+            throw new Exception("Card with this PAN doesn't exist.");
+        }
+
+        Bank bank = bankService.findByBankCode(card.getPAN().substring(0, 3));
+        if(bank == null) {
+            throw new Exception("Bank with this code doesn't exist.");
+        }
+
+        Merchant newMerchant = new Merchant();
+        newMerchant.setMerchantEmail(email);
+        newMerchant.setCard(card);
+        newMerchant.setBank(bank);
+        newMerchant.setMerchantId(generateCommonLangPassword(6)); // 30 karaktera
+        newMerchant.setPassword(generateCommonLangPassword(2)); // 10 karaktera
+
+        Merchant saved = null;
+        try {
+            saved = save(newMerchant);
+        } catch (Exception e) {
+            throw new Exception("Saving merchant failed.");
+        }
+
+        return saved;
     }
 
-    public Card merchantCardAuth(MerchantCardInfoDTO dto, Long merchantId) throws Exception {
-        try {
-            validateMerchantCardInput(dto);
-
-            Card card = cardService.findByPan(dto.getPan());
-
-            Merchant merchant = findById(merchantId);
-            if(merchant == null) {
-                throw new Exception("Nonexistent merchant");
-            }
-
-            merchant.setCard(card);
-
-            Bank bank = bankService.findByBankCode(card.getPAN().substring(0, 3));
-            if(bank == null) {
-                throw new Exception("Nonexistent bank");
-            }
-
-            merchant.setBank(bank);
-
-            merchantRepository.save(merchant);
-
-            return card;
-        } catch (Exception e) {
-            throw e;
-        }
+    private String generateCommonLangPassword(int count) {
+        String upperCaseLetters = RandomStringUtils.random(count, 65, 90, true, true);
+        String lowerCaseLetters = RandomStringUtils.random(count, 97, 122, true, true);
+        String numbers = RandomStringUtils.randomNumeric(count);
+        String specialChar = RandomStringUtils.random(count, 33, 47, false, false);
+        String totalChars = RandomStringUtils.randomAlphanumeric(count);
+        String combinedChars = upperCaseLetters.concat(lowerCaseLetters)
+                .concat(numbers)
+                .concat(specialChar)
+                .concat(totalChars);
+        List<Character> pwdChars = combinedChars.chars()
+                .mapToObj(c -> (char) c)
+                .collect(Collectors.toList());
+        Collections.shuffle(pwdChars);
+        String password = pwdChars.stream()
+                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
+                .toString();
+        return password;
     }
 
     @Override
@@ -111,17 +115,4 @@ public class MerchantServiceImpl implements MerchantService {
         return merchantRepository.save(merchant);
     }
 
-    private void validateMerchantCardInput(MerchantCardInfoDTO dto) throws Exception {
-        if (!validationService.validateString(dto.getPan()) ||
-                !validationService.validateString(dto.getSecurityNumber())) {
-            throw new InvalidDataException("Merchant Card information empty");
-        }
-        Card card = cardService.findByPan(dto.getPan());
-        if (!card.getSecurityCode().equals(dto.getSecurityNumber())) {
-            throw new InvalidDataException("Invalid security number");
-        }
-        if (!validationService.convertToYearMonthFormat(dto.getExpirationDate()).equals(card.getExpirationDate())) {
-            throw new InvalidDataException("False expiration date");
-        }
-    }
 }
