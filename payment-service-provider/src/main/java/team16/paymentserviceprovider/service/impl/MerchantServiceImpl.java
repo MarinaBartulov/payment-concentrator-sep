@@ -175,8 +175,9 @@ public class MerchantServiceImpl implements MerchantService {
 
     @Override
     public String updateMerchant(String email, MerchantBankDTO dto) throws Exception {
-
         Merchant merchant = findByMerchantEmail(email);
+        System.out.println("Info form Bank - merchant id: " + dto.getMerchantId());
+        System.out.println("Info form Bank - merchant pass: " + dto.getMerchantPassword());
         if(merchant == null) {
             throw new Exception("Merchant with given email doesn't exist.");
         }
@@ -184,6 +185,8 @@ public class MerchantServiceImpl implements MerchantService {
         merchant.setMerchantId(dto.getMerchantId());
         merchant.setMerchantPassword(dto.getMerchantPassword());
         Merchant saved = this.merchantRepository.save(merchant);
+        System.out.println("Saved merchant id:" + saved.getMerchantId());
+        System.out.println("Saved merchant password:" + saved.getMerchantPassword());
 
         return "Merchant successfully updated";
     }
