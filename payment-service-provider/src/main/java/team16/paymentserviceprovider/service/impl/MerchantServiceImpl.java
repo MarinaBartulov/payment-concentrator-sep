@@ -16,13 +16,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import team16.paymentserviceprovider.dto.MerchantActivationDTO;
-import team16.paymentserviceprovider.dto.MerchantBankDTO;
-import team16.paymentserviceprovider.dto.MerchantInfoDTO;
-import team16.paymentserviceprovider.dto.MerchantPCDTO;
-import team16.paymentserviceprovider.model.*;
+import team16.paymentserviceprovider.dto.*;
+import team16.paymentserviceprovider.model.App;
+import team16.paymentserviceprovider.model.Merchant;
+import team16.paymentserviceprovider.model.PaymentMethod;
+import team16.paymentserviceprovider.model.Role;
 import team16.paymentserviceprovider.repository.MerchantRepository;
-import team16.paymentserviceprovider.service.*;
+import team16.paymentserviceprovider.service.AppService;
+import team16.paymentserviceprovider.service.MerchantService;
+import team16.paymentserviceprovider.service.PaymentMethodService;
+import team16.paymentserviceprovider.service.RoleService;
 
 import javax.mail.MessagingException;
 import java.util.Collections;
@@ -47,8 +50,6 @@ public class MerchantServiceImpl implements MerchantService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private RestTemplate restTemplate;
-    @Autowired
-    private UserService userService;
 
     Logger logger = LoggerFactory.getLogger(MerchantServiceImpl.class);
 
@@ -198,5 +199,13 @@ public class MerchantServiceImpl implements MerchantService {
         MerchantBankDTO newDTO = new MerchantBankDTO(saved.getEmail(), saved.getMerchantId(), saved.getMerchantPassword());
 
         return newDTO;
+    }
+
+    @Override
+    public MerchantURLsDTO getMerchantURLs(String email) {
+        Merchant merchant = findByMerchantEmail(email);
+        MerchantURLsDTO merchantURLsDTO = new MerchantURLsDTO(merchant.getMerchantSuccessUrl(),
+                merchant.getMerchantErrorUrl(), merchant.getMerchantFailedUrl());
+        return merchantURLsDTO;
     }
 }

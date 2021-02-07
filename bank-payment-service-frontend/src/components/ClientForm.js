@@ -6,10 +6,29 @@ import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 import { useParams } from "react-router-dom";
 import {Button} from "react-bootstrap";
+import { toast } from "react-toastify";
 
 const ClientForm = () => {
 
     const { paymentId } = useParams();
+
+    const handleSubmit = async (payload, paymentId) => {
+        try {
+            const response = await authService.authenticate(payload, paymentId);
+            toast.success("Your payment ended successfully.", {
+                hideProgressBar: true,
+              });
+            window.location.replace(response.redirectionURL);
+        } catch (error) {
+            if (error.response) {
+                console.log("Error: " + JSON.stringify(error.response));
+            }
+            toast.error(error.response ? error.response.data.responseMessage : error.message, {
+                hideProgressBar: true,
+            });
+            window.location.replace(error.response.data.redirectionURL);
+        }
+    };
 
     const formik = useFormik({
         initialValues: {
@@ -33,10 +52,7 @@ const ClientForm = () => {
                 month: "numeric"
               }).format(startDate);
             let payload = {...values, expirationDate};
-            const promise = authService.authenticate(payload, paymentId);
-                promise.then((res) => {
-                    console.log(res);
-            });
+            handleSubmit(payload, paymentId);
         },
       });
 

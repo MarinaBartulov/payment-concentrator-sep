@@ -24,6 +24,7 @@ public class AcquirerController {
     @PostMapping(value = "/initialize-payment/{paymentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticateClient(@PathVariable Long paymentId, @RequestBody ClientAuthDTO dto) {
         TransactionResponseDTO response = new TransactionResponseDTO();
+
         try {
             response = acquirerService.initialPayment(dto, paymentId);
 
@@ -37,7 +38,7 @@ public class AcquirerController {
         } catch(Exception e) {
             response.setResponseMessage(e.getMessage());
             logger.error("ERROR | while completing transaction: " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
         }
     }
 
