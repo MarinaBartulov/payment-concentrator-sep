@@ -19,7 +19,4 @@ public class PaymentRequestDTO {
     private double amount;
     private Long merchantOrderId;
     private LocalDateTime merchantTimestamp;
-    private String successUrl;
-    private String failedUrl;
-    private String errorUrl;
 }

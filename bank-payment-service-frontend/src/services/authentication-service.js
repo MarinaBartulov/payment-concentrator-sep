@@ -4,13 +4,8 @@ import { ROUTES } from "../constants";
 
 class AuthenticationService extends HttpService {
   authenticate = async (payload, paymentId) => {
-    try {
-      const response = await this.client.post(ROUTES.AUTH + "/" + paymentId, payload);
-      window.location.replace(response.data.redirectionURL);
-      return response;
-    } catch (e) {
-      console.log("ovde");
-    }
+     const response = await this.client.post(ROUTES.AUTH + "/" + paymentId, payload);
+    return response.data;
   };
 
   authenticateMerchant = async (payload, metchantId) => {

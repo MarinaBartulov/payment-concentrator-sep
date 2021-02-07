@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import team16.bankpaymentservice.converter.SensitiveDataConverter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
@@ -21,12 +22,12 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // treba enkriptovati - ne sme ceo da se cuva u bazi
-    @Column(nullable = false, unique = true, length = 16)
+    @Convert(converter = SensitiveDataConverter.class)
+    @Column(nullable = false, unique = true) // , length = 16
     private String PAN;  // broj racuna u Srbiji ima 16 brojeva
 
-    // treba enkriptovati
-    @Column(nullable = false, length = 3)
+    @Convert(converter = SensitiveDataConverter.class)
+    @Column(nullable = false) //, length = 3
     private String securityCode;  // Card Verification Value
 
     @Column(nullable = false)
@@ -34,7 +35,5 @@ public class Card {
 
     @Column(nullable = false)
     private double availableFunds;
-
-    private double reservedFunds;
 
 }

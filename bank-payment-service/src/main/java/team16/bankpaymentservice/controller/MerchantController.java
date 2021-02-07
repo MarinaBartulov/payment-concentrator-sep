@@ -1,16 +1,14 @@
 package team16.bankpaymentservice.controller;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import team16.bankpaymentservice.dto.MerchantDTO;
-import team16.bankpaymentservice.dto.TransactionDTO;
 import team16.bankpaymentservice.model.Merchant;
 import team16.bankpaymentservice.service.MerchantService;
-
-import java.net.URISyntaxException;
 
 @RestController
 @RequestMapping(value="/api/merchant")
@@ -18,8 +16,11 @@ public class MerchantController {
 
     @Autowired
     private MerchantService merchantService;
+
     @Autowired
     private RestTemplate restTemplate;
+
+    Logger logger = LoggerFactory.getLogger(MerchantController.class);
 
     @GetMapping(value = "/formFields")
     public ResponseEntity getFormFields(){
@@ -40,11 +41,13 @@ public class MerchantController {
             email = response.getBody();
         }catch(Exception e){
             e.printStackTrace();
+            logger.error("Error occurred while authenticating merchant.");
             return ResponseEntity.badRequest().body("Error occurred while authenticating merchant.");
         }
 
         Merchant merchant = this.merchantService.findByEmail(email);
         if(merchant != null){
+            logger.error("This merchant has already chosen bank payment method.");
             return ResponseEntity.badRequest().body("This merchant has already chosen bank payment method.");
         }
 
@@ -52,6 +55,7 @@ public class MerchantController {
         try {
             saved = merchantService.addNewMerchant(merchantData, email);
         } catch (Exception e) {
+            logger.error(e.getMessage());
             return ResponseEntity.badRequest().body(e.getMessage());
         }
 
@@ -62,13 +66,16 @@ public class MerchantController {
         HttpEntity<MerchantDTO> request = new HttpEntity<>(merchantDTO, headers);
 
         try {
-            ResponseEntity<String> response = restTemplate.exchange("https://localhost:8083/psp-service/api/merchant/save-info-from-bank", HttpMethod.PUT, request, String.class);
-            System.out.println(response.getBody());
-            if(!response.getBody().equals("Merchant successfully updated")) {
+            ResponseEntity<MerchantDTO> response = restTemplate.exchange("https://localhost:8083/psp-service/api/merchant/save-info-from-bank", HttpMethod.POST, request, MerchantDTO.class);
+            if(response.getBody() == null) {
+                logger.error("Error occurred while saving merchant on Payment Concentrator.");
                 return ResponseEntity.badRequest().body("Error occurred while saving merchant on Payment Concentrator.");
             }
+            System.out.println("Response: " + response.getBody().getMerchantId() + " | " + response.getBody().getMerchantPassword());
+            logger.info("Merchant info successfully updated on PSP.");
         } catch (Exception e) {
             e.printStackTrace();
+            logger.error("Error occurred while saving merchant on Payment Concentrator.");
             return ResponseEntity.badRequest().body("Error occurred while saving merchant on Payment Concentrator.");
         }
 
