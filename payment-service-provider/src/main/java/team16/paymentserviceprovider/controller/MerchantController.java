@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -61,6 +62,7 @@ public class MerchantController {
     }
 
     @GetMapping(value="/info")
+    @PreAuthorize("hasAuthority('merchant_info')")
     public ResponseEntity<?> getMyInfo(){
 
         Authentication currentUser = SecurityContextHolder.getContext().getAuthentication();
@@ -77,6 +79,7 @@ public class MerchantController {
     }
 
     @PostMapping(value="/paymentMethod/{paymentMethodName}")
+    @PreAuthorize("hasAuthority('payment_method_add')")
     public ResponseEntity<?> addPaymentMethodForCurrentMerchant(@RequestHeader("Authorization") String authToken, @PathVariable("paymentMethodName") String paymentMethodName,
                                                                 @RequestBody Map<String, Object> formValues){
 
