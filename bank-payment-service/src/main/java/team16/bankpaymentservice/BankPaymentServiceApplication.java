@@ -13,9 +13,11 @@ import javax.crypto.spec.IvParameterSpec;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
+@EnableScheduling
 public class BankPaymentServiceApplication {
 
     public static void main(String[] args) throws IOException {

@@ -13,4 +13,6 @@ public interface TransactionService {
     Transaction update(Transaction transaction);
 
     Transaction findByMerchantOrderId(Long id);
+
+    void updateUnfinishedTransactionsFromBankSite();
 }
