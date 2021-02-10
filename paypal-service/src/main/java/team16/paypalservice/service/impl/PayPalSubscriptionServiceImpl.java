@@ -49,7 +49,7 @@ public class PayPalSubscriptionServiceImpl implements PayPalSubscriptionService 
 
         for(PayPalSubscription subscription : subscriptionList)
         {
-            if(subscription.getCreatedAt().plusMinutes(10).isBefore(LocalDateTime.now())) {
+            if(subscription.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
                 logger.info("Subscription ID | " + subscription.getId() + " - status changed | EXPIRED");
                 subscription.setStatus(SubscriptionStatus.EXPIRED);
                 save(subscription);

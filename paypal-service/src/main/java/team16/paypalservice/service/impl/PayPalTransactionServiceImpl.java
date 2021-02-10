@@ -53,14 +53,14 @@ public class PayPalTransactionServiceImpl implements PayPalTransactionService {
     }
 
     @Override
-    @Scheduled(cron = "0 0/15 * * * *")
+    @Scheduled(cron = "0 0/5 * * * *")
     public void findUnfinishedTransactions() {
         logger.info("INITIATED FINDING UNFINISHED TRANSACTIONS");
         List<PayPalTransaction> transactionList = this.findAllUnfinished();
 
         for(PayPalTransaction transaction : transactionList)
         {
-            if(transaction.getCreatedAt().plusMinutes(15).isBefore(LocalDateTime.now()))
+            if(transaction.getCreatedAt().plusMinutes(5).isBefore(LocalDateTime.now()))
             {
                 logger.info("Transaction ID | " + transaction.getId()  +  " - status changed | EXPIRED");
                 transaction.setStatus(PayPalTransactionStatus.EXPIRED);

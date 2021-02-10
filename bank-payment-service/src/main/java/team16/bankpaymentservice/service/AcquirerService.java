@@ -84,6 +84,7 @@ public class AcquirerService {
             transaction.setStatus(TransactionStatus.FAILED);
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
+            finishPaymentOneBank(t1, payment.getPaymentId());
             return responseDTO;
         } catch(InappropriateBankException ibe) {
 
@@ -134,6 +135,7 @@ public class AcquirerService {
                 transaction.setStatus(TransactionStatus.FAILED);
                 t1 = transactionService.update(transaction);
                 responseDTO.setTransactionStatus(t1.getStatus().toString());
+                finishPaymentOneBank(t1, payment.getPaymentId());
                 return responseDTO;
             }
 
@@ -143,6 +145,7 @@ public class AcquirerService {
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
             responseDTO.setResponseMessage(e.getMessage());
+            finishPaymentOneBank(t1, payment.getPaymentId());
             return responseDTO;
         }
 
@@ -159,6 +162,7 @@ public class AcquirerService {
             Transaction t1 = transactionService.update(transaction);
             responseDTO.setTransactionStatus(t1.getStatus().toString());
             responseDTO.setResponseMessage(lfe.getMessage());
+            finishPaymentOneBank(t1, payment.getPaymentId());
             return responseDTO;
         }
 
